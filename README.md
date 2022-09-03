@@ -98,13 +98,20 @@ Where status is one of :
  - success -> package was built successfully
  - error   -> problem occurred.
 
-  OBviously, <package-version> is what is sounds like.
+  Obviously, <package-version> is what is sounds like.
 
 It is possible for mkpkg itself to fail for some reason, in which case the *mkp-status:* line would be absent.
 This is also simple to detect.
   
 
-# 6. makedepends_add
+# 6. Variables mkpkg_depnds and makedepends_add
+
+If the list of makedepends does not meet user needs, then the variable 
+
+ - *mkpkg_depends*
+
+may be used - if present its list of dependencies are used in place of the standard *makedepends* 
+variable. This offers complete control over what actually triggers rebuilds.
 
 While depends are also treated by makepkg as build dependencies, mkpkg does not.  Why?
 For starters, frequently these are really run time only dependencies and 

@@ -138,6 +138,7 @@ def get_pkgbld_data(mkpkg):
     cmd_str += 'echo "_X_ pkgver = $pkgver"\n'
     cmd_str += 'echo "_X_ makedepends = ${makedepends[@]}"\n'
     cmd_str += 'echo "_X_ makedepends_add = ${makedepends_add[@]}"\n'
+    cmd_str += 'echo "_X_ mkpkg_depends = ${mkpkg_depends[@]}"\n'
 
     # call the pkgver() to get updated version
     #if vers_update:
@@ -212,11 +213,22 @@ def get_pkgbld_data(mkpkg):
         elif line.startswith('_X_ makedepends ='):
             mkpkg.makedepends = data_l          # always a list
 
+        elif line.startswith('_X_ mkpkg_depends ='):
+            mkpkg.mkpkg_depends = data_l          # always a list
+
         elif line.startswith('_X_ makedepends_add ='):
             mkpkg.makedepends_add = data_l          # always a list
-            if not mkpkg.makedepends:
-                mkpkg.makedepends = mkpkg.makedepends_add
-            elif mkpkg.makedepends_add:
-                mkpkg.makedepends += mkpkg.makedepends_add
+
+
+        #
+        # If mkpkg_depends set it overrides makedepends.
+        #
+        if mkpkg.mkpkg_depends:
+            mkpkg.makedepends = mkpkg.mkpkg_depends
+
+        if not mkpkg.makedepends:
+            mkpkg.makedepends = mkpkg.makedepends_add
+        elif mkpkg.makedepends_add:
+            mkpkg.makedepends += mkpkg.makedepends_add
 
     return okay
