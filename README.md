@@ -13,9 +13,13 @@ running *makephg* will do nothing as it deems the package up to date.
 
 The mkpkg tool provides a mechanism to rebuild a package whenever any one of of the makedepends packages is 
 newer than the last time the package was built, even if the tool itself is otherwise up to date.
+If you don't want every package in makepends to be used a build trigger, then simply
+use *mkpkg_depends* instead. If this variable is used, the packages listed in *makedepends* will not be used.
 
 This is perhaps most useful for packages which statically link libraries, or when core build tools
-change and it's important to rebuild with the newer versions.
+change and it's important to rebuild with the newer versions. 
+
+Majority of packages are built against shared libraries which are usually less of a problem of course.
 
 ## Contents
 
@@ -104,7 +108,7 @@ It is possible for mkpkg itself to fail for some reason, in which case the *mkp-
 This is also simple to detect.
   
 
-# 4. Variables mkpkg_depnds and makedepends_add
+# 4. Variables mkpkg_depends and makedepends_add
 
 If the list of makedepends does not meet user needs, then the variable 
 
