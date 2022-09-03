@@ -22,7 +22,7 @@ change and it's important to rebuild with the newer versions.
     1. Introduction
     2. Source code 
     3. How to use mkpkg
-    4. *makedepends_add*
+    4. *mkpg_depends* and *makedepends_add*
     5. Discussion
     6. Arch AUR package - TBD
 
@@ -104,7 +104,7 @@ It is possible for mkpkg itself to fail for some reason, in which case the *mkp-
 This is also simple to detect.
   
 
-# 6. Variables mkpkg_depnds and makedepends_add
+# 4. Variables mkpkg_depnds and makedepends_add
 
 If the list of makedepends does not meet user needs, then the variable 
 
@@ -133,7 +133,7 @@ time the other for build time, makepkg treats depends as makedepends - we do not
 as explained above. From mkpkg perspective we consider depends to be runtime, and 
 build time are given by makedepnds and makedepends_add.
 
-# 6. Discussion
+# 5. Discussion
 
 While mkpkg works for all the packages I build, I consider this *beta* until it's had
 sufficient time to get beaten up some more :)
@@ -150,7 +150,7 @@ be ignored as far as makepdends checks go.
 One simple way to achieve that would be to add a new variable to the PKGBUILD with the list of those
 packages which should be ignord for driving a rebuild. 
 
-# 7. Arch AUR Package - TBD
+# 6. Arch AUR Package - TBD
 
  - On the todo list - volunteers appreciated :)
 
