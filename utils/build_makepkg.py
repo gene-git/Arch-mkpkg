@@ -71,8 +71,6 @@ def build_w_makepkg(mkpkg):
     #
     # save and check version we got with what makepkg said
     #
-    #if vers_mp:
-    #    vers_mp = vers_mp.strip()
     mkpkg.pkgver_makepkg  = vers_mp
     pkg_vers = pkg_version(mkpkg)
 

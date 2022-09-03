@@ -109,7 +109,3 @@ def build(mkpkg):
             mkpkg.result.append(['sucess', 'build', 'makepkg succeeded'])
         else:
             mkpkg.result.append(['error', 'build', 'makepkg failed'])
-
-    #
-    # If build happened check new versions match
-    #
