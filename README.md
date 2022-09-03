@@ -1,5 +1,5 @@
 
-# OVERVIEW of MkPkg
+# OVERVIEW of mkpkg
 
 Building an Arch package requires invoking *makepkg* with *PKGBUILD* file.
 PKGBUILD file uses a *depends* variable to descibe a list of packages needed to use the tool the package 
@@ -11,7 +11,7 @@ needed to build the package. Contrast this to *depends* which are needed to use 
 Ordinarily, if the tool hasn't changed but something in the *makedepends* list has changed,
 running *makephg* will do nothing as it deems the package up to date.
 
-The MkPkg tool provides a mechanism to rebuild a package whenever any one of of the makedepends packages is 
+The mkpkg tool provides a mechanism to rebuild a package whenever any one of of the makedepends packages is 
 newer than the last time the package was built, even if the tool itself is otherwise up to date.
 
 This is perhaps most useful for packages which statically link libraries, or when core build tools
@@ -28,12 +28,12 @@ change and it's important to rebuild with the newer versions.
 
 ### See:
 
- - [Arch Wiki page ](https://wiki.archlinux.org/title/Mkpkg) - TBD 
- - [Github source ](https://github.com/gene-git/Arch-MkPkg)
+ - [Github source ](https://github.com/gene-git/Arch-mkpkg)
+ - [Arch Wiki page ](https://wiki.archlinux.org/title/mkpkg) - TBD 
 
 # 1. Introduction 
 
-MkPkg has one dependency,  python. 
+mkpkg has one dependency,  python. 
 
 It does use makepkg to perform package builds in the usual way. That said,  makepkg is 
 a part of pacman which is always installed and thus not a 'dependency' in the PKGBUILD meaning.
@@ -51,14 +51,14 @@ the newer tool or library.
 Another example. The *refind* boot manager statically links against gnu-efi. So when gnu-efi is updated, refind
 should probably be rebuilt as well.
 
-MkPkg was created to address this need.
+mkpkg was created to address this need.
 
-# 2. Source for MkPkg
+# 2. Source for mkpkg
 
-The source is kept in the github repository Arch-MkPkg, link above.
+The source is kept in the github repository Arch-mkpkg, link above.
 
 
-# 3. How to use MkPkg
+# 3. How to use mkpkg
 
 Simply call mkpkg instead of makepkg. Couldn't be simpler. 
 Arguments for mkpkg are all passed through to *makepkg* execpt for those of the form:
