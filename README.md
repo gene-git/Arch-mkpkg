@@ -18,8 +18,8 @@ use *mkpkg_depends* instead. If this variable is used, the packages listed in *m
 
 This is perhaps most useful for packages which statically link libraries, or when core build tools
 change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
-when tool chain changes? Sometimes yes; as an example whenever there toolchain is updated, 
-I always rebuild my kernel packages and test.  
+when tool chain changes? Sometimes yes; as an example whenever the toolchain is updated, 
+I always rebuild my kernel packages and test. 
 
 Majority of packages are built against shared libraries which are usually less of a problem of course.
 
