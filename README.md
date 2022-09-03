@@ -17,7 +17,9 @@ If you don't want every package in makepends to be used a build trigger, then si
 use *mkpkg_depends* instead. If this variable is used, the packages listed in *makedepends* will not be used.
 
 This is perhaps most useful for packages which statically link libraries, or when core build tools
-change and it's important to rebuild with the newer versions. 
+change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
+when tool chain changes? Sometimes yes; as an example whenever there toolchain is updated, 
+I always rebuild my kernel packages and test.  
 
 Majority of packages are built against shared libraries which are usually less of a problem of course.
 
@@ -26,7 +28,7 @@ Majority of packages are built against shared libraries which are usually less o
     1. Introduction
     2. Source code 
     3. How to use mkpkg
-    4. *mkpg_depends* and *makedepends_add*
+    4. mkpg_depends and makedepends_add
     5. Discussion
     6. Arch AUR package - TBD
 
@@ -135,7 +137,7 @@ the PKGBUILD guidelines should they be in the depends list.
 While some may prefer that depends and makedepends lists to be for distinct purposes - one for run 
 time the other for build time, makepkg treats depends as makedepends - we do not 
 as explained above. From mkpkg perspective we consider depends to be runtime, and 
-build time are given by makedepnds and makedepends_add.
+build time are given by makedepnds and makedepends_add or more simply by mkpkg_depends.
 
 # 5. Discussion
 
