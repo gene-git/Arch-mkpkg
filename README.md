@@ -73,7 +73,7 @@ Arguments for mkpkg are all passed through to *makepkg* execpt for those of the 
 
 These are used by mkpkg itself. The options currently supported are:
 
- - **--mkp-verb**
+ - **--mkp-verb**   
    Show (stdout) output of makepkg.  Default is not to show it.
 
  - **--mkp-force**   
@@ -143,18 +143,6 @@ build time are given by makedepnds and makedepends_add or more simply by mkpkg_d
 
 While mkpkg works for all the packages I build, I consider this *beta* until it's had
 sufficient time to get beaten up some more :)
-
-One possible area for extension is for those packages in makedepends that arguably may not require 
-rebuild. While compiler tools certainly do demand a rebuild things such as *git* may not.
-While it's better to err on being conservative and build when not entirely needed, it's
-certainly better than vice versa. On the other hand, packages such as python, in my view do
-demand a rebuild.
-
-That said we may consider a future enhancement which could mark such dependencies so as to
-be ignored as far as makepdends checks go.
-
-One simple way to achieve that would be to add a new variable to the PKGBUILD with the list of those
-packages which should be ignord for driving a rebuild. 
 
 # 6. Arch AUR Package - TBD
 
