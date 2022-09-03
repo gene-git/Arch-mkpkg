@@ -1,0 +1,21 @@
+#!/bin/bash
+# 
+# Can be useful to call from PKGBUILD install
+#  do-install <dest-dir>
+# gene c (2022)
+
+dst="$1"
+doc="README.md"
+src='mkpkg.py utils'
+sysdir="/opt/mkpkg"
+
+if [ ! -d "$dst" ] ; then
+    echo 'Missing destination directory'
+else
+    rsync --mkpath --exclude='__pycache__' -a ${src} ${dst}${sysdir}
+    rsync --mkpath -a ${doc} ${dst}${sysdir}
+
+    mkdir -p "${dst}/usr/bin"
+    ln -s $sysdir/mkpkg.py "${dst}/usr/bin/mkpkg.py"
+    ln -s $sysdir/mkpkg.py "${dst}/usr/bin/mkpkg"
+fi
