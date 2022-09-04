@@ -8,8 +8,8 @@ import subprocess
 import glob
 import datetime
 
-def pkg_version(mkpkg):
-    """ construct the latest package version/release string """
+def pkg_version_release(mkpkg):
+    """ Returns version and release number"""
     pvers = mkpkg.pkgver
     if mkpkg.pkgver_updated:
         pvers = mkpkg.pkgver_updated
@@ -18,6 +18,11 @@ def pkg_version(mkpkg):
     if mkpkg.pkgrel_updated:
         prel = mkpkg.pkgrel_updated
 
+    return (pvers, prel)
+
+def pkg_version(mkpkg):
+    """ construct the latest package version/release string """
+    (pvers,prel) = pkg_version_release(mkpkg)
     full_vers = f'{pvers}-{prel}'
     return full_vers
 
@@ -204,10 +209,22 @@ def check_deps(mkpkg):
 
     return (okay, deps_newer)
 
+def _pkg_fname_vers_rel(fname):
+    """ parse package file and extract version and release """
+    pvers = None
+    prel = None
+    if fname:
+        fsplit = fname.split('-')
+        pvers = fsplit[1]
+        prel = fsplit[2]
+    return (pvers, prel)
+
 def check_package_exists(mkpkg):
     """
     Used when PKGBUILD has not pkgver() update function.
     Check that current pkgver/rel has corresponding package
+        - Check for vers-rel
+        - If not find latest vers.
     """
     pkgname = mkpkg.pkgname
     if isinstance(pkgname, list):
@@ -215,15 +232,33 @@ def check_package_exists(mkpkg):
     else:
         pname = pkgname
 
-    full_vers = pkg_version(mkpkg)
+    (pvers,prel) = pkg_version_release(mkpkg)
 
-    pkg_pattern = f'{pname}-{full_vers}-*.pkg.tar.zst'
     found = False
+    exact_match = False
+    pkg_pattern = f'{pname}-{pvers}-{prel}-*.pkg.tar.zst'
     flist = glob.glob(pkg_pattern)
     if flist:
         found = True
+        exact_match = True
+    else:
+        # look for same vers but different release
+        pkg_pattern = f'{pname}-{pvers}-*.pkg.tar.zst'
+        flist = glob.glob(pkg_pattern)
+        if flist:
+            found = True
+            #flist.sort(key=x: os.path.getmtime(x))
+            flist = sorted(flist, key=os.path.getmtime)
+            newest = flist[len(flist)-1]
+            (pvers, prel) = _pkg_fname_vers_rel(newest)
 
-    return found
+    pkg_file_info = {
+            'found'         : found,
+            'exact_match'   : exact_match,
+            'pvers'         : pvers,
+            'prel'          : prel,
+            }
+    return pkg_file_info
 
 def print_summary(mkpkg):
     """
