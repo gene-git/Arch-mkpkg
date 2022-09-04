@@ -2,8 +2,8 @@
 # OVERVIEW of mkpkg
 
 Building an Arch package requires invoking *makepkg* with *PKGBUILD* file.
-PKGBUILD file uses a *depends* variable to descibe a list of packages needed to use the tool the package 
-provides.
+PKGBUILD file uses a *depends* variable to descibe a list of packages needed to employ the 
+tool provided by the package.
 
 It also optionally uses a 'makedepends' variable which is a list of packages that are
 needed to build the package. Contrast this to *depends* which are needed to use it.
@@ -11,10 +11,14 @@ needed to build the package. Contrast this to *depends* which are needed to use 
 Ordinarily, if the tool hasn't changed but something in the *makedepends* list has changed,
 running *makephg* will do nothing as it deems the package up to date.
 
-The mkpkg tool provides a mechanism to rebuild a package whenever any one of of the makedepends packages is 
+We consider packages that you deem appropriate to trigger a build as trigger packages.
+The preferred way to provide the list of these packages is using the PKGBUILD variable
+*mkpkg_depends*. If that is not provided then mkpkg defaults to using the *makedepends* variable.
+As discussed below the latter is likely a bit too conersvative. 
+
+The mkpkg tool provides a mechanism to rebuild a package whenever any one of of the trigger packages is 
 newer than the last time the package was built, even if the tool itself is otherwise up to date.
-If you don't want every package in makepends to be used a build trigger, then simply
-use *mkpkg_depends* instead. If this variable is used, the packages listed in *makedepends* will not be used.
+When *mkpkg_depends* variable is found the packages listed in *makedepends* will not be used.
 
 This is perhaps most useful for packages which statically link libraries, or when core build tools
 change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
@@ -41,23 +45,44 @@ Majority of packages are built against shared libraries which are usually less o
 
 mkpkg has one dependency,  python. 
 
-It does use makepkg to perform package builds in the usual way. That said,  makepkg is 
+It uses makepkg to perform the actual package builds in the usual way. That said,  makepkg is 
 a part of pacman which is always installed and thus not a 'dependency' in the PKGBUILD meaning.
 
-When a tool chain used to build a package is updated, then it's good practice to 
+When a tool chain used to build a package is updated, it's good practice, IMHO, to 
 rebuild packages which use that tool chain.  For example, when gcc, cargo, binutils et al are updated 
-packages using those tools should also be updated.
+packages using those tools should also be updated. As mentioned above, whenever compiler/binutils 
+tool chain changes, I always rebuild and test my kernel packages.
 
-While static linked libraries surely don't demand a ebuild to function, because the older library 
-is part of the binary itself, it's still good idea to rebuild it. This will pick up fixes, 
-including security related ones,  as well as improvements.  Of course,
-it's always sensible to confirm that the application properly builds and works with 
-the newer tool or library.
+While static linked libraries surely don't demand a rebuild to function, obviously, because 
+the older library is part of the binary itself, it's still a good idea to rebuild it. 
+This will pick up bug fixes, including security related ones, as well as improvements.  Of course,
+it's always sensible to confirm that an application properly builds and works with 
+the newer tool or library as well.
 
-Another example. The *refind* boot manager statically links against gnu-efi. So when gnu-efi is updated, refind
-should probably be rebuilt as well.
+Here's an example. The *refind* boot manager statically links against gnu-efi. So when gnu-efi is updated, 
+refind should be rebuilt as well even though the previous one will continue to work just fine.
 
-mkpkg was created to address this need.
+Recently, arch started switching many packages to be compiled with lto. The gnu-efi package 
+was subsequently compiled with " -flto -ffat-lto-object".  The refind boot manager statically 
+links gnu-efi.  At this point, refind itself had not changed and so it's up to date as far 
+standard approach is concerned. 
+
+However, I would like to know as early as possible that refind builds and runs with the the 
+new gnu--efi library that was updated. In fact, unfortunately perhaps, this build failed and 
+refind not longer builds with the updated gnu-efi library due to lto changes. Good to know.
+
+You could of course have waited until refind itself gets an update and then discover - oh 
+no it no longer builds. But, by doing this early and in this case knowing refind itself has 
+not changed, I know with certainty that this problem stems from the gnu-efi rebuild and not from a 
+refind change - without even looking at any refind source changes.
+
+Given the large number of packages I build I doubt I'd remember what trigger packages 
+are approprate for every package anyway. Computers are good at automating
+repetitive tasks after all and are much quicker at identifying the trigger packages.
+
+mkpkg was created to address this need. It automates this for you and rebuilds packages when needed.
+This allows for early detection of problems or confirmation that things are actually fine.
+
 
 # 2. Source for mkpkg
 
@@ -88,10 +113,10 @@ What mkpkg does is roughly:
    than the package file and if found, bump the pkgrel and rebuild package.
  - If the package is out of date, as there is newer version then reset pkgrel back to "1" and build.
 
-So, if a package builds and gets bugger package releae number, it was because of make depends. If 
-package release is "1" - then you know its a new package.
+So, if a package builds and gets larger package releae number, it was because of some trigger package 
+dependency. If package release is "1" - then you know its a fresh package version.
 
-I use another tool to run all my package builds so I prefer the output to be easily parseable and provide
+I use separate tool to run all my package builds so I prefer the output to be easily parseable and provide
 simple clear information.
 
 mkpkg thus prints a line of the form:
@@ -106,8 +131,8 @@ Where status is one of :
 
   Obviously, <package-version> is what is sounds like.
 
-It is possible for mkpkg itself to fail for some reason, in which case the *mkp-status:* line would be absent.
-This is also simple to detect.
+It is possible for mkpkg itself to fail for some reason, in which case the *mkp-status:* line could be absent.
+This is equally simple to detect.
   
 
 # 4. Variables mkpkg_depends and makedepends_add
