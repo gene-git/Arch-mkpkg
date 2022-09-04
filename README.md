@@ -112,12 +112,17 @@ This is also simple to detect.
 
 # 4. Variables mkpkg_depends and makedepends_add
 
-If the list of makedepends does not meet user needs, then the variable 
+If the list of makedepends does not meet user needs, then the PKGBUILD variable 
 
  - *mkpkg_depends*
 
-may be used - if present its list of dependencies are used in place of the standard *makedepends* 
-variable. This offers complete control over what actually triggers rebuilds.
+Using this varible the much preferred way to assign trigger depenencies, and allows for removal
+of  things like 'git', 'pandoc' etc. which, while required for building, don't usually have any 
+affect on the tool function. Without adding this variable to PKGBUILD, then by default
+the makedepends variable is used, which is certainly likely to be conservative.
+
+When mkpkg_depens is present is used as the provider of the trigger dependencies in place 
+of the standard *makedepends* variable.  This offers complete control over what actually triggers rebuilds.
 
 While depends are also treated by makepkg as build dependencies, mkpkg does not.  Why?
 For starters, frequently these are really run time only dependencies and 
@@ -125,19 +130,8 @@ as such are not actually needed to build the package.
 
 Secondly, split packages may have separate depends lists which would add some unnecessary complexity. 
 
-Also, the PKGBUILD wiki discourages duplicating any depends packages into makdepends. 
-Therefore in order to permit including specific sets of packages as makepends which are also in 
-the depends list, we allow those to be in a second list in the PKGBUILD. The 
-PKGBUI:D variable makedepends_add does this.
-
-Any packages listed in *makedepends_add* will be appended to the *makedepend* list.
-This allows for additional packages, treated exactly same as makedepends,  while following 
-the PKGBUILD guidelines should they be in the depends list.
-
-While some may prefer that depends and makedepends lists to be for distinct purposes - one for run 
-time the other for build time, makepkg treats depends as makedepends - we do not 
-as explained above. From mkpkg perspective we consider depends to be runtime, and 
-build time are given by makedepnds and makedepends_add or more simply by mkpkg_depends.
+mkpkg also reads the variable makedepends_add - which are simply treated as additional 
+trigger dependencies. When using mkpkg_depends, this is unncessary.
 
 # 5. Discussion
 
