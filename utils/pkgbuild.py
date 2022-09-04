@@ -109,6 +109,7 @@ def get_pkgbld_data(mkpkg):
           pkgrel
           To get update pkgver we run prepare() ; pkgver()
     """
+    # pylint: disable=R0914
     msg = mkpkg.msg
 
     pkgbld_file = './PKGBUILD'

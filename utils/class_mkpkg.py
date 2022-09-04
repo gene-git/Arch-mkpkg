@@ -50,7 +50,5 @@ class MkPkg:
             1) Regular build
             2) If up to date - check all makedepends packages for being newer than last build
         """
-        msg = self.msg
         build(self)
         print_summary(self)
-        #msg('Done\n', fg_col='cyan', bdash=True)
