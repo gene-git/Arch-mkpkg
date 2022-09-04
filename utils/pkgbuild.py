@@ -170,6 +170,7 @@ def get_pkgbld_data(mkpkg):
     # Extract what we want.
     #
     okay = True
+    mkpkg_depends = False
     for line in output.splitlines():
         lsplit = line.strip().split('=')
         nparts = len(lsplit)
@@ -214,21 +215,24 @@ def get_pkgbld_data(mkpkg):
             mkpkg.makedepends = data_l          # always a list
 
         elif line.startswith('_X_ mkpkg_depends ='):
+            mkpkg_depends = True
             mkpkg.mkpkg_depends = data_l          # always a list
 
         elif line.startswith('_X_ makedepends_add ='):
             mkpkg.makedepends_add = data_l          # always a list
 
 
-        #
-        # If mkpkg_depends set it overrides makedepends.
-        #
-        if mkpkg.mkpkg_depends:
-            mkpkg.makedepends = mkpkg.mkpkg_depends
+    #
+    # If mkpkg_depends set it overrides makedepends.
+    #
+    if mkpkg_depends:
+        if mkpkg.verb:
+            msg('mkpkg_depends found - overrides makedepends\n',ind=1 )
+        mkpkg.makedepends = mkpkg.mkpkg_depends
 
-        if not mkpkg.makedepends:
-            mkpkg.makedepends = mkpkg.makedepends_add
-        elif mkpkg.makedepends_add:
-            mkpkg.makedepends += mkpkg.makedepends_add
+    if not mkpkg.makedepends:
+        mkpkg.makedepends = mkpkg.makedepends_add
+    elif mkpkg.makedepends_add:
+        mkpkg.makedepends += mkpkg.makedepends_add
 
     return okay
