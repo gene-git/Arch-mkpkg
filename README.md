@@ -27,6 +27,7 @@ I always rebuild my kernel packages and test.
 
 Majority of packages are built against shared libraries which are usually less of a problem of course.
 
+
 ## Contents
 
     1. Introduction
@@ -82,6 +83,13 @@ repetitive tasks after all and are much quicker at identifying the trigger packa
 
 mkpkg was created to address this need. It automates this for you and rebuilds packages when needed.
 This allows for early detection of problems or confirmation that things are actually fine.
+
+A small side comment on shared libraries. While these are generally not a problem, 
+there is an assumption that the library itself still functions the same for whatever part 
+of it the tool is using.  Majority of providers are careful with *soname*s as well, so most of the time 
+that's likely true - however, the cautious among us may want to run regression tests even in this case, 
+certainly for mission critical tools. Bugs happen, and it's good to learn of any issues as quickly 
+as possible.
 
 
 # 2. Source for mkpkg
