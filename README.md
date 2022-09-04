@@ -116,7 +116,7 @@ If the list of makedepends does not meet user needs, then the PKGBUILD variable
 
  - *mkpkg_depends*
 
-Using this varible the much preferred way to assign trigger depenencies, and allows for removal
+Using this varible the much preferred way to assign trigger dependencies, and allows for removal
 of  things like 'git', 'pandoc' etc. which, while required for building, don't usually have any 
 affect on the tool function. Without adding this variable to PKGBUILD, then by default
 the makedepends variable is used, which is certainly likely to be conservative.
