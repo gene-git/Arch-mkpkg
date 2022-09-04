@@ -53,4 +53,4 @@ class MkPkg:
         msg = self.msg
         build(self)
         print_summary(self)
-        msg('Done\n', fg_col='cyan', bdash=True)
+        #msg('Done\n', fg_col='cyan', bdash=True)

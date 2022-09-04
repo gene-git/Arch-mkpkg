@@ -33,27 +33,29 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
 
     pkg_file_found = pkg_file_info['found']
     pkg_file_exact_match = pkg_file_info['exact_match']
-    #pkg_file_pvers = pkg_file_info['pvers']
-    #pkg_file_prel = pkg_file_info['prel']
+    pkg_file_prel = pkg_file_info['prel']
 
     if pkg_vers_changed:
-        msg('Package vers changed\n', fg_col='cyan')
-        mkpkg.result.append(['changed', 'package', 'version'])
+        vers_info = f'{mkpkg.pkgve}r -> {mkpkg.pkgver_updated}'
+
+        msg(f'Package vers changed ({vers_info})\n', fg_col='cyan')
+        mkpkg.result.append(['changed', 'package', f'{vers_info}'])
         pkgrel = "1"
         mkpkg.pkgrel_updated = pkgrel
-        msg('Resetting pkgrel and rebuilding : {pkgrel}\n', fg_col='cyan')
+        msg(f'Resetting pkgrel and rebuilding : {pkgrel}\n', fg_col='cyan')
         okay  = set_pkgrel(mkpkg, pkgrel)
         if okay:
             needs_build = True
         else:
-            msg('Failed to update pkgrel\n', fg_col='red')
-            mkpkg.result.append(['error', 'pkgbuild', 'write new pkgrel'])
+            msg('Failed to reset pkgrel\n', fg_col='red')
+            mkpkg.result.append(['error', 'pkgbuild', f'write new pkgrel {pkgrel}'])
     else:
-        msg('Package vers unchanged\n', fg_col='cyan')
+        msg('Package vers un-changed\n', fg_col='cyan')
         if pkg_file_found:
             if pkg_file_exact_match:
                 # pkg file vers and release match
-                msg('Checking make deps\n', fg_col='cyan')
+                if mkpkg.verb:
+                    msg('Checking make deps\n', fg_col='cyan')
                 (okay,deps_newer) = check_deps(mkpkg)
                 if okay and deps_newer:
                     mkpkg.result.append(['changed', 'deps', 'deps updated'])
@@ -66,19 +68,20 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
                     if okay:
                         needs_build = True
                     else:
-                        mkpkg.result.append(['error', 'pkgbuild', 'write new pkgrel'])
+                        mkpkg.result.append(['error', 'pkgbuild', f'writing new pkgrel {pkgrel}'])
                         msg('Failed to update pkgrel\n', fg_col='red')
                 else:
-                    msg('No new trigger dependencies)\n', ind=1)
+                    if mkpkg.verb:
+                        msg('No new trigger dependencies)\n', ind=1)
                     mkpkg.result.append(['up2date', 'all', 'current'])
-
             else:
                 # pkg file has vers but release doesn't match
-                msg('Pkg file matches version but not release - rebuilding\n', fg_col='cyan')
+                rel_info = f'{pkg_file_prel} vs {mkpkg.pkgrel}'
+                msg(f'Pkg file verion matches.  Release doesnt ({rel_info})\n', fg_col='cyan')
                 needs_build = True
-                mkpkg.result.append(['changed', 'no-package', 'packge missing'])
+                mkpkg.result.append(['changed', 'no-package', f'rel {rel_info}: '])
         else:
-            msg('Pkg file not found - rebuilding\n', fg_col='cyan')
+            msg('Pkg file not found\n', fg_col='cyan')
             needs_build = True
             mkpkg.result.append(['changed', 'no-package', 'packge missing'])
 
@@ -89,11 +92,13 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
         mkpkg.result.append(['changed', 'force', 'rebuild forced'])
 
     if needs_build:
-        msg('Building package with makepkg\n', ind=1)
+        msg('Building package\n', ind=1)
         mkpkg.build_ok = build_w_makepkg(mkpkg)
         ran_build = True
         if not mkpkg.build_ok:
             msg('Build failed\n', ind=1, fg_col='red')
+    else:
+        msg('Nothing to do\n', ind=1)
 
 
     return ran_build
@@ -104,7 +109,7 @@ def build(mkpkg):
         1) Regular build
         2) If up to date - check all makedepends packages for being newer than last build
     """
-    msg = mkpkg.msg
+    #msg = mkpkg.msg
 
     #
     # Extract info from pkgbui;d
@@ -127,7 +132,6 @@ def build(mkpkg):
     #
     # build if needed
     #
-    msg(f'package version: {mkpkg.pkgver} changed {pkg_vers_changed}\n')
     ran_build = _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg)
 
     #

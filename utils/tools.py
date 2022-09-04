@@ -273,7 +273,8 @@ def print_summary(mkpkg):
 
     rpt_key = 'mkp:'
     rpt_key_final = 'mkp-status:'
-    msg('Summary of results:\n', adash=True, fg_col='cyan')
+    if mkpkg.verb:
+        msg('Summary of results:\n', adash=True, fg_col='cyan')
 
     pkg_vers = pkg_version(mkpkg)
 
@@ -285,7 +286,8 @@ def print_summary(mkpkg):
         what = item[0]
         where = item[1]
         comment = item[2]
-        msg(f'{rpt_key} {what:12s} {where:12s} {comment}\n', ind=1)
+        if mkpkg.verb:
+            msg(f'{rpt_key} {what:12s} {where:12s} {comment}\n', ind=1)
         if 'error' in what:
             has_error = True
         elif 'changed' in what:

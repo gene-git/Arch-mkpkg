@@ -57,11 +57,12 @@ def build_w_makepkg(mkpkg):
 
     run_args = {}
 
-    msg('Passing the buck to makepkg:\n', adash=True, fg_col='tan')
+
+    msg('Passing the buck to makepkg:\n', adash=True, fg_col='tan', ind=1)
     [retc, output, errors] = run_prog(pargs, **run_args)
     if mkpkg.verb:
         print(output)
-    msg('makepkg finished:\n', bdash=True, fg_col='tan')
+    msg('------------------------------\n', fg_col='tan', ind=1)
 
     #
     # what did makepkg tell us:
@@ -86,7 +87,7 @@ def build_w_makepkg(mkpkg):
     else:
         build_ok = True
         if res == 'Success':
-            msg(f'Build suceeded : {pkg_vers}\n', ind=1, fg_col='green')
+            msg(f'Build succeeded : {pkg_vers}\n', ind=1, fg_col='green')
         elif res == 'Current':
             msg(f'Package Current : {pkg_vers}\n', ind=1, fg_col='green')
 
