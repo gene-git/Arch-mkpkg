@@ -171,6 +171,15 @@ trigger dependencies. When using mkpkg_depends, this is unncessary.
 While mkpkg works for all the packages I build, I consider this *beta* until it's had
 sufficient time to get beaten up some more :)
 
+Possible future enhancement: 
+
+As said above, it's pretty useful to run regression tests after run-time dependencies change.
+For example shared libraries or other programs used by the tool.
+To handle this case we might consider adding a separate variable - such as *mkpkg_test_depends* 
+which lists these kind of dependencies.  Some thought is warranted around how this might 
+intersect, or not,  with *checkdepends*. These are of course different as they are for 
+those packages used for testing but NOT for running the tool.
+
 # 6. Arch AUR Package - TBD
 
  - On the todo list - volunteers appreciated :)
