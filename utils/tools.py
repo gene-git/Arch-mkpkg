@@ -146,7 +146,7 @@ def _pac_query_date(result):
 
     return dtime
 
-def _get_dep_dates(pkglist):
+def _get_pkg_dep_dates(pkglist):
     """
     For each package in makedepend lookup the install date using pacman
         return list of [pkgname, date]
@@ -167,36 +167,63 @@ def _get_dep_dates(pkglist):
 
     return dep_dates
 
+def _get_file_dep_dates(cwd, flist):
+    """ 
+    get time of each file 
+    non-existent files ignored - not an error
+    """
+
+    dep_file_dates = []
+    if flist:
+        for file in flist:
+            path = os.path.join(cwd, file)
+            if os.path.exists(path):
+                mod_time = os.path.getmtime(path)
+                dtime = datetime.datetime.fromtimestamp(mod_time)
+            else:
+                dtime = None
+            this_one = [file, dtime]
+            dep_file_dates.append(this_one)
+
+    return dep_file_dates
+
 def check_deps(mkpkg):
     """
-        check if any makedepend dep has changed since last build
-        if we have no deps saved we rebuild package to be safe and save deps used
-            or get newest package timesamp and compare to 'Install Date' of package
-        get_pkgbld_data() must be called prior to calling this func.
+        check if any of triggre deps dep has changed since last build
+            - any package listed in mkpkg.makedepends
+            - any file listed in mkpkg.makepends_files
+        get_pkgbld_data() to read PKGBUILD must be called prior to calling this func.
     """
     msg = mkpkg.msg
 
     #
     # if no deps then nothing to do
+    #
     if not mkpkg.makedepends:
         return (False, False)
 
+    #
     # make sure we have pulled PKGBUILD info
+    #
     okay = True
     if not mkpkg.pkgname:
         msg('error: Missing pkgbuild data\n', fg_col='red', ind=1)
         return (False, False)
 
+    #
     # current package datetime
+    #
     pkg_date = _last_package_date(mkpkg)
     if not pkg_date:
-        # interuppted build - missing package - force rebuild
+        # missing package - possible interuppted build - treat same as deps newer
         return (True, True)
 
-    #get list of datetime for each makedep
-    deps = _get_dep_dates(mkpkg.makedepends)
-
+    #
+    # get list of datetime for each makedep package
+    #
     deps_newer = False
+
+    deps = _get_pkg_dep_dates(mkpkg.makedepends)
     for pkg,dtime in deps:
         if not dtime:
             msg(f'Dependency not installed {pkg}\n', ind=1)
@@ -204,8 +231,17 @@ def check_deps(mkpkg):
         elif dtime > pkg_date:
             deps_newer = True
             msg(f'Dependency newer: {pkg}\n', ind=1)
-            # dont break so can print all deps
-            #break
+            # dont break so can record all deps
+
+    deps = _get_file_dep_dates(mkpkg.cwd, mkpkg.mkpkg_depends_files)
+    for file, dtime in deps:
+        if not dtime:
+            msg(f'File not found {file}\n', ind=1)
+            okay = False
+        elif dtime > pkg_date:
+            deps_newer = True
+            msg(f'File dependency newer: {file}\n', ind=1)
+            # dont break so can record all deps
 
     return (okay, deps_newer)
 

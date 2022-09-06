@@ -24,6 +24,7 @@ class MkPkg:
         self.pkgver_makepkg = None
         self.makedepends = None
         self.makedepends_add = None
+        self.makedepends_files = None
 
         # options
         self.verb = False              # don't show normal makepkg output

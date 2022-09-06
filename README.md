@@ -33,8 +33,8 @@ Majority of packages are built against shared libraries which are usually less o
     1. Introduction
     2. Source code 
     3. How to use mkpkg
-    4. mkpg_depends and makedepends_add
-    5. Discussion
+    4. PKGBUILD Variables (mkpkg_depends, mkpkg_depends_files and makedepends)
+    5. Discussion and Next Steps
     6. Arch AUR package - TBD
 
 ### See:
@@ -143,42 +143,47 @@ It is possible for mkpkg itself to fail for some reason, in which case the *mkp-
 This is equally simple to detect.
   
 
-# 4. Variables mkpkg_depends and makedepends_add
+# 4. PKGBUILD Variables (mkpkg_depends, mkpkg_depends_files and makedepends)
 
-If the list of makedepends does not meet user needs, then the PKGBUILD variable 
+The preferred way to list trigger packages is to use:
 
  - *mkpkg_depends*
 
-Using this varible the much preferred way to assign trigger dependencies, and allows for removal
-of  things like 'git', 'pandoc' etc. which, while required for building, don't usually have any 
-affect on the tool function. Without adding this variable to PKGBUILD, then by default
-the makedepends variable is used, which is certainly likely to be conservative.
+Using this variable is the best way to assign trigger dependency packages. Unlike the *makedepends*
+variable, it allows ignoring things like 'git' or 'pandoc' etc. which, while required 
+for building, don't usually have any affect on the tool function. 
+If this variable is absent in PKGBUILD, then by the *makedepends* variable is used as a fall 
+through second choice.  This is certainly likely to be conservative, but may trigger unnecessarily.
 
-When mkpkg_depens is present is used as the provider of the trigger dependencies in place 
-of the standard *makedepends* variable.  This offers complete control over what actually triggers rebuilds.
+ - *mkpkg_depends_files*
 
-While depends are also treated by makepkg as build dependencies, mkpkg does not.  Why?
-For starters, frequently these are really run time only dependencies and 
-as such are not actually needed to build the package. 
+This variable can be used to provide a list of trigger files which are also be used to trigger a build.
+The files are relative the directory containing PKGBUILD.
+This might be convenient, for example, if the source for some daemon doesn't provide a 
+systemd service file, and the packager adds one. In which case you may want to trigger on that file
+to handle changes to it. For one file this may be simpler than using a companion git repo.
 
-Secondly, split packages may have separate depends lists which would add some unnecessary complexity. 
+These 2 variables offer considerable control over what can be used to trigger rebuilds.
 
-mkpkg also reads the variable makedepends_add - which are simply treated as additional 
-trigger dependencies. When using mkpkg_depends, this is unncessary.
+ - *makedepends_add* : deprecated
 
-# 5. Discussion
+This is now superceded by *mkpkg_depends* and will be removed at some point.
+mkpkg still used it and any packages listed continue to be simply treated as additional 
+trigger dependencies. 
+
+# 5. Discussion and Next Steps
 
 While mkpkg works for all the packages I build, I consider this *beta* until it's had
 sufficient time to get beaten up some more :)
 
 Possible future enhancement: 
 
-As said above, it's pretty useful to run regression tests after run-time dependencies change.
+As mentioned earlier, it's pretty useful to run regression tests after run-time dependencies change.
 For example shared libraries or other programs used by the tool.
 To handle this case we might consider adding a separate variable - such as *mkpkg_test_depends* 
-which lists these kind of dependencies.  Some thought is warranted around how this might 
-intersect, or not,  with *checkdepends*. These are of course different as they are for 
-those packages used for testing but NOT for running the tool.
+which lists these kind of dependencies.  
+We note that *checkdepends* are quite different in intent, as they identify 
+those packages used for testing but NOT for running the tool. Testing tools and such.
 
 # 6. Arch AUR Package - TBD
 

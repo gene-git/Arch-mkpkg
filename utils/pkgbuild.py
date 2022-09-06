@@ -1,5 +1,5 @@
 """
-Support tools for MkPkg class
+Support tools relating to pkgbuild file used by MkPkg class
 """
 # pylint: disable=R0912,R0915
 import os
@@ -140,6 +140,7 @@ def get_pkgbld_data(mkpkg):
     cmd_str += 'echo "_X_ makedepends = ${makedepends[@]}"\n'
     cmd_str += 'echo "_X_ makedepends_add = ${makedepends_add[@]}"\n'
     cmd_str += 'echo "_X_ mkpkg_depends = ${mkpkg_depends[@]}"\n'
+    cmd_str += 'echo "_X_ mkpkg_depends_files = ${mkpkg_depends_files[@]}"\n'
 
     # call the pkgver() to get updated version
     #if vers_update:
@@ -219,6 +220,9 @@ def get_pkgbld_data(mkpkg):
             mkpkg_depends = True
             mkpkg.mkpkg_depends = data_l          # always a list
 
+        elif line.startswith('_X_ mkpkg_depends_files ='):
+            mkpkg.mkpkg_depends_files = data_l          # always a list
+
         elif line.startswith('_X_ makedepends_add ='):
             mkpkg.makedepends_add = data_l          # always a list
 
@@ -228,7 +232,7 @@ def get_pkgbld_data(mkpkg):
     #
     if mkpkg_depends:
         if mkpkg.verb:
-            msg('mkpkg_depends found - overrides makedepends\n',ind=1 )
+            msg('mkpkg_depends found - ignoring any makedepends\n',ind=1 )
         mkpkg.makedepends = mkpkg.mkpkg_depends
 
     if not mkpkg.makedepends:

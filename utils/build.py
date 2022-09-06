@@ -100,7 +100,6 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
     else:
         msg('Nothing to do\n', ind=1)
 
-
     return ran_build
 
 def build(mkpkg):
@@ -121,9 +120,9 @@ def build(mkpkg):
 
     #
     # handle casw where prev build was incomplete
-    #   look for package matchin vers-rel (exact_match) or just latest release vers-
+    #   look for package matching vers-rel (exact_match) or latest release vers
+    #
     pkg_file_info = check_package_exists(mkpkg)
-    #have_package = check_package_exists(mkpkg)
 
     pkg_vers_changed = False
     if mkpkg.pkgver_updated and mkpkg.pkgver_updated != mkpkg.pkgver:
