@@ -33,7 +33,7 @@ Majority of packages are built against shared libraries which are usually less o
     1. Introduction
     2. Source code 
     3. How to use mkpkg
-    4. PKGBUILD Variables (mkpkg_depends, mkpkg_depends_files and makedepends)
+    4. PKGBUILD Variables
     5. Discussion and Next Steps
     6. Arch AUR package - TBD
 
@@ -143,7 +143,9 @@ It is possible for mkpkg itself to fail for some reason, in which case the *mkp-
 This is equally simple to detect.
   
 
-# 4. PKGBUILD Variables (mkpkg_depends, mkpkg_depends_files and makedepends)
+# 4. PKGBUILD Variables 
+
+## mkpkg_depends, mkpkg_depends_files and makedepends
 
 The preferred way to list trigger packages is to use:
 
