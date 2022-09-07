@@ -25,7 +25,8 @@ change and it's important to rebuild with the newer versions. Do we really need 
 when tool chain changes? Sometimes yes; as an example whenever the toolchain is updated, 
 I always rebuild my kernel packages and test. 
 
-Majority of packages are built against shared libraries which are usually less of a problem of course.
+Majority of packages are built against shared libraries which are usually less of a problem of course;
+there are some additional comments on this topic below.
 
 
 ## Contents
@@ -137,7 +138,7 @@ Where status is one of :
  - success -> package was built successfully
  - error   -> problem occurred.
 
-  Obviously, <package-version> is what is sounds like.
+  Obviously, package-version is what is sounds like.
 
 It is possible for mkpkg itself to fail for some reason, in which case the *mkp-status:* line could be absent.
 This is equally simple to detect.
