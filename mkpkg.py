@@ -13,9 +13,9 @@ from utils import MkPkg
 
 def main():
     """
-    Wrapper over makepkg to handle makedepends dependencies.
+    Wrapper over makepkg to handle build trigger dependencies.
     Does a regular makepkg build but additionally rebuilds
-    should any makedepend be more recent than the package.
+    should any trigger package or file is newer than the package.
     """
     #pdb.set_trace()
 
