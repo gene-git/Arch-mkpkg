@@ -1,4 +1,7 @@
-## [1.3.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-09-07
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-09-18
+ - Add Changelog  
+
+## [1.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-09-07
  - fix out of date comment in mkpkg.py  
  - fix little markdown issue  
  - tweak readme format  
