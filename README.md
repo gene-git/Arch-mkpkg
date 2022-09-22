@@ -57,7 +57,8 @@ tool chain changes, I always rebuild and test my kernel packages. This not only 
 things compile and work properly with the new build tools but can also be key to reducing the attack
 surface. One recent little example, not to pick on cargo, is 
 [CVE-2022-36113](https://nvd.nist.gov/vuln/detail/CVE-2022-36113). 
-Of course this would require upstream being problematic but still a conceivable danger.
+Of course this would require a case where cargo is actually downloading something which
+should never be permitted; still, it's a conceivable danger.
 
 While static linked libraries surely don't demand a rebuild to function, obviously, because 
 the older library is part of the binary itself, it's still a good idea to rebuild it. 
