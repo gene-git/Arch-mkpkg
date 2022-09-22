@@ -53,7 +53,11 @@ a part of pacman which is always installed and thus not a 'dependency' in the PK
 When a tool chain used to build a package is updated, it's good practice, IMHO, to 
 rebuild packages which use that tool chain.  For example, when gcc, cargo, binutils et al are updated 
 packages using those tools should also be updated. As mentioned above, whenever compiler/binutils 
-tool chain changes, I always rebuild and test my kernel packages.
+tool chain changes, I always rebuild and test my kernel packages. This not only ensures that
+things compile and work properly with the new build tools but can also be key to reducing the attack
+surface. One recent little example, not to pick on cargo, is 
+[CVE-2022-36113](https://nvd.nist.gov/vuln/detail/CVE-2022-36113). 
+Of course this would require upstream being problematic but still a conceivable danger.
 
 While static linked libraries surely don't demand a rebuild to function, obviously, because 
 the older library is part of the binary itself, it's still a good idea to rebuild it. 
