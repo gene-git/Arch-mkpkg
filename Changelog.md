@@ -1,6 +1,8 @@
 # Changelog
 
 ## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-09-28
+ - tweak readme little more  
+ - update Changelog  
  - Tweak README  
  - tweak README  
 
