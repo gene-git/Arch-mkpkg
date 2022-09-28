@@ -116,8 +116,8 @@ as possible.
 
 But there are indeed some shared library packages, some with dynamically loaded 
 libraries (plugins) that may also be trigger packages.  One symptom of that need are those
-packages that are manually rebuilt by forcing a release version bump - we certainly see
-plenty of that happening.
+packages that are manually rebuilt by forcing a release version bump typically with a comment
+such as *rebuilt with latest ...* - we certainly see plenty of that happening.
 
 
 # 2. Source for mkpkg
