@@ -8,25 +8,42 @@ tool provided by the package.
 It also optionally uses a 'makedepends' variable which is a list of packages that are
 needed to build the package. Contrast this to *depends* which are needed to use it.
 
-Ordinarily, if the tool hasn't changed but something in the *makedepends* list has changed,
-running *makephg* will do nothing as it deems the package up to date.
+The only thing which causes a rebuild is a change to the package version - either because
+the underlying tool itself changed or because the packager manually forced a rebuild
+by changing the release version.
 
-We consider packages that you deem appropriate to trigger a build as trigger packages.
-The preferred way to provide the list of these packages is using the PKGBUILD variable
-*mkpkg_depends*. If that is not provided then mkpkg defaults to using the *makedepends* variable.
-As discussed below the latter is likely a bit too conersvative. 
+If you ever needed to manually rebuild a package by bumping the release version, then
+something is clearly not right. If something triggered a rebuild other than the package itself updating
+it would be better if this were automatic and not manual - especially if something broke, and then you
+discovered a need to 'rebuild' a package as a result of something it uses having changed.
 
-The mkpkg tool provides a mechanism to rebuild a package whenever any one of of the trigger packages is 
+This is what mkpkg helps with - it automates rebuilds when they are needed for some reason 
+other than the tool / package version itself changing. 
+
+Ordinarily, if the tool hasn't changed running *makephg*  does nothing as it deems the package up to date.
+
+mkpkg allows you to define a set of *trigger* packages. These are packages that, well yes, trigger
+ a rebuild whenever they change. Simple.
+
+The packager is responsible for making the list of those trigger packages which are appropriate.  
+
+The preferred way to provide the list of these trigger packages is by using the PKGBUILD variable
+*mkpkg_depends*. However, if that is not provided, then mkpkg defaults to using the *makedepends* variable.
+As discussed below the latter is quite likely a bit too conservative and it may miss things
+that should be there.  The fall through to using *makedepends* only 
+occurs When *mkpkg_depends* variable is absent.
+
+mkpkg provides a mechanism to rebuild a package whenever any one of of the trigger packages is 
 newer than the last time the package was built, even if the tool itself is otherwise up to date.
-When *mkpkg_depends* variable is found the packages listed in *makedepends* will not be used.
 
 This is perhaps most useful for packages which statically link libraries, or when core build tools
 change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
 when tool chain changes? Sometimes yes; as an example whenever the toolchain is updated, 
-I always rebuild my kernel packages and test. 
+I always rebuild my kernel packages and test.  
 
-Majority of packages are built against shared libraries which are usually less of a problem of course;
-there are some additional comments on this topic below.
+
+Majority of packages are built against shared libraries which are usually less of a problem, but 
+sometimes it may be relevant there as well; there are additional comments on this topic below.
 
 
 ## Contents
@@ -95,7 +112,12 @@ there is an assumption that the library itself still functions the same for what
 of it the tool is using.  Majority of providers are careful with *soname*s as well, so most of the time 
 that's likely true - however, the cautious among us may want to run regression tests even in this case, 
 certainly for mission critical tools. Bugs happen, and it's good to learn of any issues as quickly 
-as possible.
+as possible.  
+
+But there are indeed some shared library packages, some with dynamically loaded 
+libraries (plugins) that may also be trigger packages.  One symptom of that need are those
+packages that are manually rebuilt by forcing a release version bump - we certainly see
+plenty of that happening.
 
 
 # 2. Source for mkpkg
