@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - Bug fix for _mkpkg_depends_files  
+ - better packge description in PKGBUILD  
+ - readme markdown missed 2 spaces for newline  
+ - Readme - markdown requires escape for underscore  
+ - update CHANGELOG.md  
+
 ## [2.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
  - Change PKGBUILD variables to have leading "_" to follow arch packaging guidelines  
    Code is backward compatible and will work with or without the _  
