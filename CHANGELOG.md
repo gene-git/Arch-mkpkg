@@ -1,5 +1,9 @@
 # Changelog
 
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - README tweak to explain "patch" being same as "First_3" for version triggers  
+ - update CHANGELOG.md  
+
 ## [2.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
  - Enhance version triggers to handle version with more than 3 elements  
  - update changelog  
