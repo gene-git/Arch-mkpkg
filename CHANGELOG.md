@@ -1,5 +1,9 @@
 # Changelog
 
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
+ - tweak readme  
+ - update changelog  
+
 ## [2.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
  - Reorganize directory structure and use poetry for packaging.  
    Add support for triggers now based on semantic versions.  
