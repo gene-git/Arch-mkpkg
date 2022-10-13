@@ -1,8 +1,10 @@
 """
 class MkPkg
 
-Wrapper around makepkg to ensure package gets rebuilt whenever a package from makedepends list
-is newer than the last time package was built
+Wrapper around makepkg to ensure package gets rebuilt whenever specific dependency 
+conditions are met. E.G. a package or file is more recent than the last build, or
+a package has updated and now hits a version trigger as specified in PKGBUILD
+array variable _mkpkg_depends.
 """
 # pylint: disable=R0902
 import os
