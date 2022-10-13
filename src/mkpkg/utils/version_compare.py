@@ -4,77 +4,90 @@
 """
 from packaging import version
 
-def _semantic_vers_parse(vers):
+def _semantic_vers_to_elems(vers):
     """
-    split semantic version into its components
-        major.minor.patch
+    split version into its components each separated by period:
+        vers_components = [major,minor,patch, elem4, ele5, ...]
+        While proper semantic versionong has 3 elements, we generalize to allow for 4 or more.
+        return list of elements [elem1, elem2, ...]
     """
-    major = None
-    minor = None
-    patch = None
+    elems = []
     if vers:
         vsplit = vers.split('.')
-        major = vsplit[0].strip()
-        if len(vsplit) > 1:
-            minor = vsplit[1].strip()
-            if len(vsplit) > 2:
-                patch = vsplit[2].strip()
+        for elem in vsplit:
+            elems.append(elem.strip())
 
-    return (major, minor, patch)
+    return elems
 
+def _vers_trigger_to_num_elems(vers_trigger):
+    """
+    Map First_N to integer N
+        'major' is alias for 'First_1'
+        'minor' is alias for 'First_2'
+        'patch' is alias for 'First_3'
+        'extra' is alias for 'First_4'
+        'last' compares the entire version
+    """
+    if not vers_trigger:
+        return 0
+
+    key = vers_trigger.lower()
+    num_elems = 0
+    match(key):
+        case 'major':
+            num_elems = 1
+        case 'minor':
+            num_elems = 2
+        case 'patch':
+            num_elems = 3
+        case 'extra':
+            num_elems = 4
+        case 'last':
+            num_elems = -1      # special case to match entire version string
+        case _:
+            if key.startswith('first_'):
+                esplit = key.split('_')
+                if len(esplit) > 1:
+                    num_elems = int(esplit[1])
+
+    return num_elems
+
+def _elems_to_version(num, elems):
+    """
+    simply concatenate the first 'num' elems elem1.elem2.elem3...elem<num>
+    """
+    vers = None
+    if num <= 0 or not elems:
+        return vers
+
+    num = min(num, len(elems))
+    vers = elems[0]
+    for cnt in range(1,num):
+        next_elem = elems[cnt]
+        vers = f'{vers}.{next_elem}'
+
+    return vers
 
 def _versions_to_compare(vers_trigger, pkg_vers, last_vers):
     """
-    Extract whats needed to compare versions.
-    think don't need last_vers_comp can use last_vers always
+    Extract whats needed to compare current pkg_vers with the last_vers used of package
     Returns:   (pkg_vers_comp, last_vers_comp)
     """
-    #(last_major, last_minor, last_patch) = _semantic_vers_parse(last_vers)
-    (pkg_major, pkg_minor, pkg_patch) = _semantic_vers_parse(pkg_vers)
 
-    last_vers_comp = last_vers
-    if not vers_trigger:
+    #
+    # Use number of elements of trigger to get the version strings compare
+    #
+    num_elems = _vers_trigger_to_num_elems(vers_trigger)
+
+    if num_elems > 0:
+        pkg_vers_elems = _semantic_vers_to_elems(pkg_vers)
+        last_vers_elems = _semantic_vers_to_elems(last_vers)
+
+        pkg_vers_comp = _elems_to_version(num_elems, pkg_vers_elems)
+        last_vers_comp = _elems_to_version(num_elems, last_vers_elems)
+    else:
         pkg_vers_comp = pkg_vers
-        return (pkg_vers_comp, last_vers_comp)
-
-    match(vers_trigger):
-        case 'last':
-            #last_vers_comp = last_vers
-            pkg_vers_comp = pkg_vers
-
-        case 'major':
-            #last_vers_comp = last_major
-            pkg_vers_comp = pkg_major
-
-        case 'minor':
-            #last_vers_comp = f'{last_major}.{last_minor}'
-            pkg_vers_comp = f'{pkg_major}.{pkg_minor}'
-
-        case 'patch':
-            #last_vers_comp = f'{last_major}.{last_minor}.{last_patch}'
-            pkg_vers_comp = f'{pkg_major}.{pkg_minor}.{pkg_patch}'
-
-        case _:
-            #
-            # specific version
-            # Handle same as above if major.minor or major etc
-            #
-            (trig_major, trig_minor, trig_patch) = _semantic_vers_parse(vers_trigger)
-            if trig_patch:
-                #last_vers_comp = f'{trig_major,}.{trig_minor}.{trig_patch}'
-                pkg_vers_comp = f'{pkg_major}.{pkg_minor}.{pkg_patch}'
-
-            elif trig_minor:
-                #last_vers_comp = f'{trig_major,}.{trig_minor}'
-                pkg_vers_comp = f'{pkg_major}.{pkg_minor}'
-
-            elif trig_major :
-                #last_vers_comp = f'{trig_major,}'
-                pkg_vers_comp = f'{pkg_major}'
-
-            else:
-                #last_vers_comp = vers_trigger
-                pkg_vers_comp = pkg_vers
+        last_vers_comp = last_vers
 
     return (pkg_vers_comp, last_vers_comp)
 

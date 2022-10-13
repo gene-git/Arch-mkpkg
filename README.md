@@ -204,20 +204,34 @@ Each item in the list can be in one of 2 forms:
      this will trigger a rebuild if the install time of a listed package is newer than the
      time of the last build.  
 
-  2. *package_name* *compare op* *vers_key*
-     This provides a list of package semantic version triggers. Each trigger is of the form
-      White space around the comparison operator is optional and
+  2. *package_name* *compare op* *vers_trigger*
+     This provides a list of package semantic version triggers. Package versions are taken
+     to be of the form 'major.minor.patch' or more generally 'elem1.elem2.elem3....'
+     White space around the comparison operator is optional. 
 
   - *compare op* 
         is one of : >, >= or <
 
-  - and *vers_key* follows semantic versioning and is one of:
-    - major     : rebuild if major > last_build_major version
+  - *vers_trigger* 
+    Based on comparing the first [N] elems of the version or the entire version.
+    - First_[N] : rebuild if first [N] elems of package version greater than when last built
+    - major     : alias for First_1 (rebuild if major > last_build_major version
     - minor     : rebuild if major.minor > last_build_major.minor version
     - patch     : rebuild if major.minor.patch > last_build_major.minor.patch version
     - last      : rebuild if package version > last_build version.
     
 *last* is very similar to a time based trigger but based on version instead of time.
+
+For example if the expression is 'pkg_name>First_2' or equivalently 'pkg_name>minor' and
+the current package version is 1.2.3 while the version when last built was 1.2.0 them
+the versions being compared would be is 
+
+'1.2' > '1.2' which is false. 
+
+Whereas if the expression was 'pkg_name>First_3' then the comparison would be  
+
+'1.2.3' > '1.2.0' which is true
+
 
 N.B. The package must be built at least once using mkpkg so it can save the dependent package
 versions used. So if a version trigger is added,  then this triggers a rebuild as it treats this
