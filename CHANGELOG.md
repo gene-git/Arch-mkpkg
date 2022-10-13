@@ -1,6 +1,8 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
+## [2.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - Enhance version triggers to handle version with more than 3 elements  
+ - update changelog  
  - readme tweaks  
  - update CHANGELOG  
 
