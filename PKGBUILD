@@ -10,7 +10,7 @@
 # Contributor: 
 # 
 pkgname='mkpkg'
-pkgdesc='Tool to enhance package building (git)'
+pkgdesc='Tool to rebuild packages based on dependency triggers (git)'
 _gitname='Arch-mkpkg'
 _branch='master'
 
