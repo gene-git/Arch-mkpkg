@@ -29,26 +29,30 @@ The way to provide the list of these trigger packages is by using the PKGBUILD v
 *mkpkg_depends*. There are 2 ways to specify a trigger package - (1) a package name and 
 (2) a package and a requirement about its version. 
 
-  - *mkpkg_depends* lists those packages which trigger a rebuild whenever the install date is 
-     more recent than the last build time. If the item is a package name then this is 
-    strictly time based.   
-    However, this can also be followed by a semantic version requirement.
-    It can be an explicit version or a key word such as *major* which would then only trigger
-    rebuild when the major version of that package was greater than that at the last build. 
-    More details are below.
-    
-This is perhaps most useful for packages which statically link libraries, or when core build tools
+  - *mkpkg_depends* is a list of packages which can trigger a rebuild   
+     Each item in the list is either 
+    (1) A package name   
+        Rebuilds if the install date is more recent than the last build time 
+
+    (2) A package version requirement  
+        It can be an explicit version or a key word such as *major* which would then only trigger
+        rebuild when the major version of that package was greater than that at the last build. 
+        More details are below.
+      
+It can also use any file to trigger a build using *mkpkg_depends_file*. Typical use case
+for these might be files provided by the packager, rather than the source, which include 
+things such as systemd unit files or pacman hook files or other package related items.
+
+This is useful to ensure packages build and work when other packages get updated.
+It is also useful for packages which statically link libraries, or when core build tools
 change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
-when tool chain changes? Sometimes yes; as an example whenever the toolchain is updated, 
-I always rebuild my kernel packages and test. I also rebuild python when python's major.minor
-is larger than what was used for previous build.
+when tool chain changes? Sometimes yes; as an example whenever the compiler toolchain is updated, 
+I always rebuild my kernel packages and test. 
 
-Majority of packages are built against shared libraries which are usually less of a problem, but 
-sometimes it may be relevant there as well; there are additional comments on this topic below.
 
-It can also use any file to trigger a build as well. Typically these might be files provided
-by the packager, not the source, such as systemd unit file for example. 
-
+Majority of packages are built against shared libraries  but may be helpful there too; 
+there are additional comments on this topic below.  As an example, I rebuild my python 
+applications when python's major.minor is larger than what was used for previous build.
 
 ## Whats New
 
@@ -205,7 +209,7 @@ Each item in the list can be in one of 2 forms:
      time of the last build.  
 
   2. *package_name* *compare op* *vers_trigger*
-     This provides a list of package semantic version triggers. Package versions are taken
+     This provides semantic version triggers. Package versions are taken
      to be of the form 'major.minor.patch' or more generally 'elem1.elem2.elem3....'
      White space around the comparison operator is optional. 
 
