@@ -1,6 +1,11 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
+## [2.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
+ - Reorganize directory structure and use poetry for packaging.  
+   Add support for triggers now based on semantic versions.  
+   e.g python>3.12 or python>minor - where minor triggers build if  
+   major.minor version of dependency package is greater than that used when  
+   it was last built.  
  - Reorganize source tree  
  - Update changelog  
  - tweak readme little more  
