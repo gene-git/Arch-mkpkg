@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - In the event mkpkg_depends / mkpkg_depends_files are absent,  
+   no longer fall back to use makedepends unless turned on with the --mkp-use_makedepends option  
+ - update changelog  
+
 ## [2.2.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
  - Bug fix for _mkpkg_depends_files  
  - better packge description in PKGBUILD  
