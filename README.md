@@ -89,7 +89,7 @@ using the option *--mkp-use_makedepends* to turn it on.
     4. PKGBUILD Variables
     5. Discussion and Next Steps
     6. Installation
-    7. Arch AUR package - TBD
+    7. Arch AUR package
 
 ### See:
 
@@ -322,8 +322,8 @@ those packages used for testing but NOT for running the tool. Testing tools and 
     Install:
         ./do-install ${pkgdir}
 
-# 7. Arch AUR Package - TBD
+# 7. Arch AUR Package 
 
- - Sample PKGBUILD provided which builds latest from git
- - Should be made available on AUR - On the todo list - feel free :)
+ - PKGBUILD provided which builds latest from git
+ - [Arch Aur mkpkg ](https://aur.archlinux.org/packages/mkpkg)
 
