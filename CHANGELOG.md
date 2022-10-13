@@ -1,6 +1,8 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+## [2.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - Provide sample PKGBUILD to build mkpkg  
+ - update changelog  
  - typo in readme  
  - update changelog  
  - README tweak to explain "patch" being same as "First_3" for version triggers  
