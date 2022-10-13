@@ -30,11 +30,11 @@ The way to provide the list of these trigger packages is by using the PKGBUILD v
 (2) a package and a requirement about its version. 
 
   - *_mkpkg_depends* is a list of packages which can trigger a rebuild   
-     Each item in the list is either 
+     Each item in the list is either   
     (1) A package name   
         Rebuilds if the install date is more recent than the last build time 
 
-    (2) A package version requirement  
+    (2) A package version requirement    
         It can be an explicit version or a key word such as *major* which would then only trigger
         rebuild when the major version of that package was greater than that at the last build. 
         More details are below.
