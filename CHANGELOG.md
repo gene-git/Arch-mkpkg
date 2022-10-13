@@ -1,6 +1,10 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+## [2.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - Change PKGBUILD variables to have leading "_" to follow arch packaging guidelines  
+   Code is backward compatible and will work with or without the _  
+   New names are: _mkpkg_depends and _mkpkg_depends_files  
+ - update changelog  
  - more readme tweaks  
  - update changelog  
 
