@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - Update readme with link to AUR for mkpkg  
+   Change PKGBUILD for AUR  
+ - little word smithing on readme  
+ - Clean up some comments  
+ - readme word smithing  
+ - update changelog  
+
 ## [2.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
  - In the event mkpkg_depends / mkpkg_depends_files are absent,  
    no longer fall back to use makedepends unless turned on with the --mkp-use_makedepends option  
