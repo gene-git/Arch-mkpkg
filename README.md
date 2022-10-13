@@ -81,6 +81,8 @@ leading "\_" as well as the ones with the "\_".
 Fall back to *makedepends* when there are no *_mkpkg_depends* variables now requires
 using the option *--mkp-use_makedepends* to turn it on.
 
+Now available on aur.
+
 ## Contents
 
     1. Introduction
