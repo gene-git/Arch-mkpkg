@@ -1,9 +1,10 @@
 """
 Support tools for MkPkg class
+    - build_w_makepkg: Use makepkg to do build
 """
 # pylint: disable=R0912,R0915
 import sys
-from .tools import run_prog
+from .run_prog import run_prog
 from .tools import pkg_version
 
 def _makepkg_outcome(retc, output, errors):

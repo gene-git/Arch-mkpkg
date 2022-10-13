@@ -1,11 +1,13 @@
 #!/usr/bin/python
 """
- Wrapper for makepkg which rebuilds package when packages listed in makedepends are newer than
- previous build.
+ Arch tool to ensure packages are rebuilt when some dependencies are newer than the last build
+ Uses makepkg for actual rebuilds.
+
+ Uses 2 new PKGBUILD variables to define rebuild triggers
 
  See README for more details
 
- gene Sep 2022
+ gene Oct 2022
 """
 
 #import pdb
@@ -13,9 +15,11 @@ from utils import MkPkg
 
 def main():
     """
-    Wrapper over makepkg to handle build trigger dependencies.
-    Does a regular makepkg build but additionally rebuilds
-    should any trigger package or file is newer than the package.
+    Build package if trigger dependencies have changed or as usual if package itself has changed.
+        mkpkg_newer - if any package listed was installed since the last build
+        mkpkg_vers  - version constraints. Uses semantic versioning.
+                      Can trigger on any version, major, major.minor or major.minor.patch
+    Uses regular makepkg to do the actual build
     """
     #pdb.set_trace()
 

@@ -1,6 +1,8 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-09-28
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
+ - Reorganize source tree  
+ - Update changelog  
  - tweak readme little more  
  - update Changelog  
  - Tweak README  

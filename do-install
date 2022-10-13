@@ -1,21 +1,33 @@
 #!/bin/bash
 # 
 # Can be useful to call from PKGBUILD install
-#  do-install <dest-dir>
+#  e.g. do-install ${pkgdir}
 # gene c (2022)
 
-dst="$1"
-doc="README.md"
+# target install dir
+dest="$1"
+
+info="README.md CHANGELOG.md LICENSE"
+sharedir="/usr/share/mkpkg"
+
 src='mkpkg.py utils'
 sysdir="/opt/mkpkg"
 
-if [ ! -d "$dst" ] ; then
-    echo 'Missing destination directory'
-else
-    rsync --mkpath --exclude='__pycache__' -a ${src} ${dst}${sysdir}
-    rsync --mkpath -a ${doc} ${dst}${sysdir}
+sysdir=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
+tdir="${dest}/${sysdir}"
 
-    mkdir -p "${dst}/usr/bin"
-    ln -s $sysdir/mkpkg.py "${dst}/usr/bin/mkpkg.py"
-    ln -s $sysdir/mkpkg.py "${dst}/usr/bin/mkpkg"
+if [ ! -d "$dest" ] ; then
+    echo 'Missing destination directory'
+    exit 1
+else
+    # shared 
+    rsync --mkpath -a ${info} ${dest}${sharedir}
+
+    # application
+    pip install --upgrade --compile dist/mkpkg-*.whl  -t ${tdir}
+
+    # link in /usr/bin/mkpkg
+    mkdir -p "${dest}/usr/bin"
+    ln -sf ${sysdir}/mkpkg/mkpkg.py "${dest}/usr/bin/mkpkg"
+    exit 0
 fi

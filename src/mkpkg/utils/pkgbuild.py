@@ -1,10 +1,16 @@
 """
-Support tools relating to pkgbuild file used by MkPkg class
+Support tools relating to PKGBUILD file used by MkPkg class
+    - bump_pkgrel
+    - write_pkgbuild
+    - read_pkgbuild
+    - set_pkgrel
+    - get_pkgbld_data
 """
 # pylint: disable=R0912,R0915
 import os
 from .tools import open_file
-from .tools import run_prog
+from .run_prog import run_prog
+from .split_deps import split_deps_vers_list
 
 def bump_pkgrel(old):
     """
@@ -100,10 +106,13 @@ def set_pkgrel(mkpkg, pkgrel):
 
 def get_pkgbld_data(mkpkg):
     """
-    Extract info from package build.
+    Extract info from package build file PKGBUILD.
     If vers_update is true, run the pkgver() func if it exists
         Extract:
           makedepends
+          mkpkg_depends
+          mkpkg_depends_files
+          mkpkg_depends_vers
           pkgver    before update
           pkgver    after  update
           pkgrel
@@ -120,7 +129,9 @@ def get_pkgbld_data(mkpkg):
         msg(f'Warning: Missing {pkgbld_file} file\n', fg_col='yellow')
         return False
 
+    #
     # set up srcdir and startdir before sourcing PKGBUILD in case overwritten
+    #
     srcdir = os.path.join(mkpkg.cwd,'src')
     cmd_str = f'startdir="{mkpkg.cwd}"\n'
     cmd_str += f'srcdir="{srcdir}"\n'
@@ -138,8 +149,9 @@ def get_pkgbld_data(mkpkg):
     cmd_str += 'echo "_X_ pkgname = ${pkgname[@]}"\n'
     cmd_str += 'echo "_X_ pkgver = $pkgver"\n'
     cmd_str += 'echo "_X_ makedepends = ${makedepends[@]}"\n'
-    cmd_str += 'echo "_X_ makedepends_add = ${makedepends_add[@]}"\n'
+    #cmd_str += 'echo "_X_ makedepends_add = ${makedepends_add[@]}"\n'
     cmd_str += 'echo "_X_ mkpkg_depends = ${mkpkg_depends[@]}"\n'
+    cmd_str += 'echo "_X_ mkpkg_depends_vers = ${mkpkg_depends_vers[@]}"\n'
     cmd_str += 'echo "_X_ mkpkg_depends_files = ${mkpkg_depends_files[@]}"\n'
 
     # call the pkgver() to get updated version
@@ -218,26 +230,21 @@ def get_pkgbld_data(mkpkg):
 
         elif line.startswith('_X_ mkpkg_depends ='):
             mkpkg_depends = True
-            mkpkg.mkpkg_depends = data_l          # always a list
+            mkpkg.depends = data_l          # always a list
 
         elif line.startswith('_X_ mkpkg_depends_files ='):
-            mkpkg.mkpkg_depends_files = data_l          # always a list
-
-        elif line.startswith('_X_ makedepends_add ='):
-            mkpkg.makedepends_add = data_l          # always a list
-
+            mkpkg.depends_files = data_l          # always a list
 
     #
     # If mkpkg_depends set it overrides makedepends.
     #
-    if mkpkg_depends:
+    if not mkpkg_depends :
         if mkpkg.verb:
-            msg('mkpkg_depends found - ignoring any makedepends\n',ind=1 )
-        mkpkg.makedepends = mkpkg.mkpkg_depends
+            msg('mkpkg_depends(_vers) not found - using makedepends\n',ind=1 )
+        mkpkg.depends = mkpkg.makedepends
 
-    if not mkpkg.makedepends:
-        mkpkg.makedepends = mkpkg.makedepends_add
-    elif mkpkg.makedepends_add:
-        mkpkg.makedepends += mkpkg.makedepends_add
-
+    #
+    # split out version deps into mkpkg_depends_vers
+    #
+    split_deps_vers_list(mkpkg)
     return okay

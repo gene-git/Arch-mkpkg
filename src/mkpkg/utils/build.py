@@ -1,16 +1,17 @@
 """
 build()
     - does all the work.
-    Wrapper around makepkg to ensure package gets rebuilt whenever a package from makedepends list
+    Wrapper around makepkg to ensure package gets rebuilt whenever a package from depends list
     is newer than the last time package was built
 """
 # pylint: disable=R0902,R0912,R0915
-from .tools import check_deps
+from .check_deps import check_deps
 from .pkgbuild import bump_pkgrel
 from .pkgbuild import set_pkgrel
 from .pkgbuild import get_pkgbld_data
 from .tools import check_package_exists
 from .build_makepkg import build_w_makepkg
+from .dep_vers import get_pkg_dep_vers_now
 
 def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
     """
@@ -36,7 +37,7 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
     pkg_file_prel = pkg_file_info['prel']
 
     if pkg_vers_changed:
-        vers_info = f'{mkpkg.pkgve}r -> {mkpkg.pkgver_updated}'
+        vers_info = f'{mkpkg.pkgver} -> {mkpkg.pkgver_updated}'
 
         msg(f'Package vers changed ({vers_info})\n', fg_col='cyan')
         mkpkg.result.append(['changed', 'package', f'{vers_info}'])
@@ -106,7 +107,8 @@ def build(mkpkg):
     """
     Do build
         1) Regular build
-        2) If up to date - check all makedepends packages for being newer than last build
+        2) If up to date - check all depends packages for being newer than last build
+        3)               - check all depends_vers for greater version than last build
     """
     #msg = mkpkg.msg
 
@@ -127,6 +129,12 @@ def build(mkpkg):
     pkg_vers_changed = False
     if mkpkg.pkgver_updated and mkpkg.pkgver_updated != mkpkg.pkgver:
         pkg_vers_changed = True
+
+    #
+    # For all mkpkg deps get the current versions
+    # save into mkpkg.dep_vers>now
+    #
+    get_pkg_dep_vers_now(mkpkg)
 
     #
     # build if needed

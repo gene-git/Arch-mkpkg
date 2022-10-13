@@ -27,11 +27,16 @@ mkpkg allows you to define a set of *trigger* packages. These are packages that,
 
 The packager is responsible for making the list of those trigger packages which are appropriate.  
 
-The preferred way to provide the list of these trigger packages is by using the PKGBUILD variable
-*mkpkg_depends*. However, if that is not provided, then mkpkg defaults to using the *makedepends* variable.
-As discussed below the latter is quite likely a bit too conservative and it may miss things
-that should be there.  The fall through to using *makedepends* only 
-occurs When *mkpkg_depends* variable is absent.
+The best way to provide the list of these trigger packages is by using the PKGBUILD variable
+*mkpkg_depends*
+
+  - *mkpkg_depends* lists those packages which trigger a rebuild whenever the install date is 
+     more recent than the last build time. If the item is a package name then this is 
+    strictly time based. However, this can also be followed by a semantic version requirement.
+    This can be an explicit version or a key word such as *major* which would then only trigger
+    rebuild when the major version of that package was greater than that at the last build. 
+    More details are found below.
+    
 
 mkpkg provides a mechanism to rebuild a package whenever any one of of the trigger packages is 
 newer than the last time the package was built, even if the tool itself is otherwise up to date.
@@ -41,10 +46,20 @@ change and it's important to rebuild with the newer versions. Do we really need 
 when tool chain changes? Sometimes yes; as an example whenever the toolchain is updated, 
 I always rebuild my kernel packages and test.  
 
-
 Majority of packages are built against shared libraries which are usually less of a problem, but 
 sometimes it may be relevant there as well; there are additional comments on this topic below.
 
+## Whats New
+
+    Version 2.x.y brings fine grain control by allowing package dependences to trigger 
+builds using semantic version. For example 'python>minor' will rebuild only if a new
+python package has it's major.minor greater than what it was when package was last built.
+See *mkpkg_depends* below for more detail. 
+
+    The source has been reorganized and packaged using poetry which simplifies installation.
+The installer script, callable from package() function in PKGBUILD has been updated 
+accordingly. Ther build() function should now just call poetry build to generate the
+wheel package.
 
 ## Contents
 
@@ -53,7 +68,8 @@ sometimes it may be relevant there as well; there are additional comments on thi
     3. How to use mkpkg
     4. PKGBUILD Variables
     5. Discussion and Next Steps
-    6. Arch AUR package - TBD
+    6. Installation
+    7. Arch AUR package - TBD
 
 ### See:
 
@@ -178,28 +194,67 @@ This is equally simple to detect.
 The preferred way to list trigger packages is to use:
 
  - *mkpkg_depends*
+    Using this variable is the way to assign a list of packages which should trigger 
+    a rebuild. If the item is simply the name of the package then,
+    this will trigger a rebuild if the install time of a listed package is newer than the
+    time of the last build.  
 
-Using this variable is the best way to assign trigger dependency packages. Unlike the *makedepends*
-variable, it allows ignoring things like 'git' or 'pandoc' etc. which, while required 
-for building, don't usually have any affect on the tool function. 
-If this variable is absent in PKGBUILD, then by the *makedepends* variable is used as a fall 
-through second choice.  This is certainly likely to be conservative, but may trigger unnecessarily.
+
+ - *mkpkg_depends_vers*
+    This provides a list of package semantic version triggers. Each trigger is of the form
+
+        *package_name* *compare* *vers_key*
+
+    White space around the comparison operator is optional and *compare* operator 
+    is one of : >, >= or <
+
+    and *vers_key* follows semantic versioning and is one of:
+        - major     : rebuild if major > last_build_major version
+        - minor     : rebuild if major.minor > last_build_major.minor version
+        - patch     : rebuild if major.minor.patch > last_build_major.minor.patch version
+        - last      : rebuild if package version > last_build version.
+    
+    *last* is very similar to a time based trigger but based on version instead of time.
+
+    N.B. The package must be built at least once using mkpkg so it can save the dependent package
+    versions used. So if a version trigger is added,  then this triggers a rebuild as it treats this
+    as if the dependent package version is greater than last used (which is not known at this point).
+    On subsequent builds the last built version of each dependent package is then known.
+
+    Unlike *makedepends* variable, this allows one not include things that are required to build the
+    package but don't have any affect on the tool function. E.g. things like 'git'.
+
+    For example if at last build python was 3.10 :
+
+    mkpkg_depends=('python>minor' 'python-dnspython')
+
+    Then a rebuild will be done if python is greater than or equal to 3.11.x or if
+    python-dnspython was installed more recently than the last build. This will not trigger
+    a rebuild if python is updated from 3.10.7 to 3.10.8 which is a patch update not a minor
+    or major update. 
+
+    Why support '<' you may ask.  The only sensible use for less than operator would be to 
+    provide a mechanism to trigger a rebuild when a package gets downgraded. This would be
+    accomplished using :
+
+        pkg_name < last 
 
  - *mkpkg_depends_files*
 
-This variable can be used to provide a list of trigger files which are also be used to trigger a build.
-The files are relative the directory containing PKGBUILD.
-This might be convenient, for example, if the source for some daemon doesn't provide a 
-systemd service file, and the packager adds one. In which case you may want to trigger on that file
-to handle changes to it. For one file this may be simpler than using a companion git repo.
+    This variable can be used to provide a list of files used to trigger a build.
+    The files are relative the directory containing PKGBUILD.
 
-These 2 variables offer considerable control over what can be used to trigger rebuilds.
+    This might be useful, for example, if the source for some daemon doesn't provide a 
+    systemd service file, and the packager adds the file. Adding the file to this list 
+    would now trigger rebuilds should there be changes to the service file.
+    An alternative would be to put these files into a git repo and just using the git version.
+    For a small number of files this may be more convenient/simpler.
 
- - *makedepends_add* : deprecated
-
-This is now superceded by *mkpkg_depends* and will be removed at some point.
-mkpkg still used it and any packages listed continue to be simply treated as additional 
-trigger dependencies. 
+These variables offer considerable control over what can be used to trigger rebuilds.
+If none of the mkpkg_xxx variables are found in PKGBUILD, then *makedepends* variable is used 
+as a fall back.  This is likely to be conservative, and may trigger unnecessarily, but may not 
+have other desirable trigger packages. This only happens when the variables are missing so
+an empty mkpkg_depends variable will prevent the fallback.
 
 # 5. Discussion and Next Steps
 
@@ -215,7 +270,19 @@ which lists these kind of dependencies.
 We note that *checkdepends* are quite different in intent, as they identify 
 those packages used for testing but NOT for running the tool. Testing tools and such.
 
-# 6. Arch AUR Package - TBD
+# 6. Installation
+
+    First cd to the source git area and pulling from git as usual :
+        git fetch
+        git pull origin
+
+    Build:
+        poetry build
+
+    Install:
+        ./do-install ${pkgdir}
+
+# 7. Arch AUR Package - TBD
 
  - On the todo list - volunteers appreciated :)
 
