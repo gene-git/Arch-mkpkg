@@ -1,5 +1,9 @@
 # Changelog
 
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
+ - more readme tweaks  
+ - update changelog  
+
 ## [2.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
  - Provide sample PKGBUILD to build mkpkg  
  - update changelog  
