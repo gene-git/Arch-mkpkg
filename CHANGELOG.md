@@ -1,6 +1,8 @@
 # Changelog
 
 ## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-12
+ - remove unused from do-install  
+ - update CHANGELOG  
  - tweak readme  
  - update changelog  
 
