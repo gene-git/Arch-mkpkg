@@ -40,7 +40,7 @@ def check_deps(mkpkg):
         check if any of triggre deps dep has changed since last build
             - any package listed in mkpkg.depends
             - any package listed in mkpkg.depends_vers with greater listed version than last build
-            - any file listed in mkpkg.pends_files
+            - any file listed in mkpkg.depends_files
         get_pkgbld_data() to read PKGBUILD must be called prior to calling this func.
     """
     msg = mkpkg.msg
@@ -82,7 +82,7 @@ def check_deps(mkpkg):
             msg(f'Dependency newer: {pkg}\n', ind=1)
             # dont break so can record all deps
 
-    these_deps = get_file_depends_times(mkpkg.cwd, mkpkg.mkpkg_depends_files)
+    these_deps = get_file_depends_times(mkpkg.cwd, mkpkg.depends_files)
     for file, dtime in these_deps:
         if not dtime:
             msg(f'File not found {file}\n', ind=1)

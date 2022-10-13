@@ -182,8 +182,7 @@ def get_pkgbld_data(mkpkg):
     # Extract what we want.
     #
     okay = True
-    mkpkg_depends = False
-    mkpkg_depends_file_old = None
+    mkpkg_depends_files_old = None
     mkpkg_depends_old = None
 
     for line in output.splitlines():
@@ -230,18 +229,16 @@ def get_pkgbld_data(mkpkg):
             mkpkg.makedepends = data_l          # always a list
 
         elif line.startswith('_X_ _mkpkg_depends ='):
-            mkpkg_depends = True
             mkpkg.depends = data_l          # always a list
 
-        elif line.startswith('_X_ mkpkg_depends ='):    # backward compat 
+        elif line.startswith('_X_ mkpkg_depends ='):    # backward compat
             mkpkg_depends_old = data_l
 
         elif line.startswith('_X_ _mkpkg_depends_files ='):
-            mkpkg_depends_file = True
             mkpkg.depends_files = data_l          # always a list
 
         elif line.startswith('_X_ mkpkg_depends_files ='):
-            mkpkg_depends_file_old = data_l
+            mkpkg_depends_files_old = data_l
 
     #
     # handle backward compat of variables without +_"
@@ -254,18 +251,17 @@ def get_pkgbld_data(mkpkg):
         else:
             msg('Found "_mkpkg_depends"  - ignoring "mkpkg_depends"\n', fg_col='yellow')
 
-    if mkpkg_depends_file_old:
-        if not mkpkg.depends_file:
+    if mkpkg_depends_files_old:
+        if not mkpkg.depends_files:
             msg('N.B.: please use undserscore : "_mkpkg_depends_files"\n', fg_col='yellow')
-            mkpkg.depends_file = mkpkg_depends_file_old
-            mkpkg_depends_file = True
+            mkpkg.depends_files = mkpkg_depends_files_old
         else:
             msg('Found "_mkpkg_depends_files" - ignoring "mkpkg_depends_files"\n', fg_col='yellow')
 
     #
     # If mkpkg_depends set it overrides makedepends.
     #
-    if not mkpkg_depends :
+    if not mkpkg.depends and mkpkg.makedepends:
         if mkpkg.verb:
             msg('mkpkg_depends(_vers) not found - using makedepends\n',ind=1 )
         mkpkg.depends = mkpkg.makedepends
