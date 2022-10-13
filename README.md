@@ -51,12 +51,12 @@ sometimes it may be relevant there as well; there are additional comments on thi
 
 ## Whats New
 
-    Version 2.x.y brings fine grain control by allowing package dependences to trigger 
+Version 2.x.y brings fine grain control by allowing package dependences to trigger 
 builds using semantic version. For example 'python>minor' will rebuild only if a new
 python package has it's major.minor greater than what it was when package was last built.
 See *mkpkg_depends* below for more detail. 
 
-    The source has been reorganized and packaged using poetry which simplifies installation.
+The source has been reorganized and packaged using poetry which simplifies installation.
 The installer script, callable from package() function in PKGBUILD has been updated 
 accordingly. Ther build() function should now just call poetry build to generate the
 wheel package.
