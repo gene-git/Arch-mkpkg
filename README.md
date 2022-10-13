@@ -5,29 +5,31 @@ Building an Arch package requires invoking *makepkg* with *PKGBUILD* file.
 PKGBUILD file uses a *depends* variable to list those packages needed to employ the 
 tool provided by the package.
 
-It also optionally uses a 'makedepends' variable which is a list of packages that are
-needed to build the package. This is off by default. 
+It also uses a 'makedepends' variable which is a list of other packages that are
+needed to build the package. 
 
 The only thing which causes a rebuild is a change to the package version - either because
 the underlying tool itself changed or because the packager manually forced a rebuild
 by changing the release version.
 
 If you ever needed to manually rebuild a package by bumping the release version, then
-something is clearly not right. If something triggered a rebuild other than the package itself updating
-it would be better if this were automatic and not manual - especially if something broke, and then you
-discovered a need to 'rebuild' a package as a result of something it uses having changed.
+something is clearly not quite right. If something triggered a rebuild, other than 
+the package itself having an update, it would be better if this were done automatically
+rather than by hand. 
 
 This is what mkpkg helps with - it automates rebuilds when they are needed for some reason 
-other than the tool / package version itself changing. 
+other than the tool / package version itself being newer. 
 
-mkpkg allows you to define a set of *trigger* packages. These are packages that, well yes, trigger
- a rebuild whenever they change. Simple.
+To accomplish this mkpkg allows you to define a set of *triggers* that will cuase a rebuild. 
+These are packages, or files,  that, well yes, trigger a rebuild whenever they change in a
+specified way. Simple.
 
-The packager is responsible for making the list of those trigger packages which are appropriate.  
+The packager is responsible for making the list of those triggers which are appropriate.  
 
-The way to provide the list of these trigger packages is by using the PKGBUILD variable
-*_mkpkg_depends*. There are 2 ways to specify a trigger package - (1) a package name and 
-(2) a package and a requirement about its version. 
+The way to provide the these triggers is by adding a PKGBUILD array variable
+*_mkpkg_depends* which provides the list of conditions to trigger a rebuild. 
+There are 2 ways to specify a trigger package: (1) a package name or 
+(2) a package along with a requirement about its version. 
 
   - *_mkpkg_depends* is a list of packages which can trigger a rebuild   
      Each item in the list is either   
@@ -36,23 +38,28 @@ The way to provide the list of these trigger packages is by using the PKGBUILD v
 
     (2) A package version requirement    
         It can be an explicit version or a key word such as *major* which would then only trigger
-        rebuild when the major version of that package was greater than that at the last build. 
-        More details are below.
+        a rebuild when the major version of that package was greater than that at the last build. 
+        More details and the different options are detailed below.
       
-It can also use any file to trigger a build using *_mkpkg_depends_file*. Typical use case
-for these might be files provided by the packager, rather than the source, which include 
-things such as systemd unit files or pacman hook files or other package related items.
+It can also use any file to trigger a build using *_mkpkg_depends_file*. When a file in this
+list is newer than the lsat build, it triggers a rebuild.
 
-This is useful to ensure packages build and work when other packages get updated.
-It is also useful for packages which statically link libraries, or when core build tools
+A typical use case for these file triggers are files provided by the packager, 
+rather than the source, and include things such as systemd unit files or pacman hook 
+files or other package related items.
+
+This is useful to ensure packages build and work when conditions are met by
+other packages being updated.
+It is certainly helpful for packages which statically link in libraries, or when core build tools
 change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
-when tool chain changes? Sometimes yes; as an example whenever the compiler toolchain is updated, 
+when tool chain changes? Sometimes yes; for example, whenever the compiler toolchain is updated, 
 I always rebuild my kernel packages and test. 
 
+The majority of compiled packages are built against shared libraries and this can be helpful in 
+this csase too; there are additional comments on this topic below.  
 
-Majority of packages are built against shared libraries  but may be helpful there too; 
-there are additional comments on this topic below.  As an example, I rebuild my python 
-applications when python's major.minor is larger than what was used for previous build.
+As another example, I rebuild my python applications when python's major.minor is larger 
+than what was used for previous build.
 
 ## Whats New
 
