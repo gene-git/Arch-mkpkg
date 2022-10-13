@@ -300,5 +300,6 @@ those packages used for testing but NOT for running the tool. Testing tools and 
 
 # 7. Arch AUR Package - TBD
 
- - On the todo list - volunteers appreciated :)
+ - Sample PKGBUILD provided which builds latest from git
+ - Should be made available on AUR - On the todo list - feel free :)
 
