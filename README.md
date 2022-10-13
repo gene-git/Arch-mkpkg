@@ -6,7 +6,7 @@ PKGBUILD file uses a *depends* variable to list those packages needed to employ 
 tool provided by the package.
 
 It also optionally uses a 'makedepends' variable which is a list of packages that are
-needed to build the package. 
+needed to build the package. This is off by default. 
 
 The only thing which causes a rebuild is a change to the package version - either because
 the underlying tool itself changed or because the packager manually forced a rebuild
@@ -70,6 +70,9 @@ Changed the PKGBUILD variables to have underscore prefix to follow Arch Package 
 Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
 The code is backward compatible and supports the previous variable names without the 
 leading "\_" as well as the ones with the "\_".
+
+Fall back to *makedepends* when there are no *_mkpkg_depends* variables now requires
+using the option *--mkp-use_makedepends* to turn it on.
 
 ## Contents
 
@@ -166,20 +169,25 @@ These are used by mkpkg itself. The options currently supported are:
  - **--mkp-force**   
    Force a makepkg run even if not needed. You may want to also set the *-f* option to be passed on to makepkg.
 
+ - **--mkp-use_makedepends**   
+   If there are *mkpkg_depends* and *mkpkg_depends_files* are absent, setting this option
+will use the array *makedepends* to populate the *mkpkg_depends* list.
+
 What mkpkg does is roughly:
     
  - If PKGBUILD has a pkgver() function, check if the pkgver variable matches its output
  - If the 2 pkgver match or if there is no pkgver() function then check if a matching package exists
  - If package not up to date, then run usual makepkg build.
- - If package seems otherwise up to date, then check if any of the makedepend packages is newer
-   than the package file and if found, bump the pkgrel and rebuild package.
+ - If package seems otherwise up to date, then check if any of the conditions given by
+*mkpkg_depends* or *mkpkg_depends_files* triggers a build.  If a build is called for, 
+then bump the pkgrel and rebuild.
  - If the package is out of date, as there is newer version then reset pkgrel back to "1" and build.
 
 So, if a package builds and gets larger package releae number, it was because of some trigger package 
-dependency. If package release is "1" - then you know its a fresh package version.
+dependency; absent manual modification.  If package release is "1" - then you know its a fresh package version.
 
 I use separate tool to run all my package builds so I prefer the output to be easily parseable and provide
-simple clear information.
+simple and clear information.
 
 mkpkg thus prints a line of the form:
 

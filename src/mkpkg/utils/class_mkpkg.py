@@ -30,6 +30,7 @@ class MkPkg:
         self.dep_vers_now = None
         self.dep_vers_opers = ['>', '>=', '<']
         self.depends_files = None
+        self.use_makedepends = None         # option --mkpk-use_makedepends (if true use as fallback)
 
         # options
         self.verb = False              # don't show normal makepkg output

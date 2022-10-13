@@ -261,9 +261,13 @@ def get_pkgbld_data(mkpkg):
     #
     # If mkpkg_depends set it overrides makedepends.
     #
-    if not mkpkg.depends and mkpkg.makedepends:
+    got_mkpkg_vars = False
+    if mkpkg.depends or mkpkg.depends_files:
+        got_mkpkg_vars = True
+
+    if (not got_mkpkg_vars) and mkpkg.use_makedepends and mkpkg.makedepends:
         if mkpkg.verb:
-            msg('mkpkg_depends(_vers) not found - using makedepends\n',ind=1 )
+            msg('mkpkg_depends(_vers) not found - falling back to makedepends\n',ind=1, fg_col='yellow' )
         mkpkg.depends = mkpkg.makedepends
 
     #

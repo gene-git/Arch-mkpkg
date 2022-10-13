@@ -55,11 +55,12 @@ def argv_parser(mkpkg):
     Args intended for mkpkg itself are all of the form:
         --mkp-<option>
     Options are:
-        verb       - show makepkg (stdout) output
-        force       - always run makepkg even if not needed
-                    - you may want to set makepkg force as well (-f)
+        verb            - show makepkg (stdout) output
+        force           - always run makepkg even if not needed
+                        - you may want to set makepkg force as well (-f)
+        use_makedepends - use makedepends array if no _mkpkg_xxx are set
     """
-    opt_keys = ['--mkp-verb', '--mkp-force']
+    opt_keys = ['--mkp-verb', '--mkp-force', '--mkp-use_makedepends']
     argv = []
     for opt in sys.argv[1:]:
         if opt in opt_keys:
