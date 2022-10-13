@@ -69,7 +69,7 @@ wheel package.
 Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
 Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
 The code is backward compatible and supports the previous variable names without the 
-leading "_" as well as the ones with the "_".
+leading "\_" as well as the ones with the "\_".
 
 ## Contents
 
