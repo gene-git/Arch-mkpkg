@@ -170,8 +170,8 @@ These are used by mkpkg itself. The options currently supported are:
    Force a makepkg run even if not needed. You may want to also set the *-f* option to be passed on to makepkg.
 
  - **--mkp-use_makedepends**   
-   If there are *mkpkg_depends* and *mkpkg_depends_files* are absent, setting this option
-will use the array *makedepends* to populate the *mkpkg_depends* list.
+   If *mkpkg_depends* and *mkpkg_depends_files* arrays are absent, setting this option
+will use the array *makedepends* to populate the *mkpkg_depends* list as a fall back.
 
 What mkpkg does is roughly:
     
