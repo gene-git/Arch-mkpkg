@@ -223,7 +223,7 @@ Each item in the list can be in one of 2 forms:
 *last* is very similar to a time based trigger but based on version instead of time.
 
 For example if the expression is 'pkg_name>First_2' or equivalently 'pkg_name>minor' and
-the current package version is 1.2.3 while the version when last built was 1.2.0 them
+the current package version is 1.2.3 while the version when last built was 1.2.0 then
 the versions being compared would be is 
 
 '1.2' > '1.2' which is false. 
