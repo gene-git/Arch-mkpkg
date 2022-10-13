@@ -26,10 +26,10 @@ mkpkg allows you to define a set of *trigger* packages. These are packages that,
 The packager is responsible for making the list of those trigger packages which are appropriate.  
 
 The way to provide the list of these trigger packages is by using the PKGBUILD variable
-*mkpkg_depends*. There are 2 ways to specify a trigger package - (1) a package name and 
+*_mkpkg_depends*. There are 2 ways to specify a trigger package - (1) a package name and 
 (2) a package and a requirement about its version. 
 
-  - *mkpkg_depends* is a list of packages which can trigger a rebuild   
+  - *_mkpkg_depends* is a list of packages which can trigger a rebuild   
      Each item in the list is either 
     (1) A package name   
         Rebuilds if the install date is more recent than the last build time 
@@ -39,7 +39,7 @@ The way to provide the list of these trigger packages is by using the PKGBUILD v
         rebuild when the major version of that package was greater than that at the last build. 
         More details are below.
       
-It can also use any file to trigger a build using *mkpkg_depends_file*. Typical use case
+It can also use any file to trigger a build using *_mkpkg_depends_file*. Typical use case
 for these might be files provided by the packager, rather than the source, which include 
 things such as systemd unit files or pacman hook files or other package related items.
 
@@ -59,12 +59,17 @@ applications when python's major.minor is larger than what was used for previous
 Version 2.x.y brings fine grain control by allowing package dependences to trigger 
 builds using semantic version. For example 'python>minor' will rebuild only if a new
 python package has it's major.minor greater than what it was when package was last built.
-See *mkpkg_depends* below for more detail. 
+See *_mkpkg_depends* below for more detail. 
 
 The source has been reorganized and packaged using poetry which simplifies installation.
 The installer script, callable from package() function in PKGBUILD has been updated 
 accordingly. Ther build() function should now just call poetry build to generate the
 wheel package.
+
+Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
+Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
+The code is backward compatible and supports the previous variable names without the 
+leading "_" as well as the ones with the "_".
 
 ## Contents
 
@@ -194,11 +199,11 @@ This is equally simple to detect.
 
 # 4. PKGBUILD Variables 
 
-## mkpkg_depends and mkpkg_depends_files
+## _mkpkg_depends and _mkpkg_depends_files
 
 The preferred way to list trigger packages is to use:
 
- - *mkpkg_depends*
+ - *_mkpkg_depends*
 
 This variable provides a list of packages which should trigger a rebuild. 
 Each item in the list can be in one of 2 forms:
@@ -247,7 +252,7 @@ package but don't have any affect on the tool function. E.g. things like 'git'.
 
 For example if at last build python was 3.10 :
 
-        mkpkg_depends=('python>minor' 'python-dnspython')
+        _mkpkg_depends=('python>minor' 'python-dnspython')
 
 Then a rebuild will be done if python is greater than or equal to 3.11.x or if
 python-dnspython was installed more recently than the last build. This will not trigger
@@ -260,7 +265,7 @@ accomplished using :
 
         pkg_name < last 
 
- - *mkpkg_depends_files*
+ - *_mkpkg_depends_files*
     This variable can be used to provide a list of files used to trigger a build.
     The files are relative the directory containing PKGBUILD.  
 
@@ -274,7 +279,7 @@ These variables offer considerable control over what can be used to trigger rebu
 If none of the mkpkg_xxx variables are found in PKGBUILD, then *makedepends* variable is used 
 as a fall back.  This is likely to be conservative, and may trigger unnecessarily, but may not 
 have other desirable trigger packages. This only happens when the variables are missing so
-an empty mkpkg_depends variable will prevent the fallback.
+an empty _mkpkg_depends variable will prevent the fallback.
 
 # 5. Discussion and Next Steps
 

@@ -23,7 +23,7 @@ arch=(any)
 license=(MIT)
 depends=('python')
 makedepends=()
-mkpkg_depends=('python>minor')
+_mkpkg_depends=('python>minor')
 
 source=()
 
