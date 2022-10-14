@@ -56,7 +56,7 @@ when tool chain changes? Sometimes yes; for example, whenever the compiler toolc
 I always rebuild my kernel packages and test. 
 
 The majority of compiled packages are built against shared libraries and this can be helpful in 
-this csase too; there are additional comments on this topic below.  
+this case too; there are additional comments on this topic below.  
 
 As another example, I rebuild my python applications when python's major.minor is larger 
 than what was used for previous build.

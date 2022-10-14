@@ -7,8 +7,10 @@
 # target install dir
 dest="$1"
 
-info="README.md CHANGELOG.md LICENSE PKGBUILD"
+license="LICENSE"
+info="README.md CHANGELOG.md PKGBUILD"
 sharedir="/usr/share/mkpkg"
+licensedir="/usr/share/licenses"
 
 sysdir=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
 tdir="${dest}/${sysdir}"
@@ -19,6 +21,7 @@ if [ ! -d "$dest" ] ; then
 else
     # shared 
     rsync --mkpath -a ${info} ${dest}${sharedir}
+    rsync --mkpath -a ${license} ${dest}/${licensedir}/mkpkg
 
     # application
     pip install --upgrade --compile dist/mkpkg-*.whl  -t ${tdir}

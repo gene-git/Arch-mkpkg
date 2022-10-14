@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "mkpkg"
-version = "2.0.0"
-description = "Arch tool to ensure packages are rebuilt when some dependencies are newer than the last build"
+version = "2.3.2"
+description = "Arch tool to rebuild packages based on specified package or file triggers"
 authors = ["Gene C"]
 license = "MIT"
 readme = "README.md"
