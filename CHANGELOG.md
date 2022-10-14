@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.3.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-14
+ - Improve PKGBUILD for aur as per comments  
+   update pyproject.toml version  
+   Clean the dist directory before doing poetry build  
+ - fix python depends version > 3.9  
+ - Add makedepends packages in aur PKGBUILD  
+ - fix comment  
+ - add aur comment  
+ - update changelog  
+
 ## [2.3.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-13
  - Update readme with link to AUR for mkpkg  
    Change PKGBUILD for AUR  
