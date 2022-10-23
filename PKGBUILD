@@ -1,6 +1,7 @@
 #
-# PKGBUILD for build mkpkg 
-# Recommended version is git HEAD, this is well tested before repo updated.
+# PKGBUILD for mkpkg 
+# This builds the latest release tag.
+# git HEAD is well also well tested before any repo change.
 #
 # Maintainer: Gene C <arch@sapience.com>
 # Contributor: 
@@ -20,6 +21,11 @@ makedepends=('git' 'python-pip' 'python-poetry' 'rsync')
 _mkpkg_depends=('python>minor')
 source=("git+https://github.com/gene-git/${_gitname}#tag=${pkgver}")
 sha512sums=('SKIP')
+
+pkgver() {
+     cd "${_gitname}"
+     git describe --tags
+}
 
 build() {
     cd "${_gitname}"
