@@ -1,6 +1,8 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-14
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
+ - PKGBUILD now builds latest release tag  
+ - update changelog  
  - Add comment about being fast  
  - update changelog  
 
