@@ -1,9 +1,14 @@
 # Changelog
 
+## [2.3.5] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
+ - avoid all but tag in pkgver()  
+   update pyproject.toml vers  
+ - update changelog  
+
 ## [2.3.4] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
  - PKGBUILD - remove tag= now that pgkver() is getting latest tag  
 
-## [2.3.3, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
+## [2.3.3] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
  - PKGBUILD now builds latest release tag  
  - update changelog  
  - Add comment about being fast  
