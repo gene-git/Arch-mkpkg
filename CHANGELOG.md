@@ -1,6 +1,9 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
+## [2.3.4] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
+ - PKGBUILD - remove tag= now that pgkver() is getting latest tag  
+
+## [2.3.3, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-23
  - PKGBUILD now builds latest release tag  
  - update changelog  
  - Add comment about being fast  
