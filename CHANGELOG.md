@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-24
+ - oops - accidently left debugger on!  
+ - update changelog  
+
 ## [2.3.6] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-24
  - Fix bug parsion <package> >= xxx.  Greater than is fine.  
  - update changelog  
