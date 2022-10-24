@@ -186,7 +186,7 @@ def get_pkgbld_data(mkpkg):
     mkpkg_depends_old = None
 
     for line in output.splitlines():
-        lsplit = line.strip().split('=')
+        lsplit = line.strip().split('=',1)
         nparts = len(lsplit)
         data = None
         data_l = None
