@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-24
+ - update pyproject.toml vers  
+ - update changelog  
+
 ## [2.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-24
  - oops - accidently left debugger on!  
  - update changelog  
