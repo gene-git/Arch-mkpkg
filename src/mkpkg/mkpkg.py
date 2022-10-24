@@ -10,14 +10,14 @@
  gene Oct 2022
 """
 
-import pdb
+#import pdb
 from utils import MkPkg
 
 def main():
     """
     Build package if trigger dependencies have changed or as usual if package itself has changed.
     """
-    pdb.set_trace()
+    #pdb.set_trace()
 
     mkpkg = MkPkg()
     mkpkg.build()
