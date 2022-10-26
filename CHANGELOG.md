@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.5.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-26
+ - bug fix for _mkpkg_depends_files - silly typo  
+ - CHANGELOG.md  
+
 ## [2.4.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-24
  - update pyproject.toml vers  
  - update changelog  
