@@ -28,12 +28,19 @@ def pkg_version_release(mkpkg):
     if mkpkg.pkgrel_updated:
         prel = mkpkg.pkgrel_updated
 
-    return (pvers, prel)
+    epoch = None
+    if mkpkg.epoch:
+        epoch = mkpkg.epoch
+
+    return (epoch, pvers, prel)
 
 def pkg_version(mkpkg):
     """ construct the latest package version/release string """
-    (pvers,prel) = pkg_version_release(mkpkg)
-    full_vers = f'{pvers}-{prel}'
+    (epoch, pvers,prel) = pkg_version_release(mkpkg)
+    if epoch:
+        full_vers = f'{epoch}:{pvers}-{prel}'
+    else:
+        full_vers = f'{pvers}-{prel}'
     return full_vers
 
 def open_file (pathname, mode):
@@ -85,23 +92,28 @@ def check_package_exists(mkpkg):
     """
     Used when PKGBUILD has not pkgver() update function.
     Check that current pkgver/rel has corresponding package
-        - Check for vers-rel
+        - Check for [epoch:]vers-rel
         - If not find latest vers.
     """
     pname = primary_pkgname(mkpkg)
 
-    (pvers,prel) = pkg_version_release(mkpkg)
+    (epoch, pvers,prel) = pkg_version_release(mkpkg)
 
     found = False
     exact_match = False
-    pkg_pattern = f'{pname}-{pvers}-{prel}-*.pkg.tar.zst'
+
+    epoch_str=''
+    if epoch:
+        epoch_str = f'{epoch}:'
+    pkg_pattern = f'{pname}-{epoch_str}{pvers}-{prel}-*.pkg.tar.zst'
+
     flist = glob.glob(pkg_pattern)
     if flist:
         found = True
         exact_match = True
     else:
         # look for same vers but different release
-        pkg_pattern = f'{pname}-{pvers}-*.pkg.tar.zst'
+        pkg_pattern = f'{pname}-{epoch_str}{pvers}-*.pkg.tar.zst'
         flist = glob.glob(pkg_pattern)
         if flist:
             found = True

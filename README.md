@@ -66,6 +66,9 @@ faster than makepkg; can be something like 10x faster or more.
 
 ## Whats New
 
+Version 3.0.0
+Preliminary support for epoch. Be good to get wider testing.
+
 Version 2.x.y brings fine grain control by allowing package dependences to trigger 
 builds using semantic version. For example 'python>minor' will rebuild only if a new
 python package has it's major.minor greater than what it was when package was last built.

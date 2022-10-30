@@ -1,7 +1,7 @@
 """
 class MkPkg
 
-Wrapper around makepkg to ensure package gets rebuilt whenever specific dependency 
+Wrapper around makepkg to ensure package gets rebuilt whenever specific dependency
 conditions are met. E.G. a package or file is more recent than the last build, or
 a package has updated and now hits a version trigger as specified in PKGBUILD
 array variable _mkpkg_depends.
@@ -25,6 +25,7 @@ class MkPkg:
         self.pkgver = None
         self.pkgver_updated = None
         self.pkgver_makepkg = None
+        self.epoch = None
 
         self.depends = None
         self.depends_vers = None
@@ -32,7 +33,7 @@ class MkPkg:
         self.dep_vers_now = None
         self.dep_vers_opers = ['>', '>=', '<']
         self.depends_files = None
-        self.use_makedepends = None         # option --mkpk-use_makedepends (if true use as fallback)
+        self.use_makedepends = None    # option --mkpk-use_makedepends (use fallback)
 
         # options
         self.verb = False              # don't show normal makepkg output

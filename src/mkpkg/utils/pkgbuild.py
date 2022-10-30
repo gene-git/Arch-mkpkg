@@ -117,7 +117,7 @@ def get_pkgbld_data(mkpkg):
           pkgrel
           To get update pkgver we run prepare() ; pkgver()
     """
-    # pylint: disable=R0914
+    # pylint: disable=R0914,C0301
     msg = mkpkg.msg
 
     pkgbld_file = './PKGBUILD'
@@ -166,6 +166,7 @@ def get_pkgbld_data(mkpkg):
     cmd_str += 'fi\n'
 
     cmd_str += 'echo "_X_ pkgrel = ${pkgrel}"\n'
+    cmd_str += 'echo "_X_ epoch = ${epoch}"\n'
     cmd_str += '\n'
 
     #
@@ -224,6 +225,10 @@ def get_pkgbld_data(mkpkg):
 
         elif line.startswith('_X_ pkgver_updated ='):
             mkpkg.pkgver_updated = data
+
+        elif line.startswith('_X_ epoch ='):
+            if data and int(data) > 0:
+                mkpkg.epoch = data
 
         elif line.startswith('_X_ makedepends ='):
             mkpkg.makedepends = data_l          # always a list
