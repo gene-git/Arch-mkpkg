@@ -1,6 +1,7 @@
 # Changelog
 
-## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-30
+## [3.0.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-30
+ - update CHANGELOG.md  
  - Add epoch support - needs wider testing  
  - update changelog  
 
