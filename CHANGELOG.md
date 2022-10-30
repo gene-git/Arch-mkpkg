@@ -1,6 +1,10 @@
 # Changelog
 
-## [2.5.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-26
+## [HEAD] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-30
+ - Add epoch support - needs wider testing  
+ - update changelog  
+
+## [2.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-26
  - bug fix for _mkpkg_depends_files - silly typo  
  - CHANGELOG.md  
 
