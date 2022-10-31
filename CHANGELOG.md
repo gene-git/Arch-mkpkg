@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-31
+ - typo - so sorry  
+ - update CHANGELOG.md  
+
 ## [3.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-31
  - Add more aliases of First_N for version comparisons (micro, serial)  
    Change build from poetry/pip to python -m build/installer  
