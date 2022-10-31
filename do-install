@@ -1,33 +1,41 @@
 #!/bin/bash
 # 
-# Can be useful to call from PKGBUILD install
-#  e.g. do-install ${pkgdir}
+# installer script for mkpkg
+#  e.g. Call from PKGBUILD:  
+#   do-install ${pkgdir}
 # gene c (2022)
-
-# target install dir
+#
 dest="$1"
+self='mkpg'
+
+info="README.md CHANGELOG.md PKGBUILD"
+infodir="/usr/share/${self}"
 
 license="LICENSE"
-info="README.md CHANGELOG.md PKGBUILD"
-sharedir="/usr/share/mkpkg"
-licensedir="/usr/share/licenses"
+licensedir="/usr/share/licenses/${self}"
 
-sysdir=$(python -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")
-tdir="${dest}/${sysdir}"
+# list apps without the ".py" or leave empty string
+apps="mkpkg"
+
+sitedir=$(python -c "import site; print(site.getsitepackages()[0])")
 
 if [ ! -d "$dest" ] ; then
     echo 'Missing destination directory'
     exit 1
 else
     # shared 
-    rsync --mkpath -a ${info} ${dest}${sharedir}
-    rsync --mkpath -a ${license} ${dest}/${licensedir}/mkpkg
+    rsync --mkpath -a ${info} ${dest}${infodir}
+    rsync --mkpath -a ${license} ${dest}/${licensedir}/${license}
 
-    # application
-    pip install --upgrade --compile dist/mkpkg-*.whl  -t ${tdir}
+    /usr/bin/python -m installer --destdir="${dest}" dist/*.whl
 
-    # link in /usr/bin/mkpkg
-    mkdir -p "${dest}/usr/bin"
-    ln -sf ${sysdir}/mkpkg/mkpkg.py "${dest}/usr/bin/mkpkg"
+    # link(s) in /usr/bin/
+    if [ ! -z "${apps}" ] ; then
+        /usr/bin/mkdir -p "${dest}/usr/bin"
+        for app in "${apps}"
+        do
+            /usr/bin/ln -sf ${sitedir}/${self}/${app}.py "${dest}/usr/bin/${app}"
+        done
+    fi
     exit 0
 fi

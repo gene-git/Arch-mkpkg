@@ -246,10 +246,21 @@ Each item in the list can be in one of 2 forms:
 
   - *vers_trigger* 
     Based on comparing the first [N] elems of the version or the entire version.
+
     - First_[N] : rebuild if first [N] elems of package version greater than when last built
-    - major     : alias for First_1 (rebuild if major > last_build_major version)
-    - minor     : alias for First_2 (rebuild if major.minor > last_build_major.minor version)
-    - patch     : alias for First_3 (rebuild if major.minor.patch > last_build_major.minor.patch version)
+
+    - major     : alias for First_1 (rebuild if major > last_build)
+
+    - minor     : alias for First_2 (rebuild if major.minor > last_build)
+
+    - patch     : alias for First_3 (rebuild if major.minor.patch > last_build)  
+      micro
+
+    - extra     : alias for First_4 (rebuild if major.minor.patch.extra > last_build)  
+      releaselevel
+
+    - serial    : alias for First_5 (rebuild if major.minor.patch.extra.serial > last_build)  
+
     - last      : rebuild if package version > last_build version.
     
 *last* is very similar to a time based trigger but based on version instead of time.

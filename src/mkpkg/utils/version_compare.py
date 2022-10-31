@@ -27,6 +27,7 @@ def _vers_trigger_to_num_elems(vers_trigger):
         'patch' is alias for 'First_3'
         'extra' is alias for 'First_4'
         'last' compares the entire version
+        Also in use: major, minor, micro, releaselevel, serial
     """
     if not vers_trigger:
         return 0
@@ -40,8 +41,14 @@ def _vers_trigger_to_num_elems(vers_trigger):
             num_elems = 2
         case 'patch':
             num_elems = 3
+        case 'micro':
+            num_elems = 3
         case 'extra':
             num_elems = 4
+        case 'releaselevel':
+            num_elems = 4
+        case 'serial':
+            num_elems = 5
         case 'last':
             num_elems = -1      # special case to match entire version string
         case _:
