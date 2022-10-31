@@ -6,7 +6,7 @@
 # gene c (2022)
 #
 dest="$1"
-self='mkpg'
+self='mkpkg'
 
 info="README.md CHANGELOG.md PKGBUILD"
 infodir="/usr/share/${self}"
@@ -32,7 +32,7 @@ else
     # link(s) in /usr/bin/
     if [ ! -z "${apps}" ] ; then
         /usr/bin/mkdir -p "${dest}/usr/bin"
-        for app in "${apps}"
+        for app in ${apps}
         do
             /usr/bin/ln -sf ${sitedir}/${self}/${app}.py "${dest}/usr/bin/${app}"
         done
