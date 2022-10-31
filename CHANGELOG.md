@@ -1,6 +1,11 @@
 # Changelog
 
-## [3.0.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-30
+## [3.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-31
+ - Add more aliases of First_N for version comparisons (micro, serial)  
+   Change build from poetry/pip to python -m build/installer  
+ - update CHANGELOG.md  
+
+## [3.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-30
  - update CHANGELOG.md  
  - Add epoch support - needs wider testing  
  - update changelog  
