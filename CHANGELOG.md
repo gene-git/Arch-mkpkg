@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.4.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
+ - Better handling of PKGBUILD syntax errors  
+ - update CHANGELOG.md  
+
 ## [3.3.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
  - unwind prev error check - needs more work  
  - update CHANGELOG.md  
