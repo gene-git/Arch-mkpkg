@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.3.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
+ - unwind prev error check - needs more work  
+ - update CHANGELOG.md  
+
 ## [3.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
  - Additional check for errors when sourcing PKGBUILD  
  - update CHANGELOG.md  
