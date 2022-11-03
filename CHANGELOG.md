@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
+ - Additional check for errors when sourcing PKGBUILD  
+ - update CHANGELOG.md  
+
 ## [3.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-10-31
  - typo - so sorry  
  - update CHANGELOG.md  
