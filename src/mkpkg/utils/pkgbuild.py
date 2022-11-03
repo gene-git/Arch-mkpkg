@@ -175,7 +175,7 @@ def get_pkgbld_data(mkpkg):
     pargs = ['/bin/bash', '-s']
     [retc, output, errors] = run_prog (pargs, input_str=cmd_str)
 
-    if retc != 0 or errors:
+    if retc != 0 :
         msg('Failed to extract PKGBUILD info\n', fg_col='red')
         if errors:
             msg(f'{errors}')

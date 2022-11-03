@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mkpkg"
-version = "3.3.0"
+version = "3.3.1"
 description = "Arch tool to rebuild packages based on specified package or file triggers"
 authors = ["Gene C"]
 license = "MIT"
