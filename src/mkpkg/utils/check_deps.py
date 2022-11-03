@@ -48,7 +48,7 @@ def check_deps(mkpkg):
     #
     # if no deps then nothing to do
     #
-    if not (mkpkg.depends or mkpkg.depends_files):
+    if not (mkpkg.depends or mkpkg.depends_files or mkpkg.depends_vers):
         return (False, False)
 
     #
