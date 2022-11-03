@@ -129,10 +129,15 @@ def get_pkgbld_data(mkpkg):
         return False
 
     #
+    # Trap any errors
+    #
+    cmd_str = 'mkpkg_cleanup () { exit 1 ;}\n'
+    cmd_str += 'trap mkpkg_cleanup ERR\n'
+    #
     # set up srcdir and startdir before sourcing PKGBUILD in case overwritten
     #
     srcdir = os.path.join(mkpkg.cwd,'src')
-    cmd_str = f'startdir="{mkpkg.cwd}"\n'
+    cmd_str += f'startdir="{mkpkg.cwd}"\n'
     cmd_str += f'srcdir="{srcdir}"\n'
 
     cmd_str += f'source "{pkgbld_file}"\n'
