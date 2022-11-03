@@ -78,7 +78,7 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
             else:
                 # pkg file has vers but release doesn't match
                 rel_info = f'{pkg_file_prel} vs {mkpkg.pkgrel}'
-                msg(f'Pkg file verion matches.  Release doesnt ({rel_info})\n', fg_col='cyan')
+                msg(f'Pkg file version matches.  Release doesnt ({rel_info})\n', fg_col='cyan')
                 needs_build = True
                 mkpkg.result.append(['changed', 'no-package', f'rel {rel_info}: '])
         else:
