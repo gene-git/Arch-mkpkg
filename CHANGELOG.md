@@ -1,6 +1,10 @@
 # Changelog
 
-## [3.4.0, origin/master] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
+## [3.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
+ - bug fix incorrectly handling triggers pkg>xxx  
+ - update CHANGELOG.md  
+
+## [3.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
  - Better handling of PKGBUILD syntax errors  
  - update CHANGELOG.md  
 
