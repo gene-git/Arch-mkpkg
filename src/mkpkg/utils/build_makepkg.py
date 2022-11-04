@@ -88,8 +88,8 @@ def build_w_makepkg(mkpkg):
     else:
         build_ok = True
         if res == 'Success':
-            msg(f'Build succeeded : {pkg_vers}\n', ind=1, fg_col='green')
+            msg(f'Build succeeded : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg_col='green')
         elif res == 'Current':
-            msg(f'Package Current : {pkg_vers}\n', ind=1, fg_col='green')
+            msg(f'Package Current : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg_col='green')
 
     return build_ok

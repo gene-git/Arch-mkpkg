@@ -39,7 +39,7 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
     if pkg_vers_changed:
         vers_info = f'{mkpkg.pkgver} -> {mkpkg.pkgver_updated}'
 
-        msg(f'Package vers changed ({vers_info})\n', fg_col='cyan')
+        msg(f'Package vers changed : {mkpkg.pkgname} ({vers_info})\n', fg_col='cyan')
         mkpkg.result.append(['changed', 'package', f'{vers_info}'])
         pkgrel = "1"
         mkpkg.pkgrel_updated = pkgrel
@@ -51,7 +51,7 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
             msg('Failed to reset pkgrel\n', fg_col='red')
             mkpkg.result.append(['error', 'pkgbuild', f'write new pkgrel {pkgrel}'])
     else:
-        msg('Package vers un-changed\n', fg_col='cyan')
+        msg(f'Package vers un-changed: {mkpkg.pkgname}\n', fg_col='cyan')
         if pkg_file_found:
             if pkg_file_exact_match:
                 # pkg file vers and release match
