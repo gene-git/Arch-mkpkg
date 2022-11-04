@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.5.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-04
+ - Add package name to screen message  
+ - update CHANGELOG.md  
+
 ## [3.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-03
  - bug fix incorrectly handling triggers pkg>xxx  
  - update CHANGELOG.md  
