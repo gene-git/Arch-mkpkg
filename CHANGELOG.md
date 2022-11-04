@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.5.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-04
+ - PKGBUILD - duh - put back makedepends on poetry  
+ - update CHANGELOG.md  
+
 ## [3.5.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-04
  - Add package name to screen message  
  - update CHANGELOG.md  
