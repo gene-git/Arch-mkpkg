@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.5.3] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-05
+ - tweak readme  
+   installer script change list to bash array for apps being installed. zero impact  
+ - update CHANGELOG.md  
+
 ## [3.5.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-04
  - PKGBUILD - duh - put back makedepends on poetry  
  - update CHANGELOG.md  
