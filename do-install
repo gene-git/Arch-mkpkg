@@ -15,7 +15,7 @@ license="LICENSE"
 licensedir="/usr/share/licenses/${self}"
 
 # list apps without the ".py" or leave empty string
-apps="mkpkg"
+apps=("mkpkg")
 
 sitedir=$(python -c "import site; print(site.getsitepackages()[0])")
 
@@ -30,9 +30,9 @@ else
     /usr/bin/python -m installer --destdir="${dest}" dist/*.whl
 
     # link(s) in /usr/bin/
-    if [ ! -z "${apps}" ] ; then
+    if [ ! -z "${apps[@]}" ] ; then
         /usr/bin/mkdir -p "${dest}/usr/bin"
-        for app in ${apps}
+        for app in ${apps[@]}
         do
             /usr/bin/ln -sf ${sitedir}/${self}/${app}.py "${dest}/usr/bin/${app}"
         done

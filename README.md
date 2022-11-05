@@ -1,4 +1,30 @@
 
+# mkpkg
+
+Tool to rebuild packages based on dependency triggers.
+
+## Installation
+
+Available on
+ - [Github source ](https://github.com/gene-git/Arch-mkpkg)
+ - [Archlinux AUR](https://aur.archlinux.org/packages/mkpkg)
+   PKGBUILD also in source tree
+
+### Dependencies
+
+- Run Time:
+  - python (3.9 or later)
+  - packaging aka python-packaging
+
+- Building Package :
+  - git 
+  - build aka python-build
+  - intaller aka python-installer
+  - wheel aka python-wheel
+  - poetry aka python-poetry
+  - rsync
+
+
 # OVERVIEW of mkpkg
 
 Building an Arch package requires invoking *makepkg* with *PKGBUILD* file.
@@ -35,21 +61,32 @@ There are 2 ways to specify a trigger package: (1) a package name or
      Each item in the list is either   
     (1) A package name   
         Rebuilds if the install date is more recent than the last build time 
+        e.g. 
+
+        _mkpkg_depends=('openssl' 'systemd')
 
     (2) A package version requirement    
         It can be an explicit version or a key word such as *major* which would then only trigger
         a rebuild when the major version of that package was greater than that at the last build. 
         More details and the different options are detailed below.
-      
+        e.g. 
+
+        _mkpkg_depends=('openssl>3.0.6' 'systemd')
+
 It can also use any file to trigger a build using *_mkpkg_depends_file*. When a file in this
 list is newer than the lsat build, it triggers a rebuild.
 
 A typical use case for these file triggers are files provided by the packager, 
 rather than the source, and include things such as systemd unit files or pacman hook 
 files or other package related items.
+e.g.
+
+        _mkpkg_depends_file=('xxx.service')
+        
 
 This is useful to ensure packages build and work when conditions are met by
 other packages being updated.
+
 It is certainly helpful for packages which statically link in libraries, or when core build tools
 change and it's important to rebuild with the newer versions. Do we really need to rebuild a package
 when tool chain changes? Sometimes yes; for example, whenever the compiler toolchain is updated, 
@@ -67,7 +104,7 @@ faster than makepkg; can be something like 10x faster or more.
 ## Whats New
 
 Version 3.0.0
-Preliminary support for epoch. Be good to get wider testing.
+Support for epoch.
 
 Version 2.x.y brings fine grain control by allowing package dependences to trigger 
 builds using semantic version. For example 'python>minor' will rebuild only if a new
@@ -343,6 +380,6 @@ those packages used for testing but NOT for running the tool. Testing tools and 
 
 # 7. Arch AUR Package 
 
- - PKGBUILD provided which builds latest from git
- - [Arch Aur mkpkg ](https://aur.archlinux.org/packages/mkpkg)
+ - The AUR PKGBUILD is provided in git tree and builds latest tagged version git
+   Link is at beginning of README.
 
