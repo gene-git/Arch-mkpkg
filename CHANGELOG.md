@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.5.4] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-29
+ - Small change to README.  
+   Change variable check in installer (no functional change)  
+ - update CHANGELOG.md  
+
 ## [3.5.3] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-05
  - tweak readme  
    installer script change list to bash array for apps being installed. zero impact  
