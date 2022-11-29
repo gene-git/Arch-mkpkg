@@ -10,6 +10,14 @@ Available on
  - [Archlinux AUR](https://aur.archlinux.org/packages/mkpkg)
    PKGBUILD also in source tree
 
+Can build using the PKGBUID provided which is also available in the AUR.
+
+To build it manually, clone the repo and do:
+
+        rm -f dist/*
+        python python -m build --wheel --no-isolation
+        ./do-install /
+
 ### Dependencies
 
 - Run Time:
@@ -103,8 +111,9 @@ faster than makepkg; can be something like 10x faster or more.
 
 ## Whats New
 
-Version 3.0.0
-Support for epoch.
+### Version 3.0.0
+
+Adds support for epoch.
 
 Version 2.x.y brings fine grain control by allowing package dependences to trigger 
 builds using semantic version. For example 'python>minor' will rebuild only if a new
@@ -113,15 +122,15 @@ See *_mkpkg_depends* below for more detail.
 
 The source has been reorganized and packaged using poetry which simplifies installation.
 The installer script, callable from package() function in PKGBUILD has been updated 
-accordingly. Ther build() function should now just call poetry build to generate the
-wheel package.
+accordingly. Ther build() function uses python build module to generate the
+wheel package, as outlined above.
 
 Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
 Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
 The code is backward compatible and supports the previous variable names without the 
 leading "\_" as well as the ones with the "\_".
 
-Fall back to *makedepends* when there are no *_mkpkg_depends* variables now requires
+To fall back to *makedepends* when there are no *_mkpkg_depends* variables now requires
 using the option *--mkp-use_makedepends* to turn it on.
 
 Now available on aur.
