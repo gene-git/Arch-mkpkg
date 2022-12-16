@@ -1,5 +1,14 @@
 # Changelog
 
+## [4.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-12-15
+ - Add --mkp-refresh  
+   Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.  
+   refactor some code  
+   pull out pacman queries to more easily share  
+   Add suport for missing soname library driving rebuild  
+   suggestion thanks to Alberto Novella Archlinux subredit.  
+ - update CHANGELOG.md  
+
 ## [3.5.4] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-11-29
  - Small change to README.  
    Change variable check in installer (no functional change)  
