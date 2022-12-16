@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-12-16
+ - Add config file support.  
+   Change option handling. Options to be passed to makepkg must now be placed after --  
+   Improveed soname treatment via option --soname-build (missing (default), newer or never)  
+ - update CHANGELOG.md  
+
 ## [4.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-12-15
  - Add --mkp-refresh  
    Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.  
