@@ -12,8 +12,10 @@ from .pkgbuild import get_pkgbld_data
 from .tools import check_package_exists
 from .build_makepkg import build_w_makepkg
 from .dep_vers import get_pkg_dep_vers_now
+from .soname import read_last_pkg_dep_soname
+from .soname import soname_rebuild_needed
 
-def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
+def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
     """
     Package itself is up to date - now deal with make deps
         - pkgver changed (pkgver_updated)
@@ -36,10 +38,13 @@ def _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg):
     pkg_file_exact_match = pkg_file_info['exact_match']
     pkg_file_prel = pkg_file_info['prel']
 
-    if pkg_vers_changed:
+    if pkg_vers_changed or soname_build:
         vers_info = f'{mkpkg.pkgver} -> {mkpkg.pkgver_updated}'
 
         msg(f'Package vers changed : {mkpkg.pkgname} ({vers_info})\n', fg_col='cyan')
+        if soname_build:
+            msg('Soname requires rebuild\n')
+
         mkpkg.result.append(['changed', 'package', f'{vers_info}'])
         pkgrel = "1"
         mkpkg.pkgrel_updated = pkgrel
@@ -121,7 +126,13 @@ def build(mkpkg):
         return
 
     #
-    # handle casw where prev build was incomplete
+    # read the last soname data (if exists)
+    #
+    read_last_pkg_dep_soname(mkpkg)
+    soname_build = soname_rebuild_needed(mkpkg)
+
+    #
+    # handle case where prev build was incomplete
     #   look for package matching vers-rel (exact_match) or latest release vers
     #
     pkg_file_info = check_package_exists(mkpkg)
@@ -139,7 +150,7 @@ def build(mkpkg):
     #
     # build if needed
     #
-    ran_build = _build_if_needed(pkg_vers_changed, pkg_file_info, mkpkg)
+    ran_build = _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg)
 
     #
     # summarize result (for easy parsing)

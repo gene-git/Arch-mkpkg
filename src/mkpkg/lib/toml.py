@@ -1,0 +1,89 @@
+"""
+toml helper functions
+    - NB toml write cannot handle None values
+"""
+import os
+import sys
+import tomli_w
+from .tools import open_file
+
+if sys.version_info >= (3,11):
+    # 3.11 has tomllib
+    try:
+        import tomllib as toml
+    except ImportError:
+        pass
+else:
+    import tomli as toml
+
+def _dict_none_to_empty(dic):
+    """
+    Replaces None values with empty string ''
+    returns copy of dictionary
+    """
+    if not dic:
+        return {}
+
+    clean = dic.copy()
+
+    for key,val in clean.items():
+        if val is None:
+            clean[key] = ''
+        elif isinstance(val, dict):
+            clean[key] = _dict_none_to_empty(val)
+
+    return clean
+
+def _dict_remove_none(dic):
+    """
+    Rmoves keys with None values
+    returns copy of dictionary
+    """
+    clean = {}
+    if not dic:
+        return clean
+
+    for key,val in dic.items():
+        if val is not None:
+            if isinstance(val, dict):
+                new_val = _dict_remove_none(val)
+                if new_val:
+                    clean[key] = new_val
+            else:
+                clean[key] = val
+    return clean
+
+def dict_to_toml_string(dic):
+    """
+    Returns a toml formatted string from a dictionary
+      - Keys with None values are removed/ignored
+    """
+    clean_dict = _dict_remove_none(dic)
+    txt = tomli_w.dumps(clean_dict)
+    return txt
+
+def read_toml_file(fpath):
+    """
+    read toml file and return a dictionary
+    """
+    this_dict = None
+    if os.path.exists(fpath):
+        fobj = open_file(fpath, 'r')
+        if fobj:
+            data = fobj.read()
+            fobj.close()
+            this_dict = toml.loads(data)
+    return this_dict
+
+def write_toml_file(dic, fpath):
+    """
+    write dict to file
+    """
+    if not dic:
+        return
+
+    fobj = open_file(fpath, 'w')
+    if fobj:
+        data = dict_to_toml_string(dic)
+        fobj.write(data)
+        fobj.close()

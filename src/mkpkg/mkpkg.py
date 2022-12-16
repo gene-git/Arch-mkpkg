@@ -11,7 +11,7 @@
 """
 
 #import pdb
-from utils import MkPkg
+from lib import MkPkg
 
 def main():
     """

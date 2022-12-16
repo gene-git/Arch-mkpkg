@@ -13,6 +13,8 @@ from .tools import argv_parser
 from .tools import print_summary
 from .build import build
 from .dep_vers import write_current_pkg_dep_vers
+from .soname import write_current_pkg_dep_soname
+from .soname import pkginfo_soname_dep_info
 
 class MkPkg:
     """ MkPkg wrapper class """
@@ -34,10 +36,12 @@ class MkPkg:
         self.dep_vers_opers = ['>', '>=', '<']
         self.depends_files = None
         self.use_makedepends = None    # option --mkpk-use_makedepends (use fallback)
+        self.soname_info = {}
 
         # options
         self.verb = False              # don't show normal makepkg output
         self.force = False              # run makepkg even if not necessary
+        self.refresh = False            # refresh .mkpkg_dep_soname .mkpkg_dep_vers
 
         self.argv = argv_parser(self)   # passed down to makepkg
 
@@ -62,7 +66,12 @@ class MkPkg:
             2) If up to date - check all makedepends packages for being newer than last build
         """
         build(self)
-        if self.build_ok:
-            # save package names and versions of any depenencies
+        if self.build_ok or self.refresh:
+            #
+            # Get any soname info and save package names and versions
+            # of any depenencies (including sonames)
+            #
             write_current_pkg_dep_vers(self)
+            self.soname_info = pkginfo_soname_dep_info(self)
+            write_current_pkg_dep_soname(self)
         print_summary(self)

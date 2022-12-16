@@ -15,7 +15,7 @@ Can build using the PKGBUID provided which is also available in the AUR.
 To build it manually, clone the repo and do:
 
         rm -f dist/*
-        python python -m build --wheel --no-isolation
+        poetry build --format --wheel
         ./do-install /
 
 ### Dependencies
@@ -111,7 +111,18 @@ faster than makepkg; can be something like 10x faster or more.
 
 ## Whats New
 
-### Version 3.0.0
+### Version 4.0.0
+
+ - Soname drive rebuilds.  
+   Adds support for detecting missing soname libraries, and triggering rebuild.
+   If soname is found then no rebuild is done. Typically happens when
+   older soname is deprecated.
+
+ - Adds new option *--mkp-refresh*.  
+   Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
+   
+
+### Older
 
 Adds support for epoch.
 
@@ -233,6 +244,13 @@ These are used by mkpkg itself. The options currently supported are:
  - **--mkp-use_makedepends**   
    If *mkpkg_depends* and *mkpkg_depends_files* arrays are absent, setting this option
 will use the array *makedepends* to populate the *mkpkg_depends* list as a fall back.
+
+ - **--mkp-refresh**    
+   Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
+   If there is no saved metadata, and build is up to date, will try refresh the build info.
+   Files updated are *.mkp\_dep\_vers* and  *.mkp_dep_soname*. The soname data can only be updated
+   if the .PKGINFO file is still in the *pkg* directory.  Forcing a rebuild is the 
+   slower alternative but is guaranteed to have information needed.
 
 What mkpkg does is roughly:
     

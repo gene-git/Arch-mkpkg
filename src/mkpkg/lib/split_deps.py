@@ -52,10 +52,6 @@ def _split_pkg_vers_constraint(mkpkg, item):
 
     return (pkg, oper, vers_trigger)
 
-
-
-    return (pkg, oper, vers_trigger)
-
 def split_deps_vers_list(mkpkg):
     """
     Splits the mkpkg.depends list into 2 lists:
@@ -67,7 +63,7 @@ def split_deps_vers_list(mkpkg):
 
     dep_names = []
     dep_vers = []
-    opers = mkpkg.dep_vers_opers
+    #opers = mkpkg.dep_vers_opers
     for item in mkpkg.depends:
         (pkg, oper, vers_trigger) = _split_pkg_vers_constraint(mkpkg, item)
         if oper:

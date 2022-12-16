@@ -10,18 +10,24 @@ Package dependency support tools for MkPkg class check_deps()
 # pylint: disable=R0912,R0915
 import os
 import datetime
-from .run_prog import run_prog
 from .tools import open_file
+from .pacman import pacman_query
+from .pacman import pac_qi_key
+from .pacman import pac_qi_install_date
 from .version_compare import check_version_trigger
 
+#
+# Save / Restore '.mkpkg_dep_vers'
+#
 def write_current_pkg_dep_vers(mkpkg):
     """
-    Writes lsit of dependeny packages and versions as of last build
-        package_name version
+    Writes list of dependeny packages and versions as of last build
+        each item take form:
+         - package_name version
     """
     data = ''
     if mkpkg.dep_vers_now :
-        for (pkg,vers) in mkpkg.dep_vers_now.items():
+        for (pkg, vers) in mkpkg.dep_vers_now.items():
             data += f'{pkg} {vers}\n'
 
         fname = '.mkpkg_dep_vers'
@@ -55,35 +61,9 @@ def read_last_dep_vers(mkpkg):
             dep_vers_last[pkg] = vers
     return dep_vers_last
 
-def _pac_query_version(result):
-    """
-    Extract package version from pacman -Qi output
-    """
-    key = 'Version'
-    for line in result.splitlines():
-        if line.startswith(key):
-            lsplit = line.split(':', 1)
-            vers_str = lsplit[1].strip()
-            break
-
-    return vers_str
-
-def _pac_query_install_date(result):
-    """
-    Extract install date from pacman -Qi output
-        date time string format: Wed 06 Jul 2022 07:06:39 PM EDT
-    """
-    key = 'Install Date'
-    fmt = '%a %d %b %Y %I:%M:%S %p %Z'
-    dtime = None
-    for line in result.splitlines():
-        if line.startswith(key):
-            lsplit = line.split(':', 1)
-            dt_str = lsplit[1].strip()
-            dtime = datetime.datetime.strptime(dt_str, fmt)
-            break
-
-    return dtime
+#
+# dep version tools
+#
 
 def get_pkg_dep_vers_now(mkpkg):
     """
@@ -106,13 +86,8 @@ def get_pkg_dep_vers_now(mkpkg):
             pkg_list.append(pkg)
 
     for pkg in pkg_list:
-        pac_cmd = ['/usr/bin/pacman', '-Qi']
-        pargs = pac_cmd + [pkg]
-        [retc, output, _error] = run_prog(pargs)
-        if retc == 0:
-            pkg_vers = _pac_query_version(output)
-        else:
-            pkg_vers = None
+        output = pacman_query(['-Qi', pkg])
+        pkg_vers = pac_qi_key(output, 'Version')
         mkpkg.dep_vers_now[pkg] = pkg_vers
 
 def get_depends_times(pkglist):
@@ -125,13 +100,8 @@ def get_depends_times(pkglist):
     dep_datetimes = []
     if pkglist:
         for pkg in pkglist:
-            pac_cmd = ['/usr/bin/pacman', '-Qi']
-            pargs = pac_cmd + [pkg]
-            [retc, output, _error] = run_prog(pargs)
-            if retc == 0:
-                dtime = _pac_query_install_date(output)
-            else:
-                dtime = None
+            output = pacman_query(['-Qi', pkg])
+            dtime = pac_qi_install_date(output)
             this_one = [pkg, dtime]
             dep_datetimes.append(this_one)
 
@@ -142,7 +112,6 @@ def get_file_depends_times(cwd, flist):
     for each file in flist, get its last modified time
     non-existent files ignored - not an error
     """
-
     dep_file_dates = []
     if flist:
         for file in flist:
