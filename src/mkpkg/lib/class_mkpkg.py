@@ -9,7 +9,8 @@ array variable _mkpkg_depends.
 # pylint: disable=R0902
 import os
 from .class_msg import GcMsg
-from .tools import argv_parser
+from .class_config import MkpkgConf
+#from .tools import argv_parser
 from .tools import print_summary
 from .build import build
 from .dep_vers import write_current_pkg_dep_vers
@@ -35,15 +36,17 @@ class MkPkg:
         self.dep_vers_now = None
         self.dep_vers_opers = ['>', '>=', '<']
         self.depends_files = None
-        self.use_makedepends = None    # option --mkpk-use_makedepends (use fallback)
-        self.soname_info = {}
 
         # options
-        self.verb = False              # don't show normal makepkg output
-        self.force = False              # run makepkg even if not necessary
-        self.refresh = False            # refresh .mkpkg_dep_soname .mkpkg_dep_vers
+        self.conf = MkpkgConf()
+        self.verb = self.conf.verb              # don't show normal makepkg output
+        self.force = self.conf.force            # run makepkg even if not necessary
+        self.refresh = self.conf.refresh        # refresh .mkpkg_dep_soname .mkpkg_dep_vers
+        self.soname_build = self.conf.soname_build
+        self.argv = self.conf.makepkg_args      # passed down to makepkg
+        self.use_makedepends = self.conf.use_makedepends  # deprecated
 
-        self.argv = argv_parser(self)   # passed down to makepkg
+        self.soname_info = {}
 
         self.cwd = os.getcwd()
         self.mymsg = GcMsg()

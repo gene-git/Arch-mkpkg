@@ -111,6 +111,24 @@ faster than makepkg; can be something like 10x faster or more.
 
 ## Whats New
 
+### Version 4.1.0
+
+ - Arguments  
+Change in argument handling. Arguments to be passed to *makepkg* must now follow *--*.
+Arguments before the double dash are used by mkpkg itself. To keep backward
+compatibility the older *--mkp-* style arguments are honored, but the newer simpler
+ones are preferred. e.g. *-v, --verb* for verbose. Help availble via *-h*. 
+
+ - New argument for how soname changes are treated : *-so-bld, --soname-build*. 
+   Can be *missing*, *newer* or *never*. Default is missing - rebuild if soname 
+   no longer available.  
+
+ - Config file now available.
+   Configs are looked for in /etc/mkpkg/config then ~/.config/mkpkg/config. It shoule
+   be in TOML format. e.g. to change the default soname rebuild option:
+
+        soname_build = "newer"
+
 ### Version 4.0.0
 
  - Soname drive rebuilds.  
@@ -229,28 +247,40 @@ The source is kept in the github repository Arch-mkpkg, link above.
 # 3. How to use mkpkg
 
 Simply call mkpkg instead of makepkg. Couldn't be simpler. 
-Arguments for mkpkg are all passed through to *makepkg* execpt for those of the form:
+Options for mkpkg are those before any double dash *--*. Any options following *--*
+are passed through to *makepkg*
 
- - **--mkp-\<option\>**
+The older style options using *--mkp-* are deprecated but are supported to ensure backward
+compatibility. They will be removed at some point in the future.
 
-These are used by mkpkg itself. The options currently supported are:
+The options currently supported by mkpkg are:
 
- - **--mkp-verb**   
+ - **-v, --verb, --mkp-verb**   
    Show (stdout) output of makepkg.  Default is not to show it.
 
- - **--mkp-force**   
+ - **-f, --force, --mkp-force**   
    Force a makepkg run even if not needed. You may want to also set the *-f* option to be passed on to makepkg.
 
- - **--mkp-use_makedepends**   
+ - **--mkp-use_makedepends**  
+   Still supported, but this feature is deprecated.
    If *mkpkg_depends* and *mkpkg_depends_files* arrays are absent, setting this option
 will use the array *makedepends* to populate the *mkpkg_depends* list as a fall back.
 
- - **--mkp-refresh**    
+ - **-r, --refresh, --mkp-refresh**    
    Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
    If there is no saved metadata, and build is up to date, will try refresh the build info.
    Files updated are *.mkp\_dep\_vers* and  *.mkp_dep_soname*. The soname data can only be updated
    if the .PKGINFO file is still in the *pkg* directory.  Forcing a rebuild is the 
    slower alternative but is guaranteed to have information needed.
+
+ - *--*  
+   All options following this are passed to makepkg 
+
+ - Config file
+   Configs are looked for in /etc/mkpkg/config then ~/.config/mkpkg/config. It shoule
+   be in TOML format. e.g. to change the default soname rebuild option:
+
+        soname_build = "newer"
 
 What mkpkg does is roughly:
     

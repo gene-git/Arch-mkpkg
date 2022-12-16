@@ -4,6 +4,7 @@ Support routines for soname library management
 import os
 import re
 import glob
+from packaging import version
 from .tools import open_file
 from .pacman import pacman_query
 from .pacman import pac_qi_key
@@ -205,8 +206,9 @@ def _info_to_sonames(info):
         this_sonames = pkg_info.get('sonames')
         if this_sonames:
             sonames += this_sonames
-    return sonames
-
+    # large to small
+    sonames_sorted = sorted(sonames, key=version.parse,reverse=True)
+    return sonames_sorted
 
 def soname_rebuild_needed(mkpkg):
     """
@@ -219,21 +221,52 @@ def soname_rebuild_needed(mkpkg):
                      can try rebuild and hope works without sonames
       (b) lib gone - nothing we can do - package is broken - error
     """
+    # pylint: disable=R0912
     msg = mkpkg.msg
     soname_info_last = mkpkg.soname_info
     soname_info_curr = current_soname_provides(mkpkg)
 
     rebuild = False
-    for (lib, info) in soname_info_last.items():
-        soname = info['soname']
+    for (lib, info_last) in soname_info_last.items():
+        this_rebuild = False
+        soname_last = info_last['soname']
+        sonames_last = _info_to_sonames(info_last)
 
-        info_lib = soname_info_curr.get(lib)
-        sonames = _info_to_sonames(info_lib)
-        if sonames and soname in sonames:
-            continue
-        msg(f'Soname {lib} missing : want {soname} have {sonames}\n', fg_col='yellow')
-        msg('  Will try rebuilding\n')
-        rebuild = True
+        info_curr = soname_info_curr.get(lib)
+        sonames_curr = _info_to_sonames(info_curr)
+
+        soname_avail = False
+        soname_newer = False
+        if sonames_curr :
+            if soname_last in sonames_curr:
+                soname_avail = True
+            if sonames_last:
+                if version.parse(sonames_curr[0]) > version.parse(sonames_last[0]):
+                    soname_newer = True
+            else:
+                if mkpkg.verb:
+                    msg('  No sonames version list from last build\n')
+
+            if not soname_avail:
+                msg(f'  {lib} soname gone {soname_last} : have {sonames_curr}\n', fg_col='yellow')
+                if mkpkg.soname_build in ('missing', 'newer') :
+                    this_rebuild = True
+
+            if soname_newer:
+                msg(f'  {lib} has newer soname {sonames_curr[0]} > {sonames_last[0]}\n')
+                if mkpkg.soname_build in ('newer'):
+                    this_rebuild = True
+        else:
+            msg(f'{lib} soname {soname_last} - no sonames found.', fg_col='red')
+            this_rebuild = True
+
+        if this_rebuild:
+            rebuild = True
+
+    if rebuild and mkpkg.soname_build == 'never':
+        if mkpkg.verb:
+            msg('  Soname rebuild set to never - no rebuild\n')
+            rebuild = False
 
     return rebuild
 
