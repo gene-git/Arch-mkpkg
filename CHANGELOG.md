@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-12-16
+ - Add toml dependency to PKGBUILD  
+ - update CHANGELOG.md for 4.1.0  
+
 ## [4.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-12-16
  - Add config file support.  
    Change option handling. Options to be passed to makepkg must now be placed after --  
