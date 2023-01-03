@@ -11,6 +11,9 @@
 """
 def _get_matches(cnt, num_max, col, col_list):
     """ return matches of first 'cnt' chars """
+    if col in col_list:
+        return [col]
+
     sub_list = []
     for color in col_list:
         if len(color) >= cnt and col[0:cnt] == color[0:cnt]:
