@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-01-03
+ - Fix for potential color name match bug - not with current color sets  
+ - update CHANGELOG.md for 4.1.1  
+
 ## [4.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2022-12-16
  - Add toml dependency to PKGBUILD  
  - update CHANGELOG.md for 4.1.0  
