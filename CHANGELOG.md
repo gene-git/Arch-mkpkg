@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.2.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-01-06
+ - Add SPDX licensing lines  
+   Lint and tidy  
+ - update CHANGELOG.md for 4.2.0  
+
 ## [4.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-01-03
  - Fix for potential color name match bug - not with current color sets  
  - update CHANGELOG.md for 4.1.1  
