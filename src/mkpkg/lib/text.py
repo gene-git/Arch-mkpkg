@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022,2023 Gene C
 """
 Support tools for text
     text_fmt_helper() - tracks columns and issues newline and column reset when hit last column

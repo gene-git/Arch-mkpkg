@@ -440,3 +440,8 @@ those packages used for testing but NOT for running the tool. Testing tools and 
  - The AUR PKGBUILD is provided in git tree and builds latest tagged version git
    Link is at beginning of README.
 
+## License
+
+`mkpkg` was created by Gene C. It is licensed under the terms of the MIT license.
+ - SPDX-License-Identifier: MIT  
+ - Copyright (c) 2023, Gene C

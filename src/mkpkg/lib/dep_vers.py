@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022,2023 Gene C
 """
 Package dependency support tools for MkPkg class check_deps()
     - read_last_dep_vers            - read list of packages / versions

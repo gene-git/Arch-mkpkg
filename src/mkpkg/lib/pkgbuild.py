@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022,2023 Gene C
 """
 Support tools relating to PKGBUILD file used by MkPkg class
     - bump_pkgrel
