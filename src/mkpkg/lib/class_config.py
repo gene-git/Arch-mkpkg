@@ -46,11 +46,11 @@ class MkpkgConf:
                  {'help' : 'More verbose output'}
                 ],
                 [('-f', '--force', '--mkp-force'),
-                 {'help' : 'Force makepkg to be run (may want -f to makepkg)',
+                 {'help' : 'Bump package release and rebuild',
                   'action'      : 'store_true'}
                 ],
                 [('-r', '--refresh', '--mkp-refresh'),
-                 {'help' : 'Force makepkg to be run (may want -f to makepkg)',
+                 {'help' : 'update saved metadata files.',
                   'action'      : 'store_true'}
                 ],
                 [('-so-bld', '--mkp-soname-build'),

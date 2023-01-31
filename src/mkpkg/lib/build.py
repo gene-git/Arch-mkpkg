@@ -97,7 +97,14 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
     if not needs_build and mkpkg.force:
         needs_build = True
         msg('Force active : Running build\n', ind=1)
+        pkgrel = bump_pkgrel(mkpkg.pkgrel)
+        mkpkg.pkgrel_updated = pkgrel
         mkpkg.result.append(['changed', 'force', 'rebuild forced'])
+        msg(f'Updating pkgrel : {mkpkg.pkgrel} -> {pkgrel}\n', ind=1)
+        okay = set_pkgrel(mkpkg, pkgrel)
+        if not okay:
+            msg('Failed to update pkgrel\n', fg_col='red')
+            mkpkg.result.append(['error', 'pkgbuild', f'writing new pkgrel {pkgrel}'])
 
     if needs_build:
         msg('Building package\n', ind=1)

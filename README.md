@@ -259,7 +259,7 @@ The options currently supported by mkpkg are:
    Show (stdout) output of makepkg.  Default is not to show it.
 
  - **-f, --force, --mkp-force**   
-   Force a makepkg run even if not needed. You may want to also set the *-f* option to be passed on to makepkg.
+   Force a makepkg run even if not needed. Bump the package release and rebuild
 
  - **--mkp-use_makedepends**  
    Still supported, but this feature is deprecated.
