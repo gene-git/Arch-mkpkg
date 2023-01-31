@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-01-31
+ - Force now bumps the package release and rebuilds  
+ - update CHANGELOG.md for 4.2.1  
+
 ## [4.2.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-01-06
  - Add SPDX licensing lines  
    Lint and tidy  
