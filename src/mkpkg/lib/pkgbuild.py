@@ -142,7 +142,7 @@ def get_pkgbld_data(mkpkg):
     cmd_str += f'startdir="{mkpkg.cwd}"\n'
     cmd_str += f'srcdir="{srcdir}"\n'
 
-    cmd_str += f'source "{pkgbld_file}"\n'
+    cmd_str += f'cd {srcdir}; source "$startdir/{pkgbld_file}"\n'
 
     cmd_str += 'is_function() {\n'
     cmd_str += '  [[ $(type -t $1) ]] && echo true || echo "false"\n'
@@ -229,7 +229,7 @@ def get_pkgbld_data(mkpkg):
         elif line.startswith('_X_ pkgver ='):
             mkpkg.pkgver = data
             if not data:
-                msg('Warning: PKGBUILD missing pkgrel\n', fg_col='yellow')
+                msg('Warning: PKGBUILD missing pkgver\n', fg_col='yellow')
                 okay = False
 
         elif line.startswith('_X_ pkgver_updated ='):
