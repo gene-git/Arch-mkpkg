@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-02-18
+ - Bug fix extracting PKGBUILD info for certain cases  
+ - update CHANGELOG.md for 4.3.0  
+
 ## [4.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-01-31
  - Force now bumps the package release and rebuilds  
  - update CHANGELOG.md for 4.2.1  
