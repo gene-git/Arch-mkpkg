@@ -48,7 +48,10 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
             msg('Soname requires rebuild\n')
 
         mkpkg.result.append(['changed', 'package', f'{vers_info}'])
-        pkgrel = "1"
+        if pkg_vers_changed:
+            pkgrel = "1"
+        else:
+            pkgrel = bump_pkgrel(mkpkg.pkgrel)
         mkpkg.pkgrel_updated = pkgrel
         msg(f'Resetting pkgrel and rebuilding : {pkgrel}\n', fg_col='cyan')
         okay  = set_pkgrel(mkpkg, pkgrel)
