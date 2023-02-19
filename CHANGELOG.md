@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-02-19
+ - Fix bug when soname dependency drives rebuild by ensuring pkgrel is bumped  
+ - update CHANGELOG.md for 4.4.0  
+
 ## [4.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-02-18
  - Bug fix extracting PKGBUILD info for certain cases  
  - update CHANGELOG.md for 4.3.0  
