@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-05-17
+ - Simplify Arch PKGBUILD and more closely follow arch guidelines  
+ - update CHANGELOG.md for 4.5.0  
+
 ## [4.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-02-19
  - Fix bug when soname dependency drives rebuild by ensuring pkgrel is bumped  
  - update CHANGELOG.md for 4.4.0  
