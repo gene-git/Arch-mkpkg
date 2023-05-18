@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.4] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-05-18
+ - Change PKGBUILD makedepnds from pip to installer  
+ - update CHANGELOG.md for 4.5.3  
+
 ## [4.5.3] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-05-18
  - install: switch from pip to python installer package. This adds optimized bytecode  
  - update CHANGELOG.md for 4.5.2  
