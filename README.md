@@ -15,7 +15,7 @@ Can build using the PKGBUID provided which is also available in the AUR.
 To build it manually, clone the repo and do:
 
         rm -f dist/*
-        poetry build --format --wheel
+        /usr/bin/python -m build --wheel --no-isolation
         ./do-install /
 
 ### Dependencies
