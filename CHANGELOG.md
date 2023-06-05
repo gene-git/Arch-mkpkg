@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.5.5] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-05
+ - Small tweak to README  
+ - update CHANGELOG.md for 4.5.4  
+
 ## [4.5.4] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-05-18
  - Change PKGBUILD makedepnds from pip to installer  
  - update CHANGELOG.md for 4.5.3  
