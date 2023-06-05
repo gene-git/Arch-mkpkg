@@ -35,33 +35,38 @@ To build it manually, clone the repo and do:
 
 # OVERVIEW of mkpkg
 
-Building an Arch package requires invoking *makepkg* with *PKGBUILD* file.
-PKGBUILD file uses a *depends* variable to list those packages needed to employ the 
-tool provided by the package.
+Building an Arch package requires invoking *makepkg* with a *PKGBUILD* file.
+PKGBUILD file contains a *depends* variable which lists those packages that are
+needed to use tool provided by the package.
 
-It also uses a 'makedepends' variable which is a list of other packages that are
-needed to build the package. 
+It also has a 'makedepends' variable which is a list of other packages that are
+needed to build the package. makepkg also assumes that any package listed in the *depends* 
+variable must also be present to build the package.
 
-The only thing which causes a rebuild is a change to the package version - either because
-the underlying tool itself changed or because the packager manually forced a rebuild
-by changing the release version.
+However, once a package has been built, then the only thing which causes 
+a rebuild is a change to the actual package version itself. This can be either because
+the version of the tool itself changed or because the packager manually 
+changed the release version, thereby forcing a rebuild.
 
-If you ever needed to manually rebuild a package by bumping the release version, then
-something is clearly not quite right. If something triggered a rebuild, other than 
-the package itself having an update, it would be better if this were done automatically
+If you have ever needed to rebuild a package by manually bumping the release version, then
+something is not ideal. If something requires a rebuild, other than 
+the package itself having an update, it would be far better if this is done automatically
 rather than by hand. 
 
-This is what mkpkg helps with - it automates rebuilds when they are needed for some reason 
-other than the tool / package version itself being newer. 
+This is what mkpkg does. It automates rebuilds when they are needed for some reason 
+other than the tool / package version itself being newer. As a simple example, if something
+depends on openssl and the last build was against 3.0.0, then it can be set to rebuild 
+if openssl has been installed more recently version than when the last package build 
+was done. It could also be set to rebuild if openssl has a minor version update like 3.1.x.
 
-To accomplish this mkpkg allows you to define a set of *triggers* that will cuase a rebuild. 
-These are packages, or files,  that, well yes, trigger a rebuild whenever they change in a
-specified way. Simple.
+To accomplish this mkpkg allows you to define a set of *triggers* that will cause a rebuild. 
+These are packages, or files,  that trigger a rebuild whenever they change in a
+specified way. Straightforward concept.
 
-The packager is responsible for making the list of those triggers which are appropriate.  
+The packager is responsible for providing the list of appropriate triggers.
 
 The way to provide the these triggers is by adding a PKGBUILD array variable
-*_mkpkg_depends* which provides the list of conditions to trigger a rebuild. 
+*_mkpkg_depends* which provides the list of conditions that should trigger a rebuild. 
 There are 2 ways to specify a trigger package: (1) a package name or 
 (2) a package along with a requirement about its version. 
 
@@ -107,7 +112,7 @@ As another example, I rebuild my python applications when python's major.minor i
 than what was used for previous build.
 
 An additional little benefit, if packages are up to date then running mkpkg is significantly
-faster than makepkg; can be something like 10x faster or more. 
+faster than makepkg; can be something like 10x faster or even more.  
 
 ## Whats New
 
