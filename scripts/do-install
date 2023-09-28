@@ -2,16 +2,16 @@
 # 
 # installer script for mkpkg
 #  e.g. Call from PKGBUILD:  
-#   do-install ${pkgdir}
+#   ./scripts/do-install ${pkgdir}
 # gene c (2022)
 #
 dest="$1"
 self='mkpkg'
 
-info="README.md CHANGELOG.md PKGBUILD"
+info="README.rst Docs packaging scripts"
 infodir="/usr/share/${self}"
 
-license="LICENSE"
+license="Docs/License.rst"
 licensedir="/usr/share/licenses/${self}"
 
 # list apps without the ".py" or leave empty string
@@ -24,8 +24,8 @@ if [ ! -d "$dest" ] ; then
     exit 1
 else
     # shared 
-    rsync --mkpath -a ${info} ${dest}${infodir}
-    rsync --mkpath -a ${license} ${dest}/${licensedir}/${license}
+    rsync --mkpath -a ${info} ${dest}${infodir}/
+    rsync --mkpath -a ${license} ${dest}/${licensedir}/
 
     /usr/bin/python -m installer --destdir="$dest" dist/*.whl
 
