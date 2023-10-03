@@ -2,214 +2,159 @@ Changelog
 =========
 
 [4.7.0] ----- 2023-10-03
- * update project version  
  * Bug fix semantic version comparisons  
  * Stop treating Arch pkgrel as part of the last version element - its separate additional element  
- * update Docs/Changelog.rst  
+ * update Docs/Changelog.rst for 4.6.0  
 
 [4.6.0] ----- 2023-09-28
- * update project version  
- * change pyproject to use README.rst  
  * Reorganize the tree and documents.  
  * Switch from markdown to restructured text.  
  * Now easy to build html and pdf docs using sphinx  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.5.5  
 
 [4.5.5] ----- 2023-06-05
- * update project version  
- * Small tweaks to README  
- * update CHANGELOG.md  
+ * Small tweak to README  
+ * update CHANGELOG.md for 4.5.4  
 
 [4.5.4] ----- 2023-05-18
- * update project version  
  * Change PKGBUILD makedepnds from pip to installer  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.5.3  
 
 [4.5.3] ----- 2023-05-18
- * update project version  
  * install: switch from pip to python installer package. This adds optimized bytecode  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.5.2  
 
 [4.5.2] ----- 2023-05-18
- * update project version  
  * PKGBUILD: build wheel back to using python -m build instead of poetry  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.5.1  
 
 [4.5.1] ----- 2023-05-17
- * update project version  
  * Simplify Arch PKGBUILD and more closely follow arch guidelines  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.5.0  
 
 [4.5.0] ----- 2023-02-19
- * update project version  
  * Fix bug when soname dependency drives rebuild by ensuring pkgrel is bumped  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.4.0  
 
 [4.4.0] ----- 2023-02-18
- * update project version  
- * Bug fix extracing PKGBUILD for certain cases  
- * update CHANGELOG.md  
+ * Bug fix extracting PKGBUILD info for certain cases  
+ * update CHANGELOG.md for 4.3.0  
 
 [4.3.0] ----- 2023-01-31
- * update project version  
- * typo  
  * Force now bumps the package release and rebuilds  
-
-[4.2.2] ----- 2023-01-06
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.2.1  
 
 [4.2.1] ----- 2023-01-06
- * update project version  
  * Add SPDX licensing lines  
  * Lint and tidy  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.2.0  
 
 [4.2.0] ----- 2023-01-03
- * update project version  
- * Fix for potential color match bug  
- * update CHANGELOG.md  
+ * Fix for potential color name match bug - not with current color sets  
+ * update CHANGELOG.md for 4.1.1  
 
 [4.1.1] ----- 2022-12-16
- * update project version  
  * Add toml dependency to PKGBUILD  
- * update CHANGELOG.md  
+ * update CHANGELOG.md for 4.1.0  
 
 [4.1.0] ----- 2022-12-16
- * update project version  
  * Add config file support.  
  * Change option handling. Options to be passed to makepkg must now be placed after --  
  * Improveed soname treatment via option --soname-build (missing (default), newer or never)  
- * ;  
  * update CHANGELOG.md  
 
 [4.0.0] ----- 2022-12-15
- * update project version  
- * Soname suggestion thanks to Alberto Novella Archlinux subredit.  
  * Add --mkp-refresh  
  * Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.  
- * more work on soname change driven build  
  * refactor some code  
  * pull out pacman queries to more easily share  
- * build foundation code for soname checks  
- * ;  
- * Use poetry to build wheel.  
- * Use pip install in installer script.  
- * Rename src/mkpkg/utils -> src/mkpkg/lib  
+ * Add suport for missing soname library driving rebuild  
+ * suggestion thanks to Alberto Novella Archlinux subredit.  
  * update CHANGELOG.md  
 
 [3.5.4] ----- 2022-11-29
- * update project version  
- * tweak readme  
- * improve bash variable check in installer - no functional change  
+ * Small change to README.  
+ * Change variable check in installer (no functional change)  
  * update CHANGELOG.md  
 
 [3.5.3] ----- 2022-11-05
- * update project version  
- * tweak readme some  
  * tweak readme  
- * update CHANGELOG.md  
+ * installer script change list to bash array for apps being installed. zero impact  
  * update CHANGELOG.md  
 
 [3.5.2] ----- 2022-11-04
- * update project version  
  * PKGBUILD - duh - put back makedepends on poetry  
  * update CHANGELOG.md  
 
 [3.5.1] ----- 2022-11-04
- * update project version  
- * vers now 3.5.1  
  * Add package name to screen message  
  * update CHANGELOG.md  
 
 [3.5.0] ----- 2022-11-03
- * update project version  
  * bug fix incorrectly handling triggers pkg>xxx  
  * update CHANGELOG.md  
 
 [3.4.0] ----- 2022-11-03
- * update project version  
  * Better handling of PKGBUILD syntax errors  
  * update CHANGELOG.md  
 
 [3.3.1] ----- 2022-11-03
- * update project version  
  * unwind prev error check - needs more work  
  * update CHANGELOG.md  
 
 [3.3.0] ----- 2022-11-03
- * update project version  
  * Additional check for errors when sourcing PKGBUILD  
- * info messagetypo verion -> version  
- * update CHANGELOG.md  
- * update CHANGELOG.md  
  * update CHANGELOG.md  
 
 [3.2.0] ----- 2022-10-31
- * update project version  
- * bah typo - sorry  
- * tidy  
+ * typo - so sorry  
  * update CHANGELOG.md  
 
 [3.1.0] ----- 2022-10-31
- * update project version  
- * duh me - do-install  
- * typo - missing if in do-install  
- * update CHANGELOG.md  
-
-[3.0.1] ----- 2022-10-31
- * update project version  
  * Add more aliases of First_N for version comparisons (micro, serial)  
  * Change build from poetry/pip to python -m build/installer  
- * sync PKGBUILD from aur  
  * update CHANGELOG.md  
 
 [3.0.0] ----- 2022-10-30
- * update project version  
+ * update CHANGELOG.md  
  * Add epoch support - needs wider testing  
- * debug off  
- * upd changelog  
+ * update changelog  
 
 [2.5.0] ----- 2022-10-26
  * bug fix for _mkpkg_depends_files - silly typo  
- * upd changelog  
+ * CHANGELOG.md  
 
 [2.4.1] ----- 2022-10-24
- * update pyproject vers  
+ * update pyproject.toml vers  
  * update changelog  
 
 [2.4.0] ----- 2022-10-24
  * oops - accidently left debugger on!  
  * update changelog  
- * update 2.3.6  
+
+[2.3.6] ----- 2022-10-24
  * Fix bug parsion <package> >= xxx.  Greater than is fine.  
- * Fix bug parsion <package> >= xxx.  Greater than is fine.  
+ * update changelog  
 
 [2.3.5] ----- 2022-10-23
- * update pyproject.toml vers  
  * avoid all but tag in pkgver()  
+ * update pyproject.toml vers  
+ * update changelog  
 
 [2.3.4] ----- 2022-10-23
- * Prep for 2.3.4  
  * PKGBUILD - remove tag= now that pgkver() is getting latest tag  
- * typo  
- * update changelog  
 
 [2.3.3] ----- 2022-10-23
- * update pyproject.toml version to 2.3.3 release  
- * Update PKGBUILD to get build latest release tag  
+ * PKGBUILD now builds latest release tag  
  * update changelog  
  * Add comment about being fast  
- * bump aur to latest tag  
  * update changelog  
 
 [2.3.2] ----- 2022-10-14
- * remove execute mode on license file  
- * Clean the dist directory before doing poetry build  
- * update pyproject.toml version  
  * Improve PKGBUILD for aur as per comments  
+ * update pyproject.toml version  
+ * Clean the dist directory before doing poetry build  
  * fix python depends version > 3.9  
- * Update minimum python in PKGBUILD dependency  
- * Remove python from  makedepends PKGBUILD as in depends  
  * Add makedepends packages in aur PKGBUILD  
  * fix comment  
  * add aur comment  
@@ -217,14 +162,13 @@ Changelog
 
 [2.3.1] ----- 2022-10-13
  * Update readme with link to AUR for mkpkg  
- * Prep PKGBUILD for aur  
+ * Change PKGBUILD for AUR  
  * little word smithing on readme  
  * Clean up some comments  
  * readme word smithing  
  * update changelog  
 
 [2.3.0] ----- 2022-10-13
- * turn off debug  
  * In the event mkpkg_depends / mkpkg_depends_files are absent,  
  * no longer fall back to use makedepends unless turned on with the --mkp-use_makedepends option  
  * update changelog  
@@ -243,11 +187,8 @@ Changelog
  * update changelog  
  * more readme tweaks  
  * update changelog  
- * update changelog  
 
 [2.1.1] ----- 2022-10-13
- * update do-install to share PKGBUILD  
- * update changelog  
  * Provide sample PKGBUILD to build mkpkg  
  * update changelog  
  * typo in readme  
@@ -264,21 +205,69 @@ Changelog
 [2.0.1] ----- 2022-10-12
  * update changelog  
  * remove unused from do-install  
+ * update CHANGELOG  
+ * tweak readme  
  * update changelog  
 
 [2.0.0] ----- 2022-10-12
- * tweak readme  
- * tweak readme  
- * Update Changelog  
- * Update README with whats new  
- * use ln -sf when making link in /usr/bin/mkpkg to handle a previous build failure  
- * buglet do-install  
- * update changelog  
-
-[1.9.9] ----- 2022-10-12
  * Reorganize directory structure and use poetry for packaging.  
  * Add support for triggers now based on semantic versions.  
  * e.g python>3.12 or python>minor - where minor triggers build if  
  * major.minor version of dependency package is greater than that used when  
  * it was last built.  
+ * Reorganize source tree  
+ * Update changelog  
+ * tweak readme little more  
+ * update Changelog  
+ * Tweak README  
+ * tweak README  
+
+[1.3.1] ----- 2022-09-22
+ * Update Changelog  
+ * Add CVE-2022-36113 as example of build tool danger  
+ * Update Changelog  
+ * Add Changelog  
+
+[1.3.0] ----- 2022-09-07
+ * fix out of date comment in mkpkg.py  
+ * fix little markdown issue  
+ * tweak readme format  
+
+[1.2.0] ----- 2022-09-06
+ * Add support for trigger files : mkpkg_depends_files  
+ * add README discssion comment  
+ * lint picking  
+ * Add comment in README  
+ * few more README tweaks  
+
+[1.1.1] ----- 2022-09-04
+ * tidy message output  
+ * typo  
+ * Little tidy on README  
+
+[1.1.0] ----- 2022-09-04
+ * Handle edge case when PKGBUILD hand edited  
+ * Bug fix for case when override mkpkg_depends set to empty set  
+
+[1.0.5] ----- 2022-09-03
+ * Now that we implemented mkpkg_depends, remove some readme comments  
+ * typo  
+ * minor README tweak  
+ * Fix typo (resolves issue #1) and tweak README  
+
+[1.0.4] ----- 2022-09-03
+ * fix section numbers in README  
+
+[1.0.3] ----- 2022-09-03
+ * Support mkpkg_depends overriding makepends - gives full control to user  
+
+[1.0.2] ----- 2022-09-03
+ * README use lower case for mkpkg  
+
+[1.0.1] ----- 2022-09-03
+ * Tidy couple comments  
+
+[1.0.0] ----- 2022-09-03
+ * Initial Revision of mkpkg.  
+ * mkpkg builds Arch packages and rebuilds them whenever a make dependency is more recent than the last package  
 
