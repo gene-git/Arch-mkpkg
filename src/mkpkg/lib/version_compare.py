@@ -11,13 +11,23 @@ def _semantic_vers_to_elems(vers):
     split version into its components each separated by period:
         vers_components = [major,minor,patch, elem4, ele5, ...]
         While proper semantic versionong has 3 elements, we generalize to allow for 4 or more.
+
+        NB. Arch pkgrel is always in the last element - and we need to handle it.
+            We treat the pkgrel as an additional element in the list to avoid incorrect compares
+
+        e.g. Compare minor (or first_2) : 2.30-8   with 2.30-7
+             Correct : same as 2.30 == 2.30
+             Wrong :           2.30-8 > 20.30-7 
         return list of elements [elem1, elem2, ...]
     """
     elems = []
     if vers:
-        vsplit = vers.split('.')
-        for elem in vsplit:
-            elems.append(elem.strip())
+        # Split by period
+        vsplit = [elem.strip() for elem in vers.split('.')]
+
+        # split out Arch pkgrel
+        last = vsplit[-1]
+        elems = vsplit[:-1] + last.rsplit('-', 1)
 
     return elems
 
