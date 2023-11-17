@@ -12,8 +12,8 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
- * Documentation moved to Docs and migrated to rst 
- * Straightforward to build html and pdf docs using sphinx
+ * Version comparisons now use pyalpm instead of packaging
+   packaging.version barfs on systemd package version 255rc2.1
 
 #################
 mkpkg application
@@ -453,7 +453,7 @@ Dependencies
 
 - Run Time:
   - python (3.9 or later)
-  - packaging aka python-packaging
+  - pyalpm
 
 - Building Package :
   - git 

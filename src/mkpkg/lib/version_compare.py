@@ -4,7 +4,8 @@
  Package dependency support tools for MkPkg class
     - version comparison tools
 """
-from packaging import version
+#from packaging import version
+import pyalpm
 
 def _semantic_vers_to_elems(vers):
     """
@@ -137,13 +138,17 @@ def check_version_trigger(mkpkg, oper, vers_trigger, pkg_vers, last_vers):
 
     (pkg_vers_comp, last_vers_comp) = _versions_to_compare(vers_trigger, pkg_vers, last_vers)
 
+    # use pyalpm
+    #new_minus_old = version.parse(pkg_vers_comp) - version.parse(last_vers_comp)
+    new_minus_old = pyalpm.vercmp(pkg_vers_comp, last_vers_comp)
+
     match(oper):
         case '>=':
-            trigger = version.parse(pkg_vers_comp) >= version.parse(last_vers_comp)
+            trigger = new_minus_old >= 0
         case '>':
-            trigger = version.parse(pkg_vers_comp) >  version.parse(last_vers_comp)
+            trigger = new_minus_old >  0
         case '<':
-            trigger = version.parse(pkg_vers_comp) <  version.parse(last_vers_comp)
+            trigger = new_minus_old <  0
         case _:
             msg = mkpkg.msg
             msg(f'Unkown package version operator : {oper} ignoring\n', fg_col='yellow', ind=1)
