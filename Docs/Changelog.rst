@@ -1,20 +1,25 @@
 Changelog
 =========
 
+[4.9.0] ----- 2023-11-28
+ * Switch python build backend to hatch (was poetry)  
+ * Switch python build backend to hatch (was poetry)  
+ * update Docs/Changelog.rst Docs/mkpkg.pdf for 4.8.0  
+
 [4.8.0] ----- 2023-11-17
  * Change to using pyalpm to compare package versions instead of packaging.  
- * ing.version() barfs on systemd version 255rc2.1 for some reason  
+   ing.version() barfs on systemd version 255rc2.1 for some reason  
  * update Docs/Changelog.rst for 4.7.0  
 
 [4.7.0] ----- 2023-10-03
  * Bug fix semantic version comparisons  
- * Stop treating Arch pkgrel as part of the last version element - its separate additional element  
+   Stop treating Arch pkgrel as part of the last version element - its separate additional element  
  * update Docs/Changelog.rst for 4.6.0  
 
 [4.6.0] ----- 2023-09-28
  * Reorganize the tree and documents.  
- * Switch from markdown to restructured text.  
- * Now easy to build html and pdf docs using sphinx  
+   Switch from markdown to restructured text.  
+   Now easy to build html and pdf docs using sphinx  
  * update CHANGELOG.md for 4.5.5  
 
 [4.5.5] ----- 2023-06-05
@@ -51,7 +56,7 @@ Changelog
 
 [4.2.1] ----- 2023-01-06
  * Add SPDX licensing lines  
- * Lint and tidy  
+   Lint and tidy  
  * update CHANGELOG.md for 4.2.0  
 
 [4.2.0] ----- 2023-01-03
@@ -64,27 +69,27 @@ Changelog
 
 [4.1.0] ----- 2022-12-16
  * Add config file support.  
- * Change option handling. Options to be passed to makepkg must now be placed after --  
- * Improveed soname treatment via option --soname-build (missing (default), newer or never)  
+   Change option handling. Options to be passed to makepkg must now be placed after --  
+   Improveed soname treatment via option --soname-build (missing (default), newer or never)  
  * update CHANGELOG.md  
 
 [4.0.0] ----- 2022-12-15
  * Add --mkp-refresh  
- * Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.  
- * refactor some code  
- * pull out pacman queries to more easily share  
- * Add suport for missing soname library driving rebuild  
- * suggestion thanks to Alberto Novella Archlinux subredit.  
+   Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.  
+   refactor some code  
+   pull out pacman queries to more easily share  
+   Add suport for missing soname library driving rebuild  
+   suggestion thanks to Alberto Novella Archlinux subredit.  
  * update CHANGELOG.md  
 
 [3.5.4] ----- 2022-11-29
  * Small change to README.  
- * Change variable check in installer (no functional change)  
+   Change variable check in installer (no functional change)  
  * update CHANGELOG.md  
 
 [3.5.3] ----- 2022-11-05
  * tweak readme  
- * installer script change list to bash array for apps being installed. zero impact  
+   installer script change list to bash array for apps being installed. zero impact  
  * update CHANGELOG.md  
 
 [3.5.2] ----- 2022-11-04
@@ -117,7 +122,7 @@ Changelog
 
 [3.1.0] ----- 2022-10-31
  * Add more aliases of First_N for version comparisons (micro, serial)  
- * Change build from poetry/pip to python -m build/installer  
+   Change build from poetry/pip to python -m build/installer  
  * update CHANGELOG.md  
 
 [3.0.0] ----- 2022-10-30
@@ -143,7 +148,7 @@ Changelog
 
 [2.3.5] ----- 2022-10-23
  * avoid all but tag in pkgver()  
- * update pyproject.toml vers  
+   update pyproject.toml vers  
  * update changelog  
 
 [2.3.4] ----- 2022-10-23
@@ -157,8 +162,8 @@ Changelog
 
 [2.3.2] ----- 2022-10-14
  * Improve PKGBUILD for aur as per comments  
- * update pyproject.toml version  
- * Clean the dist directory before doing poetry build  
+   update pyproject.toml version  
+   Clean the dist directory before doing poetry build  
  * fix python depends version > 3.9  
  * Add makedepends packages in aur PKGBUILD  
  * fix comment  
@@ -167,7 +172,7 @@ Changelog
 
 [2.3.1] ----- 2022-10-13
  * Update readme with link to AUR for mkpkg  
- * Change PKGBUILD for AUR  
+   Change PKGBUILD for AUR  
  * little word smithing on readme  
  * Clean up some comments  
  * readme word smithing  
@@ -175,7 +180,7 @@ Changelog
 
 [2.3.0] ----- 2022-10-13
  * In the event mkpkg_depends / mkpkg_depends_files are absent,  
- * no longer fall back to use makedepends unless turned on with the --mkp-use_makedepends option  
+   no longer fall back to use makedepends unless turned on with the --mkp-use_makedepends option  
  * update changelog  
 
 [2.2.1] ----- 2022-10-13
@@ -187,8 +192,8 @@ Changelog
 
 [2.2.0] ----- 2022-10-13
  * Change PKGBUILD variables to have leading "_" to follow arch packaging guidelines  
- * Code is backward compatible and will work with or without the _  
- * New names are: _mkpkg_depends and _mkpkg_depends_files  
+   Code is backward compatible and will work with or without the _  
+   New names are: _mkpkg_depends and _mkpkg_depends_files  
  * update changelog  
  * more readme tweaks  
  * update changelog  
@@ -216,10 +221,10 @@ Changelog
 
 [2.0.0] ----- 2022-10-12
  * Reorganize directory structure and use poetry for packaging.  
- * Add support for triggers now based on semantic versions.  
- * e.g python>3.12 or python>minor - where minor triggers build if  
- * major.minor version of dependency package is greater than that used when  
- * it was last built.  
+   Add support for triggers now based on semantic versions.  
+   e.g python>3.12 or python>minor - where minor triggers build if  
+   major.minor version of dependency package is greater than that used when  
+   it was last built.  
  * Reorganize source tree  
  * Update changelog  
  * tweak readme little more  
@@ -274,5 +279,5 @@ Changelog
 
 [1.0.0] ----- 2022-09-03
  * Initial Revision of mkpkg.  
- * mkpkg builds Arch packages and rebuilds them whenever a make dependency is more recent than the last package  
+   mkpkg builds Arch packages and rebuilds them whenever a make dependency is more recent than the last package  
 
