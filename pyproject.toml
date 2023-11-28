@@ -1,16 +1,30 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "mkpkg"
-version = "4.8.0"
+dynamic = ["version"]
 description = "Arch tool to rebuild packages based on package conditions or file triggers"
-authors = ["Gene C"]
+authors = [{ name = "Gene C", email = "arch@sapience.com" }]
 license = "MIT"
 readme = "README.rst"
+keywords = []
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = []
 
-[tool.poetry.dependencies]
-python = "^3.9"
+[project.urls]
+Documentation = "https://github.com/gene-git/Arch-mkpkg/Docs"
+Issues = "https://github.com/gene-git/Arch-mkpkg/issues"
+Source = "https://github.com/gene-git/Arch-mkpkg"
 
-[tool.poetry.dev-dependencies]
+[tool.hatch.version]
+path = "src/mkpkg/__about__.py"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[[tool.hatch.envs.all.matrix]]
+python = ["3.10", "3.11", "3.12"]
+
