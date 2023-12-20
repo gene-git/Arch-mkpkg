@@ -1,6 +1,11 @@
 Changelog
 =========
 
+[5.0.0] ----- 2023-12-20
+ * Fix soname dep handling when there are multiple pkgnames in PKGBUILD  
+   verbose option is boolean - does not take argument  
+ * update Docs/Changelog.rst Docs/mkpkg.pdf for 4.9.0  
+
 [4.9.0] ----- 2023-11-28
  * Switch python build backend to hatch (was poetry)  
  * Switch python build backend to hatch (was poetry)  
