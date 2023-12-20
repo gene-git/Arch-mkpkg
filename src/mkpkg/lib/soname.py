@@ -13,20 +13,38 @@ from .pacman import pac_qi_key
 from .toml import read_toml_file
 from .toml import write_toml_file
 
+def _read_one_pkginfo(pkgname):
+    """
+    Read one .PKGINFO file in:
+       pkg/pkgname/.PKGINFO
+    """
+    pkginfo_file = f'pkg/{pkgname}/.PKGINFO'
+    fobj = open_file(pkginfo_file, 'r')
+    pkginfo = None
+    if fobj:
+        pkginfo = fobj.readlines()
+        fobj.close()
+    return pkginfo
+
 def read_pkginfo(mkpkg):
     """
     After build completes successfully,
     Read .PKGINFO file
+    returns list of pkginfo
     """
     pkgname = mkpkg.pkgname
-    pkginfo = None
-    pkginfo_file = f'pkg/{pkgname}/.PKGINFO'
-    fobj = open_file(pkginfo_file, 'r')
-    if fobj:
-        pkginfo = fobj.readlines()
-        fobj.close()
+    if isinstance(pkgname, list):
+        pkgname_list = pkgname
+    else:
+        pkgname_list = [pkgname]
 
-    return pkginfo
+    pkginfo_list = []
+    for item in pkgname_list:
+        pkginfo = _read_one_pkginfo(item)
+        if pkginfo:
+            pkginfo_list.append(pkginfo)
+
+    return pkginfo_list
 
 def pkginfo_soname_deps(mkpkg):
     """
@@ -37,23 +55,25 @@ def pkginfo_soname_deps(mkpkg):
     return list of pairs: [s1, s2,...]
         s1 = [libs1, soname1]
         e.g : ['libfoo.so', 1.0] using above example
+    NB : there can be 1 or more packages listed in pkgname
     """
-    pkginfo = read_pkginfo(mkpkg)
+    pkginfo_list = read_pkginfo(mkpkg)
     sonames = []
-    if not pkginfo:
+    if not pkginfo_list:
         return sonames
 
-    for line in pkginfo:
-        if not line.startswith('depend'):
-            continue
-        lsplit = line.split('=')
-        lib = lsplit[1].strip()
-        if lib.endswith('.so') and len(lsplit) > 2:
-            soname=lsplit[2]
-            ssplit=soname.rsplit('-',1)
-            soname = ssplit[0].strip()
-            sonames.append([lib, soname])
-
+    # get sonames for all pkgnames
+    for pkginfo in pkginfo_list:
+        for line in pkginfo:
+            if not line.startswith('depend'):
+                continue
+            lsplit = line.split('=')
+            lib = lsplit[1].strip()
+            if lib.endswith('.so') and len(lsplit) > 2:
+                soname=lsplit[2]
+                ssplit=soname.rsplit('-',1)
+                soname = ssplit[0].strip()
+                sonames.append([lib, soname])
     return sonames
 
 def _extract_pkg_owner(result):

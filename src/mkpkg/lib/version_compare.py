@@ -139,7 +139,6 @@ def check_version_trigger(mkpkg, oper, vers_trigger, pkg_vers, last_vers):
     (pkg_vers_comp, last_vers_comp) = _versions_to_compare(vers_trigger, pkg_vers, last_vers)
 
     # use pyalpm
-    #new_minus_old = version.parse(pkg_vers_comp) - version.parse(last_vers_comp)
     new_minus_old = pyalpm.vercmp(pkg_vers_comp, last_vers_comp)
 
     match(oper):

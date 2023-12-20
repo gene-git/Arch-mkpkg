@@ -10,7 +10,7 @@ from .toml import read_toml_file
 
 class MkpkgConf:
     """ config options """
-    # pylint: disable=R0903
+    # pylint: disable=too-many-instance-attributes,too-few-public-methods
 
     def __init__(self):
         self.verb = False
@@ -42,27 +42,24 @@ class MkpkgConf:
 
         # Command line args
         opts = [
-                [('-v', '--verb', '--mkp-verb'),
-                 {'help' : 'More verbose output'}
+                [('-v', '--verb', '--mkp-verb'), {'action' : 'store_true',
+                  'help' : 'More verbose output',
+                  }
                 ],
-                [('-f', '--force', '--mkp-force'),
-                 {'help' : 'Bump package release and rebuild',
-                  'action'      : 'store_true'}
+                [('-f', '--force', '--mkp-force'), {'action' : 'store_true',
+                    'help' : 'Bump package release and rebuild'}
                 ],
-                [('-r', '--refresh', '--mkp-refresh'),
-                 {'help' : 'update saved metadata files.',
-                  'action'      : 'store_true'}
+                [('-r', '--refresh', '--mkp-refresh'), {'action' : 'store_true',
+                    'help' : 'update saved metadata files.'}
                 ],
                 [('-so-bld', '--mkp-soname-build'),
                  {'help' : f'Rebuild if soname missing, newer, never (default {self.soname_build})'}
                 ],
-                [('--mkp-use_makedepends'),
-                 {'help' : 'Use makedepends array of no _mkpkg_xxx set (deprecated))',
-                  'action'      : 'store_true'}
+                [('--mkp-use_makedepends'), {'action' : 'store_true',
+                    'help' : 'Use makedepends array of no _mkpkg_xxx set (deprecated))'}
                 ],
-                [('makepkg'),
-                 {'help' : 'All remaining args after -- passed to makepkg',
-                  'nargs' : '*'}
+                [('makepkg'), {'nargs' : '*',
+                    'help' : 'All remaining args after -- passed to makepkg'}
                 ],
                ]
         par = argparse.ArgumentParser(description='mkpkg')
