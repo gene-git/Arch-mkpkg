@@ -12,8 +12,26 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
- * Version comparisons now use pyalpm instead of packaging
-   packaging.version barfs on systemd package version 255rc2.1
+ * Major update: soname handling has been re-written from scratch and improved substantially. 
+
+   It now identifies every soname versioned library in elf executables
+   along with their full path.  It also properly handles executables 
+   built with *--rpath* loader options.
+
+   Previous versions relied on makepkg soname output
+   which, unfortunately, only lists sonames if they are also listed as a PKGBUILD dependency.
+   We need every soname versioned library to ensure we do the right thing
+   and rebuild when needed. So it was a mistake to rely on this.
+
+   Can also specify how to handle version comparisons similar to the way 
+   package version comparisons are done (e.g. soname > major)
+
+   If you're interested, the soname info is saved into the file *.mkp_dep_soname*
+
+ * Old options now deprecated
+   
+    * (*--mpk-xxx*)
+    * (*--soname-build*) : use *--soname-comp* instead
 
 #################
 mkpkg application
@@ -205,7 +223,7 @@ With the trigger conditions in the PKGBUID, then simply call mkpkg instead of ma
 Options for mkpkg are those before any double dash *--*. Any options following *--*
 are passed through to *makepkg* [#]_.
 
-.. [#] The older style options using *--mkp-* are deprecated but are supported to ensure backward compatibility. They will be removed at some point in the future.
+.. [#] The older style options using *--mkp-* are now deprecated.
 
 Options
 =======
@@ -224,9 +242,26 @@ The options currently supported by mkpkg are:
 
    Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
    If there is no saved metadata, and build is up to date, will try refresh the build info.
-   Files updated are *.mkp\_dep\_vers* and  *.mkp_dep_soname*. The soname data can only be updated
-   if the .PKGINFO file is still in the *pkg* directory.  Forcing a rebuild is the 
-   slower alternative but is guaranteed to have information needed.
+   Files updated are *.mkp\_dep\_vers* and  *.mkp_dep_soname*. 
+
+   Note that *sonames* are found by examining any executables in the *pkg* directory.
+   If the *pkg* directory is empty, the refresh will not find any sonames.
+   
+ * (**so-comp, --soname-comp**)
+
+   How to handle automatic soname changes. Default value is *last* - which uses the entire soname version
+   when comparing to what's available.
+
+    * *never* : soname dependencies are ignored
+
+    * *newer* : if soname is newer then reubild (time based)
+
+    * *keep* : if soname library is still available, then dont rebuild even if newer version(s) are available
+
+    * *vcomp* : rebuild if soname version is greater than the *vcomp* version. *vcomp* is one of *major*, *minor*, *patch*, *extra* or *last* - same as for regular depenencies.
+
+    * *neverever* : Developer option - will not rebuild even if the soname library is no longer available.
+
 
  * (*--*)  
 
@@ -236,9 +271,9 @@ The options currently supported by mkpkg are:
 
 Configs are looked for in first in /etc/mkpkg/config and then in
 ~/.config/mkpkg/config. Config files are in TOML format. 
-e.g. to change the default soname rebuild option::
+e.g. to change the default soname rebuild compare option from default of *last*::
 
-        soname_build = "newer"
+        soname_comp = "newer"
 
 How mkpkg works
 ===============
@@ -491,6 +526,31 @@ Some history
 Version 4.1.0
 -------------
 
+ * soname rewrite
+   
+   New argument for how soname changes are treated : *-so-comp, --soname-comp*. 
+
+   Can be *<compare>*, *newer*,  *never* or key how to compare the soname versions. 
+   The comparison types are the same as for package dependencies described above.
+   Default is *last* which means the entire soname version will be compared to 
+   whats available and rebuild will be triggered if a later version now available.
+
+   *<compare>* e.g. *>major* or *>minor*' or *last* etc. 
+   If the last built soname was 5.1, and now available is 5.2 then
+   *minor* and *last* will trigger rebuild while *major* would not. *newer* triggers if the
+   last modify time of the library is newer.
+
+   Previous version used sonmaes produced by makepkg - however this only generates
+   sonames if they are listed as dependencies. We want to get every soname - so 
+   we started over from scratch. By using our own soname generate we catch
+   every soname and its absolute path - this enables us to correctly treat soname
+   changes. This approach will also correctly deal with any *rpath* loader flags
+   causing executable to use shared library from path(s) specified at compile time.
+
+
+Version 4.1.0
+-------------
+
  * Arguments  
 
     Change in argument handling. Arguments to be passed to *makepkg* must now follow *--*.
@@ -498,17 +558,13 @@ Version 4.1.0
     compatibility the older *--mkp-* style arguments are honored, but the newer simpler
     ones are preferred. e.g. *-v, --verb* for verbose. Help availble via *-h*. 
 
- * New argument for how soname changes are treated : *-so-bld, --soname-build*. 
-
-   Can be *missing*, *newer* or *never*. Default is missing - rebuild if soname 
-   no longer available.  
 
  * Config file now available.
 
    Configs are looked for in /etc/mkpkg/config then ~/.config/mkpkg/config. It should
    be in TOML format. e.g. to change the default soname rebuild option::
 
-        soname_build = "newer"
+        soname_comp = "newer"
 
 Version 4.0.0
 -------------

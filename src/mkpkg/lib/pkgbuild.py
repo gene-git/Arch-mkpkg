@@ -157,8 +157,8 @@ def get_pkgbld_data(mkpkg):
     cmd_str += 'echo "_X_ makedepends = ${makedepends[@]}"\n'
 
     # arch guidelines require custom variables start with "_"- support old for backward compat
-    cmd_str += 'echo "_X_ mkpkg_depends = ${mkpkg_depends[@]}"\n'
-    cmd_str += 'echo "_X_ mkpkg_depends_files = ${mkpkg_depends_files[@]}"\n'
+    #cmd_str += 'echo "_X_ mkpkg_depends = ${mkpkg_depends[@]}"\n'
+    #cmd_str += 'echo "_X_ mkpkg_depends_files = ${mkpkg_depends_files[@]}"\n'
     cmd_str += 'echo "_X_ _mkpkg_depends = ${_mkpkg_depends[@]}"\n'
     cmd_str += 'echo "_X_ _mkpkg_depends_files = ${_mkpkg_depends_files[@]}"\n'
 
@@ -192,8 +192,6 @@ def get_pkgbld_data(mkpkg):
     # Extract what we want.
     #
     okay = True
-    mkpkg_depends_files_old = None
-    mkpkg_depends_old = None
 
     for line in output.splitlines():
         lsplit = line.strip().split('=',1)
@@ -245,44 +243,8 @@ def get_pkgbld_data(mkpkg):
         elif line.startswith('_X_ _mkpkg_depends ='):
             mkpkg.depends = data_l          # always a list
 
-        elif line.startswith('_X_ mkpkg_depends ='):    # backward compat
-            mkpkg_depends_old = data_l
-
         elif line.startswith('_X_ _mkpkg_depends_files ='):
             mkpkg.depends_files = data_l          # always a list
-
-        elif line.startswith('_X_ mkpkg_depends_files ='):
-            mkpkg_depends_files_old = data_l
-
-    #
-    # handle backward compat of variables without +_"
-    #
-    if mkpkg_depends_old:
-        if not mkpkg.depends:
-            msg('N.B.: please use underscore : "_mkpkg_depends"\n', fg_col='yellow')
-            mkpkg.depends = mkpkg_depends_old
-            mkpkg.depends = data_l          # always a list
-        else:
-            msg('Found "_mkpkg_depends"  - ignoring "mkpkg_depends"\n', fg_col='yellow')
-
-    if mkpkg_depends_files_old:
-        if not mkpkg.depends_files:
-            msg('N.B.: please use undserscore : "_mkpkg_depends_files"\n', fg_col='yellow')
-            mkpkg.depends_files = mkpkg_depends_files_old
-        else:
-            msg('Found "_mkpkg_depends_files" - ignoring "mkpkg_depends_files"\n', fg_col='yellow')
-
-    #
-    # If mkpkg_depends set it overrides makedepends.
-    #
-    got_mkpkg_vars = False
-    if mkpkg.depends or mkpkg.depends_files:
-        got_mkpkg_vars = True
-
-    if (not got_mkpkg_vars) and mkpkg.use_makedepends and mkpkg.makedepends:
-        if mkpkg.verb:
-            msg('mkpkg_depends(_vers) not found - falling back to makedepends\n',ind=1, fg_col='yellow' )
-        mkpkg.depends = mkpkg.makedepends
 
     #
     # split out version deps into mkpkg_depends_vers

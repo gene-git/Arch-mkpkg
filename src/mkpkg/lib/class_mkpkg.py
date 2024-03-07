@@ -16,8 +16,8 @@ from .class_config import MkpkgConf
 from .tools import print_summary
 from .build import build
 from .dep_vers import write_current_pkg_dep_vers
-from .soname import write_current_pkg_dep_soname
-from .soname import pkginfo_soname_dep_info
+from .soname_deps import (write_soname_deps )
+from .soname import (get_current_soname_info )
 
 class MkPkg:
     """ MkPkg wrapper class """
@@ -44,11 +44,14 @@ class MkPkg:
         self.verb = self.conf.verb              # don't show normal makepkg output
         self.force = self.conf.force            # run makepkg even if not necessary
         self.refresh = self.conf.refresh        # refresh .mkpkg_dep_soname .mkpkg_dep_vers
-        self.soname_build = self.conf.soname_build
-        self.argv = self.conf.makepkg_args      # passed down to makepkg
-        self.use_makedepends = self.conf.use_makedepends  # deprecated
 
+        # soname_build ~ 'never', 'newer', <compare-how>
+        #  These compare using greater than: 'major' or 'minor' or 'last' etc
+        self.soname_comp = self.conf.soname_comp
         self.soname_info = {}
+        self.avail_soname_info = {}
+
+        self.argv = self.conf.makepkg_args      # passed down to makepkg
 
         self.cwd = os.getcwd()
         self.mymsg = GcMsg()
@@ -77,6 +80,6 @@ class MkPkg:
             # of any depenencies (including sonames)
             #
             write_current_pkg_dep_vers(self)
-            self.soname_info = pkginfo_soname_dep_info(self)
-            write_current_pkg_dep_soname(self)
+            self.soname_info = get_current_soname_info('pkg')
+            write_soname_deps(self)
         print_summary(self)

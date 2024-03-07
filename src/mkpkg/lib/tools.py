@@ -67,9 +67,8 @@ def argv_parser(mkpkg):
         verb            - show makepkg (stdout) output
         force           - always run makepkg even if not needed
                         - you may want to set makepkg force as well (-f)
-        use_makedepends - use makedepends array if no _mkpkg_xxx are set
     """
-    opt_keys = ['--mkp-verb', '--mkp-force', '--mkp-use_makedepends', '--mkp-refresh']
+    opt_keys = ['--mkp-verb', '--mkp-force', '--mkp-refresh']
     argv = []
     for opt in sys.argv[1:]:
         if opt in opt_keys:

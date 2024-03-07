@@ -1,311 +1,206 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2022,2023 Gene C
 """
-Support routines for soname library management
+soname library management
+ - get list of all sonames
+ n.b. makepkg :
+     - only generates sonames that are explicit in depends() array
+     - pays no attention to rpath - only generates the soname-version pair
 """
 import os
-import re
+import stat
 import glob
-from packaging import version
-from .tools import open_file
-from .pacman import pacman_query
-from .pacman import pac_qi_key
-from .toml import read_toml_file
-from .toml import write_toml_file
+from pathlib import (Path, PosixPath)
 
-def _read_one_pkginfo(pkgname):
-    """
-    Read one .PKGINFO file in:
-       pkg/pkgname/.PKGINFO
-    """
-    pkginfo_file = f'pkg/{pkgname}/.PKGINFO'
-    fobj = open_file(pkginfo_file, 'r')
-    pkginfo = None
-    if fobj:
-        pkginfo = fobj.readlines()
-        fobj.close()
-    return pkginfo
+from typing import (List, Dict)
+from pydantic import (BaseModel, FilePath)
 
-def read_pkginfo(mkpkg):
-    """
-    After build completes successfully,
-    Read .PKGINFO file
-    returns list of pkginfo
-    """
-    pkgname = mkpkg.pkgname
-    if isinstance(pkgname, list):
-        pkgname_list = pkgname
-    else:
-        pkgname_list = [pkgname]
+from .utils import os_scandir
+from .elf_utils import (file_is_elf, sonames_in_elf_file)
 
-    pkginfo_list = []
-    for item in pkgname_list:
-        pkginfo = _read_one_pkginfo(item)
-        if pkginfo:
-            pkginfo_list.append(pkginfo)
-
-    return pkginfo_list
-
-def pkginfo_soname_deps(mkpkg):
+class SonameInfo(BaseModel):
     """
-    After build completes successfully,
-    Extract any soname depends from pkg/xxx/.PKGINFO
-     Take the form:
-     depend = libfoo.so=1.0-64
-    return list of pairs: [s1, s2,...]
-        s1 = [libs1, soname1]
-        e.g : ['libfoo.so', 1.0] using above example
-    NB : there can be 1 or more packages listed in pkgname
+    State of soname lib
     """
-    pkginfo_list = read_pkginfo(mkpkg)
+    path: str = None       # do NOT use FilePath as can be non existent
+    mtime: int = -1
+    vers: str = None
+    avail: List[str] = []
+
+def _split_soname_vers(soname:str) -> (str, str):
+    """
+    soname is the library name as required by the linked executable.
+    strip off the soname version and return base lib name and version
+    If the path is a symlink, version is extracted from link target.
+    e.g.
+      /usr/lib/libxxx.so.2 -> (/usr/lib/libxxx.so, 2)
+      If not versioned then returns lib, None
+
+      If so.2 is symlink to so.2.0.0 then vers will be 2.0.0
+      And (/usr/lib/libxx.so.2.0.0, 2.0.0) is returned
+    """
+    #
+    # Check has a soname version
+    #
+    vsplit = soname.split('.so.')
+    if len(vsplit) < 2:
+        return (soname, None)
+
+    #
+    # Check library exists
+    #
+    if not os.path.exists(soname):
+        return (soname, None)
+
+    #
+    # Check if symlink
+    # and get version of library file
+    # NB. A versioned sym link should always have versioned target
+    # But, in weird case where target has no version we use link version
+    #
+    vers = vers_soname = vsplit[1]
+    libso = soname
+    ppath = PosixPath(libso)
+    if Path.is_symlink(ppath):
+        libso = str(Path.resolve(ppath))
+        vsplit = libso.split('.so.')
+        if len(vsplit) < 2:
+            libso = soname
+            vers = vers_soname
+        else:
+            vers = vsplit[1]
+
+    return (libso, vers)
+
+def generate_soname_info(sonames: List[FilePath]) -> Dict[FilePath, SonameInfo]:
+    """
+    Input is list if libraris,
+        e.g. [/usr/lib/libz.so.1, /usr/lib/libxxx.so.nnn]
+
+    No package should have more than 1 version of soname library.
+    If this happens we keep the smallest and force rebuild
+    For each, find available versions
+    returns dict keyed by name and each libname has dictionary of info :
+
+    To handle mulitple versions keep use library path as key
+    If the library is a symlink, vers refers to the link target file.
+    That way if multiple symlinks point to same actual file they will be
+    correctly treated as the same.
+
+    result = {
+            '/usr/lib/libbz2.so.1' : {
+                         'path' : /usr/lib/libbz2.1.0'
+                         'mtime' : xxx (secs)
+                         'vers'   : '1' ,
+                         'avail' : ['1', '1.0','1.0.8']
+                         }
+            '/usr/lib/libfoo.so.22' : ...
+           }
+    """
+    infos = {}
+    for path in sonames:
+        # if path is symlink then libpath is target file
+        (libpath, version) = _split_soname_vers(path)
+        if not version:
+            continue
+        libpath_base = libpath.split('.so.')[0]
+
+        mtime = -1
+        if os.path.exists(libpath):
+            mtime = os.path.getmtime(libpath)
+
+        # Get all avail versions
+        tomatch = f'{libpath_base}.*'
+        avail = []
+        path_list = glob.glob(tomatch)
+        for lib in path_list:
+            (_libpath, vers) = _split_soname_vers(lib)
+
+            if vers and vers not in avail:
+                avail.append(vers)
+
+        info_dict = {'path' : libpath,
+                     'mtime' : mtime,
+                     'vers' : version,
+                     'avail' : avail
+                     }
+        soname_info = SonameInfo(**info_dict)
+        infos[path] = soname_info
+
+    return infos
+
+
+def _find_all_elf_executables(dirname:str) -> [str]:
+    """
+    Make list of all executables and list of soname libs they are using
+    creates list of tuples: (/usr/lib/libressl/libssl.so.56, 56)
+    output:
+        [(libpath, version), (libpath, version), ... ]
+    """
+    scan = os_scandir(dirname)
+    if not scan:
+        return []
+
+    elf_files = []
+    for item in scan:
+        if item.is_file() and file_is_elf(item.path):
+            mode = os.stat(item.path).st_mode
+            executable = bool(mode & (stat.S_IXUSR | stat.S_IXGRP| stat.S_IXOTH))
+            if executable:
+                elf_files.append(item.path)
+        elif item.is_dir():
+            elf_files += _find_all_elf_executables(item.path)
+    scan.close()
+    return elf_files
+
+def _find_all_sonames(dirname:str) -> [str]:
+    """
+    Generate list of sonames from list of elf executables
+     list of sonames, each item is:
+     library path
+      e.g. (/usr/lib/libz.so.1)
+    """
+    elf_files = _find_all_elf_executables(dirname)
+    if not elf_files:
+        return []
+
     sonames = []
-    if not pkginfo_list:
-        return sonames
-
-    # get sonames for all pkgnames
-    for pkginfo in pkginfo_list:
-        for line in pkginfo:
-            if not line.startswith('depend'):
-                continue
-            lsplit = line.split('=')
-            lib = lsplit[1].strip()
-            if lib.endswith('.so') and len(lsplit) > 2:
-                soname=lsplit[2]
-                ssplit=soname.rsplit('-',1)
-                soname = ssplit[0].strip()
-                sonames.append([lib, soname])
+    for file in elf_files:
+        these_sonames = sonames_in_elf_file(file)
+        if these_sonames:
+            sonames += these_sonames
+            sonames = list(set(sonames))
     return sonames
 
-def _extract_pkg_owner(result):
-    """ parses output of pacman -Qo file """
-    pkg = None
-    vers = None
-    #for line in result.splitlines():
-    if 'owned by' in result:
-        lsplit = result.split()
-        if len(lsplit) > 1:
-            vers = lsplit[-1]
-            pkg = lsplit[-2]
-    return (pkg, vers)
+#----------------------
+# public
+#----------------------
 
-def package_owner(file):
+def get_current_soname_info(pkgdir:str) -> dict:
     """
-    Find package owner of file - None if not found
+    Generate soname_info from all elf executables in
+    found in pkgdir
     """
-    output = pacman_query(['-Qo', file])
-    owner = _extract_pkg_owner(output)
-    return owner
-
-def file_to_soname(lib, file):
-    """
-    pull of soname from library file:
-    e.g.
-        lib = libfoo.so
-        file = libfoo.so.1.0
-        soname  = X
-    """
-    soname = None
-    remove = f'{lib}.'
-    if remove in file:
-        # skip lib with no soname
-        soname = file.replace(remove, '')
-    return soname
-
-def soname_package_owners(sonames):
-    """
-    Input is list if items, item ~ [lib, soname]
-    For each, find package owner(s) of all files lib.soname*
-    returns dict keyed by libray name and each libname has dictionary of info :
-    -> result = {
-          'libbz2.so' : {
-                         'soname'   : '1' ,
-                         'packages' : {'bzip2' :
-                                       {
-                                        'vers': '1.0.8-5',
-                                        'all_sonames': ['1', '1.0','1.0.8']}
-                                       }
-                                      }
-                          }
-            'libfoo.so' : ...
-            }
-
-        where libs files are in /usr/lib/
-    """
-    soname_info = {}
-    for [lib, soname] in sonames:
-        #libpath = os.path.join('/usr/lib', f'{lib}.{soname}')
-        libpath = os.path.join('/usr/lib', f'{lib}')
-        tomatch = f'{libpath}*'
-
-        packages = {}
-        path_list = glob.glob(tomatch)
-        if path_list:
-            for lib_path in path_list:
-                file = os.path.basename(lib_path)
-                file_soname = file_to_soname(lib, file)
-                (pkg, vers) = package_owner(lib_path)
-
-                if not pkg in packages:
-                    packages[pkg] = {'vers' : vers, 'sonames' : [] }
-
-                if file_soname:
-                    packages[pkg]['sonames'].append(file_soname)
-
-        soname_info[lib] = {'soname' : soname, 'packages' : packages }
-
-    return soname_info
-
-def pkginfo_soname_dep_info(mkpkg):
-    """
-    After build completes successfully,
-    Extract any soname depends info from pkg/xxx/.PKGINFO
-    returns list of items. Each
-       item ~ [package_owner, package_vers, lib, soname ]
-    """
-
-    sonames = pkginfo_soname_deps(mkpkg)
-    soname_info = soname_package_owners(sonames)
-    return soname_info
-
-def pkg_soname_provides(pkg):
-    """
-    Lookup current soname versions provided by a package
-    """
-    output = pacman_query(['-Qi', pkg])
-    provides = pac_qi_key(output, 'Provides')
-    if not provides:
-        return None
-    provides = provides.split()
-
-    # soname ~ libfoo.so=x-64
-    regex = r'^(?P<lib>lib.*\.so)=(?P<soname>[0-9.-]*)$'
-    re_soname = re.compile(regex)
-
-    soname_provides = []
-    for item in provides:
-        dat = re_soname.search(item)
-        if not dat:
-            continue
-        dat_dict = dat.dat.groupdict()
-        lib = dat_dict['lib']
-        lib = f'lib{lib}'
-        soname = dat_dict['soname']
-        soname_provides.append([lib, soname])
-    return soname_provides
-
-
-def current_soname_provides(mkpkg):
-    """
-    Lookup current soname versions for each soname dependency
-    """
-    if not mkpkg.soname_info:
+    if not os.path.isdir(pkgdir):
         return None
 
-    #
-    # list of [lib, soname]
-    #
-    sonames = []
-    for (lib, info) in mkpkg.soname_info.items():
-        soname = info['soname']
-        sonames.append([lib, soname])
-
-    soname_info =  soname_package_owners(sonames)
+    sonames = _find_all_sonames(pkgdir)
+    soname_info = generate_soname_info(sonames)
     return soname_info
 
-#
-# soname driving rebuild
-#
-def _info_to_sonames(info):
-    """ extract all sonames from soname_info """
+def avail_soname_info(last_soname_info:dict) -> dict:
+    """
+    Lookup current soname info for each soname when last built
+    """
+    if not last_soname_info:
+        return {}
+    #
+    # Make list of sonames and refresh soname_info
+    # Check uses actual path not soname
+    sonames = list(last_soname_info.keys())
     sonames = []
-    if not info:
-        return sonames
-
-    packages = info.get('packages')
-    if not packages:
-        return sonames
-    for (_pkg, pkg_info) in packages.items():
-        this_sonames = pkg_info.get('sonames')
-        if this_sonames:
-            sonames += this_sonames
-    # large to small
-    sonames_sorted = sorted(sonames, key=version.parse,reverse=True)
-    return sonames_sorted
-
-def soname_rebuild_needed(mkpkg):
-    """
-    decide if need rebuild.
-    we always search for packages owning the libs -
-      (a) lib exists:
-            soname - exists - all fine (status - current - advise newer soname avail)
-            soname - not available (newe ) -> rebuild (hope works with newer sonames)
-            soname - no sonames provided at all.
-                     can try rebuild and hope works without sonames
-      (b) lib gone - nothing we can do - package is broken - error
-    """
-    # pylint: disable=R0912
-    msg = mkpkg.msg
-    soname_info_last = mkpkg.soname_info
-    soname_info_curr = current_soname_provides(mkpkg)
-
-    rebuild = False
-    for (lib, info_last) in soname_info_last.items():
-        this_rebuild = False
-        soname_last = info_last['soname']
-        sonames_last = _info_to_sonames(info_last)
-
-        info_curr = soname_info_curr.get(lib)
-        sonames_curr = _info_to_sonames(info_curr)
-
-        soname_avail = False
-        soname_newer = False
-        if sonames_curr :
-            if soname_last in sonames_curr:
-                soname_avail = True
-            if sonames_last:
-                if version.parse(sonames_curr[0]) > version.parse(sonames_last[0]):
-                    soname_newer = True
-            else:
-                if mkpkg.verb:
-                    msg('  No sonames version list from last build\n')
-
-            if not soname_avail:
-                msg(f'  {lib} soname gone {soname_last} : have {sonames_curr}\n', fg_col='yellow')
-                if mkpkg.soname_build in ('missing', 'newer') :
-                    this_rebuild = True
-
-            if soname_newer:
-                msg(f'  {lib} has newer soname {sonames_curr[0]} > {sonames_last[0]}\n')
-                if mkpkg.soname_build in ('newer'):
-                    this_rebuild = True
-        else:
-            msg(f'{lib} soname {soname_last} - no sonames found.', fg_col='red')
-            this_rebuild = True
-
-        if this_rebuild:
-            rebuild = True
-
-    if rebuild and mkpkg.soname_build == 'never':
-        if mkpkg.verb:
-            msg('  Soname rebuild set to never - no rebuild\n')
-            rebuild = False
-
-    return rebuild
-
-#
-# Save / Restore
-#
-def write_current_pkg_dep_soname(mkpkg):
-    """ save the soname dep info """
-    if not mkpkg.soname_info:
-        return
-
-    pname = os.path.join(mkpkg.cwd, '.mkpkg_dep_soname')
-    write_toml_file(mkpkg.soname_info, pname)
-
-def read_last_pkg_dep_soname(mkpkg):
-    """ read thew soname dep info """
-    pname = os.path.join(mkpkg.cwd, '.mkpkg_dep_soname')
-
-    if os.path.exists(pname):
-        mkpkg.soname_info = read_toml_file(pname)
+    for (_name, info) in last_soname_info.items():
+        if info and info.path and info.path not in sonames:
+            sonames.append(info.path)
+    avail_info =  generate_soname_info(sonames)
+    return avail_info

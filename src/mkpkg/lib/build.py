@@ -14,8 +14,8 @@ from .pkgbuild import get_pkgbld_data
 from .tools import check_package_exists
 from .build_makepkg import build_w_makepkg
 from .dep_vers import get_pkg_dep_vers_now
-from .soname import read_last_pkg_dep_soname
-from .soname import soname_rebuild_needed
+from .soname_deps import read_soname_deps
+from .soname_rebuild import soname_rebuild_needed
 
 def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
     """
@@ -140,7 +140,7 @@ def build(mkpkg):
     #
     # read the last soname data (if exists)
     #
-    read_last_pkg_dep_soname(mkpkg)
+    read_soname_deps(mkpkg)
     soname_build = soname_rebuild_needed(mkpkg)
 
     #

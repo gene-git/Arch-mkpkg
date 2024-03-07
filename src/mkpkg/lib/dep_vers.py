@@ -158,7 +158,7 @@ def get_depends_versions(mkpkg, depends_vers):
             pkg_vers = dep_vers_now[pkg]
             last_vers = _get_pkg_dep_vers_last(mkpkg, pkg)
 
-            info = check_version_trigger(mkpkg, oper, vers_trigger, pkg_vers, last_vers)
+            info = check_version_trigger(mkpkg.msg, oper, vers_trigger, pkg_vers, last_vers)
             (trigger, pvers_comp, lvers_comp) = info
 
             this_one = [pkg, oper, vers_trigger, pvers_comp, lvers_comp, trigger]

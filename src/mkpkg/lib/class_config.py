@@ -16,8 +16,8 @@ class MkpkgConf:
         self.verb = False
         self.force = False
         self.refresh = False
-        self.use_makedepends = False    # deprecated
-        self.soname_build = 'missing'
+
+        self.soname_comp = 'last' # was previously soname_build
         self.makepkg_args = None
 
         #
@@ -40,28 +40,7 @@ class MkpkgConf:
             for (opt,val) in conf.items():
                 setattr(self, opt, val)
 
-        # Command line args
-        opts = [
-                [('-v', '--verb', '--mkp-verb'), {'action' : 'store_true',
-                  'help' : 'More verbose output',
-                  }
-                ],
-                [('-f', '--force', '--mkp-force'), {'action' : 'store_true',
-                    'help' : 'Bump package release and rebuild'}
-                ],
-                [('-r', '--refresh', '--mkp-refresh'), {'action' : 'store_true',
-                    'help' : 'update saved metadata files.'}
-                ],
-                [('-so-bld', '--mkp-soname-build'),
-                 {'help' : f'Rebuild if soname missing, newer, never (default {self.soname_build})'}
-                ],
-                [('--mkp-use_makedepends'), {'action' : 'store_true',
-                    'help' : 'Use makedepends array of no _mkpkg_xxx set (deprecated))'}
-                ],
-                [('makepkg'), {'nargs' : '*',
-                    'help' : 'All remaining args after -- passed to makepkg'}
-                ],
-               ]
+        opts = get_available_opts(self)
         par = argparse.ArgumentParser(description='mkpkg')
         for opt in opts:
             (opts), kwargs = opt
@@ -85,3 +64,35 @@ class MkpkgConf:
                 del opt_dict['makepkg']
             for (opt, val) in opt_dict.items():
                 setattr(self, opt, val)
+
+def get_available_opts(conf) -> [[tuple, dict]]:
+    """
+    Available options
+    """
+    # Command line args
+    opts = []
+    act = 'action'
+    act_on = 'store_true'
+
+    ohelp = 'More verbose output'
+    opt = [('-v', '--verb'), {'help' : ohelp, act : act_on}]
+    opts.append(opt)
+
+    ohelp = 'Bump package release and rebuild'
+    opt = [('-f', '--force'), {'help' : ohelp, act : act_on}]
+    opts.append(opt)
+
+    ohelp = 'Update saved metadata files.'
+    opt = [('-r', '--refresh'), {'help' : ohelp, act : act_on}]
+    opts.append(opt)
+
+    default = conf.soname_comp
+    ohelp = 'When soname rebuilds: never, newer, keep or major/minor/last etc (default {default})'
+    opt = [('-so-comp', '--soname-comp'), {'help' : ohelp, act : act_on, 'default' : default}]
+    opts.append(opt)
+
+    ohelp = 'All remaining args after -- passed to makepkg'
+    opt = [('makepkg'), {'help' : ohelp, 'nargs' : '*'}]
+    opts.append(opt)
+
+    return opts

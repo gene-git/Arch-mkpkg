@@ -31,8 +31,7 @@ def _most_recent_package_date(mkpkg):
         mod_time = os.path.getmtime(pkgfile)
         pkg_dtime = datetime.datetime.fromtimestamp(mod_time)
         if dtime :
-            if pkg_dtime > dtime:
-                dtime = pkg_dtime
+            dtime = max(dtime, pkg_dtime)
         else:
             dtime = pkg_dtime
     return dtime
