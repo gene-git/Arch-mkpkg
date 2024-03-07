@@ -1,6 +1,26 @@
 Changelog
 =========
 
+[6.0.0] ----- 2024-03-07
+ * 
+ * soname handling has been re-written from scratch and improved substantially.  
+   It now identifies every soname versioned library in elf executables  
+   along with their full path.  It also properly handles executables  
+   built with *--rpath* loader options.  
+   Previous versions relied on makepkg soname output  
+   which, unfortunately, only lists sonames if they are also listed as a PKGBUILD dependency.  
+   We need every soname versioned library to ensure we do the right thing  
+   and rebuild when needed. So it was a mistake to rely on this.  
+   Can also specify how to handle version comparisons similar to the way  
+   package version comparisons are done (e.g. soname > major)  
+   
+ * Old options now deprecated  
+   
+ * (*--mpk-xxx*)  
+   
+ * (*--soname-build*) : use *--soname-comp* instead  
+ * update Docs/Changelog.rst Docs/mkpkg.pdf for 5.0.0  
+
 [5.0.0] ----- 2023-12-20
  * Fix soname dep handling when there are multiple pkgnames in PKGBUILD  
    verbose option is boolean - does not take argument  
