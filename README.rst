@@ -523,7 +523,7 @@ Created by Gene C. and licensed under the terms of the MIT license.
 Some history
 ============
 
-Version 4.1.0
+Version 6.0.0
 -------------
 
  * soname rewrite
