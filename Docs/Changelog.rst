@@ -1,6 +1,11 @@
 Changelog
 =========
 
+[6.0.1] ----- 2024-03-08
+ * Tidy comments in soname file(s)  
+ * README - use 6.0.0 for version in history section  
+ * update Docs/Changelog.rst Docs/mkpkg.pdf for 6.0.0  
+
 [6.0.0] ----- 2024-03-07
  * 
  * soname handling has been re-written from scratch and improved substantially.  
