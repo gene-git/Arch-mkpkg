@@ -30,7 +30,7 @@ class SonameInfo(BaseModel):
 def _split_soname_vers(soname:str) -> (str, str):
     """
     soname is the library name as required by the linked executable.
-    strip off the soname version and return base lib name and version
+    strip off the soname version and return lib path and version
     If the path is a symlink, version is extracted from link target.
     e.g.
       /usr/lib/libxxx.so.2 -> (/usr/lib/libxxx.so, 2)
@@ -53,8 +53,7 @@ def _split_soname_vers(soname:str) -> (str, str):
         return (soname, None)
 
     #
-    # Check if symlink
-    # and get version of library file
+    # Check if symlink (use link target) and get version of library file
     # NB. A versioned sym link should always have versioned target
     # But, in weird case where target has no version we use link version
     #
@@ -78,14 +77,19 @@ def generate_soname_info(sonames: List[FilePath]) -> Dict[FilePath, SonameInfo]:
         e.g. [/usr/lib/libz.so.1, /usr/lib/libxxx.so.nnn]
 
     No package should have more than 1 version of soname library.
-    If this happens we keep the smallest and force rebuild
-    For each, find available versions
-    returns dict keyed by name and each libname has dictionary of info :
+    By keeping the dictionary key the full library path we handle 
+    this (odd) case anyway.
 
-    To handle mulitple versions keep use library path as key
+    For each library, also find available versions
+    and return dict keyed by library as seen by executable. 
+
     If the library is a symlink, vers refers to the link target file.
     That way if multiple symlinks point to same actual file they will be
-    correctly treated as the same.
+    correctly treated as the same - which they obviously are.
+
+    path is the absolute library path that is actually used.
+
+    Result is dictionary of SonameInfo class instances.
 
     result = {
             '/usr/lib/libbz2.so.1' : {
@@ -132,10 +136,11 @@ def generate_soname_info(sonames: List[FilePath]) -> Dict[FilePath, SonameInfo]:
 
 def _find_all_elf_executables(dirname:str) -> [str]:
     """
-    Make list of all executables and list of soname libs they are using
-    creates list of tuples: (/usr/lib/libressl/libssl.so.56, 56)
-    output:
-        [(libpath, version), (libpath, version), ... ]
+    Make list of (elf) all executables and list of soname libs they are using
+    creates list of tuples of path of each executable: 
+    libpath ~ /usr/lib/libressl/libssl.so.56
+    e.g. output:
+        [libpath1, libpathr2, version, ... ]
     """
     scan = os_scandir(dirname)
     if not scan:
@@ -155,10 +160,10 @@ def _find_all_elf_executables(dirname:str) -> [str]:
 
 def _find_all_sonames(dirname:str) -> [str]:
     """
-    Generate list of sonames from list of elf executables
-     list of sonames, each item is:
+    Generate unique list of sonames from list of all elf executables
+    list of items where each item is full path to library:
      library path
-      e.g. (/usr/lib/libz.so.1)
+      e.g. [/usr/lib/libz.so.1, /usr/lib/libxxx.so.n, ...]
     """
     elf_files = _find_all_elf_executables(dirname)
     if not elf_files:
@@ -191,6 +196,8 @@ def get_current_soname_info(pkgdir:str) -> dict:
 def avail_soname_info(last_soname_info:dict) -> dict:
     """
     Lookup current soname info for each soname when last built
+    input: dictionary of soname info as returned by generate_soname_info
+    output: refreshed dict of same sonames
     """
     if not last_soname_info:
         return {}
