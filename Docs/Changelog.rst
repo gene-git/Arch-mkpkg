@@ -1,6 +1,15 @@
 Changelog
 =========
 
+**[6.1.0] ----- 2024-03-09** ::
+
+	        soname logic updated.
+	           Default is now keep which only rebuilds of a soname is no longer available.
+	           This is in line with how sonames are typically used where soname only changes
+	           when ABI changes.
+	    update Docs/Changelog.rst Docs/mkpkg.pdf for 6.0.4
+
+
 **[6.0.4] ----- 2024-03-09** ::
 
 	    Add missing pydantic from PKGBUILD depends
