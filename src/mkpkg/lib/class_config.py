@@ -17,7 +17,7 @@ class MkpkgConf:
         self.force = False
         self.refresh = False
 
-        self.soname_comp = 'last' # was previously soname_build
+        self.soname_comp = 'keep'
         self.makepkg_args = None
 
         #

@@ -12,6 +12,11 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
+ * soname logic updated.
+   Default is now 'keep' which only rebuilds of a soname is no longer available.
+   This is in line with how sonames are typically used where soname only changes
+   when ABI changes.
+
  * Major update: soname handling has been re-written from scratch and improved substantially. 
 
    It now identifies every soname versioned library in elf executables
@@ -253,10 +258,8 @@ The options currently supported by mkpkg are:
    
  * (**so-comp, --soname-comp**)
 
-   How to handle automatic soname changes. Default value is *last* - which uses the entire soname version
-   when comparing to what's available.
-
-    * *never* : soname dependencies are ignored
+   How to handle automatic soname changes. Default value is *keep* - only rebuilds if
+   soname is no longer available.
 
     * *newer* : if soname is newer then reubild (time based)
 

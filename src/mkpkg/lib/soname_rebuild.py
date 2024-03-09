@@ -14,20 +14,26 @@ from .soname import avail_soname_info
 def _check_rebuild_needed(msg, comp, info_last, info_avail):
     """
     Private support routine
-    Check if this soname has changed and should trigger a rebuild
+    Check if this soname should trigger a rebuild
     Input:
-      * msg
-      * comp - comparison operator for versions
-        * never, newer, keep, comparison
-        keep means keep if same version available even if newer
-
+      * Rebuild rules
+      * If the soname is no longer available - then rebuild is forced.
+      * comp : comparison operator for versions
+        * keep  - this is the default and is generally how sonames are used 
+            no abi change so fine to keep using the library.
+           - if 'soname version' from last build is still available do nothing
+        * newer
+           - if there is a newer (by timestamp) version of soname library rebuild
+        * <comp_op>
+          This compares actual library versions not just the soname.
+          operators are same as for package versions, major, minor etc
     returns True if rebuild is needed otherwise False
     """
     #
     # check if soname still exists - always rebuild if library no longer available
     #
     still_available = False
-    if (info_avail and info_last and info_last.vers and info_avail.vers):
+    if (info_avail and info_last and info_last.vers and info_avail.avail):
         still_available = info_last.vers in info_avail.avail
 
     if not still_available:
@@ -37,9 +43,6 @@ def _check_rebuild_needed(msg, comp, info_last, info_avail):
     #
     # Are we checking sonames (other than vanished)
     #
-    if comp == 'never':
-        return False
-
     if comp == 'keep':
         return False
 
@@ -116,7 +119,7 @@ def soname_rebuild_needed(mkpkg):
     #
     rebuild = False
     for (_name, info_last) in soname_info_last.items():
-        info_avail = soname_info_avail.get(info_last.path)
+        info_avail = soname_info_avail.get(info_last.soname)
         if _check_rebuild_needed(msg, comp, info_last, info_avail) :
             rebuild = True
 

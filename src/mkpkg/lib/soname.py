@@ -21,55 +21,66 @@ from .elf_utils import (file_is_elf, sonames_in_elf_file)
 class SonameInfo(BaseModel):
     """
     State of soname lib
+     - soname is just the soname path (/usr/lib/libfoo.so.1) 
+     - soname_vers is it's associated version   (1)
+     - path is the actual library being used    (/usrlib.foo.so.1.1.0)
+     - path_vers is its version                 (1.1.0)
+     - avail list of all available versions     (1, 1.1.0, 1.2.0, ...)
+     do NOT use FilePath for soname/path since it may not exist
     """
-    path: str = None       # do NOT use FilePath as can be non existent
-    mtime: int = -1
+    soname: str = None
     vers: str = None
+    path: str = None
+    path_vers: str = None
+    mtime: int = -1
     avail: List[str] = []
+    class_vers: int = 1
 
 def _split_soname_vers(soname:str) -> (str, str):
     """
     soname is the library name as required by the linked executable.
-    strip off the soname version and return lib path and version
-    If the path is a symlink, version is extracted from link target.
-    e.g.
-      /usr/lib/libxxx.so.2 -> (/usr/lib/libxxx.so, 2)
-      If not versioned then returns lib, None
+    Identify the soname version and the actual library path and it's 
+    version. Usually soname is a symlink to actual library path
+    Returns:
+        (libpath, soname_version, libpath_version)
 
-      If so.2 is symlink to so.2.0.0 then vers will be 2.0.0
-      And (/usr/lib/libxx.so.2.0.0, 2.0.0) is returned
+    e.g.
+      /usr/lib/libxxx.so    -> (/usr/lib/libxxx.so, None, None)
+
+      /usr/lib/libxxx.so.2 
+        - not symlink       -> (/usr/lib/libxxx.so.2, 2, 2)
+        - link to so.2.0.0  -> (/usr/lib/libxx.so.2.0.0, 2, 2.0.0)
     """
     #
     # Check has a soname version
     #
     vsplit = soname.split('.so.')
     if len(vsplit) < 2:
-        return (soname, None)
+        return (soname, None, None)
 
     #
     # Check library exists
     #
     if not os.path.exists(soname):
-        return (soname, None)
+        return (soname, None, None)
 
     #
-    # Check if symlink (use link target) and get version of library file
+    # Check if symlink (get link target) and get version of library file
     # NB. A versioned sym link should always have versioned target
-    # But, in weird case where target has no version we use link version
     #
-    vers = vers_soname = vsplit[1]
-    libso = soname
-    ppath = PosixPath(libso)
+    libpath_vers = vers_soname = vsplit[1]
+    libpath = soname
+    ppath = PosixPath(libpath)
     if Path.is_symlink(ppath):
-        libso = str(Path.resolve(ppath))
-        vsplit = libso.split('.so.')
+        libpath = str(Path.resolve(ppath))
+        vsplit = libpath.split('.so.')
         if len(vsplit) < 2:
-            libso = soname
-            vers = vers_soname
+            libpath = soname
+            libpath_vers = vers_soname
         else:
-            vers = vsplit[1]
+            libpath_vers = vsplit[1]
 
-    return (libso, vers)
+    return (libpath, vers_soname, libpath_vers)
 
 def generate_soname_info(sonames: List[FilePath]) -> Dict[FilePath, SonameInfo]:
     """
@@ -91,45 +102,61 @@ def generate_soname_info(sonames: List[FilePath]) -> Dict[FilePath, SonameInfo]:
 
     Result is dictionary of SonameInfo class instances.
 
-    result = {
-            '/usr/lib/libbz2.so.1' : {
-                         'path' : /usr/lib/libbz2.1.0'
-                         'mtime' : xxx (secs)
-                         'vers'   : '1' ,
-                         'avail' : ['1', '1.0','1.0.8']
-                         }
-            '/usr/lib/libfoo.so.22' : ...
-           }
+    {
+      '/usr/lib/libbz2.so.1' : SonameInfo(libz2s.o.1)
+      '/usr/lib/libfoo.so.22' : ...
+    }
     """
+    # pylint: disable=too-many-locals
     infos = {}
-    for path in sonames:
-        # if path is symlink then libpath is target file
-        (libpath, version) = _split_soname_vers(path)
-        if not version:
+    for soname in sonames:
+        # if soname is symlink (usual case) then libpath is target file
+        (libpath, soname_vers, libpath_vers) = _split_soname_vers(soname)
+        if not soname_vers:
+            # not a soname
             continue
-        libpath_base = libpath.split('.so.')[0]
 
+        #
+        # timestamp (could also use soname path here)
+        #
         mtime = -1
         if os.path.exists(libpath):
             mtime = os.path.getmtime(libpath)
 
+        #
         # Get all avail versions
+        #
+        libpath_base = libpath.split('.so.')[0]
+
         tomatch = f'{libpath_base}.*'
         avail = []
         path_list = glob.glob(tomatch)
         for lib in path_list:
-            (_libpath, vers) = _split_soname_vers(lib)
+            # ignore any sym link in list if it doesn't point to actual library
+            if not os.path.exists(lib):
+                continue
 
-            if vers and vers not in avail:
-                avail.append(vers)
+            # add soname and lib_vers to avail list
+            (libpath, this_soname_vers, this_lib_vers) = _split_soname_vers(lib)
 
-        info_dict = {'path' : libpath,
+            if this_soname_vers and this_soname_vers not in avail:
+                avail.append(this_soname_vers)
+
+            if this_lib_vers and this_lib_vers not in avail:
+                avail.append(this_lib_vers)
+
+        #
+        # update soname_info
+        #
+        info_dict = {'soname' : soname,
+                     'vers' : soname_vers,
+                     'path' : libpath,
+                     'path_vers' : libpath_vers,
                      'mtime' : mtime,
-                     'vers' : version,
                      'avail' : avail
                      }
         soname_info = SonameInfo(**info_dict)
-        infos[path] = soname_info
+        infos[soname] = soname_info
 
     return infos
 
@@ -208,9 +235,9 @@ def avail_soname_info(last_soname_info:dict) -> dict:
     # Make list of sonames and refresh soname_info
     # Check uses actual path not soname
     sonames = list(last_soname_info.keys())
-    sonames = []
-    for (_name, info) in last_soname_info.items():
-        if info and info.path and info.path not in sonames:
-            sonames.append(info.path)
+    #sonames = []
+    #for (_name, info) in last_soname_info.items():
+    #    if info and info.path and info.path not in sonames:
+    #        sonames.append(info.path)
     avail_info =  generate_soname_info(sonames)
     return avail_info

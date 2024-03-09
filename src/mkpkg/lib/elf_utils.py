@@ -29,11 +29,18 @@ def file_is_elf(filename):
             pass
     return is_elf
 
-def sonames_in_elf_file(elf_file):
+def sonames_in_elf_file(elf_file:str) -> [str]:
     """
     Extract list of sonames
-      each item is full path to versioned library (path)
+      each item is full path to library
       e.g. (/usr/lib/libressl.so.56)
+
+    Discussion:
+      We use ldd rather than objdump - this will pick up shared lib
+      libxxx.so.1 even if doesn't have NEEDED in private header.
+      e.g. nginx has soname dep on libresolv.so.2 - but objdump -p 
+      shows no NEEDED header (build problem perhaps). So we use ldd
+      For shared libs use objdump -p <shared> | grep SONAME
     """
     sonames = []
     if not os.path.exists(elf_file):
@@ -56,11 +63,11 @@ def sonames_in_elf_file(elf_file):
             # even if foo.so -> /usr/lib/lib/foo.so.NNN
             #
             soname = srow[0]
-            libname = srow[2]
+            soname_path = srow[2]
             vsplit = soname.split('.so.')
             if len(vsplit) < 2:
                 continue
 
-            if libname not in sonames:
-                sonames.append(libname)
+            if soname_path not in sonames:
+                sonames.append(soname_path)
     return sonames
