@@ -4,7 +4,6 @@
  Package dependency support tools for MkPkg class
     - version comparison tools
 """
-#from packaging import version
 import pyalpm
 
 def _semantic_vers_to_elems(vers):
@@ -127,7 +126,7 @@ def check_version_trigger(msg, oper, vers_trigger, pkg_vers, last_vers):
         where trigger is True if package is to be rebuilt
         The package vers and last_vers are what was use for the final comparison.
     """
-
+    # pylint: disable=c-extension-no-member
     if not last_vers:
         trigger = True
         return (trigger, pkg_vers, last_vers)

@@ -32,8 +32,8 @@ def file_is_elf(filename):
 def sonames_in_elf_file(elf_file):
     """
     Extract list of sonames
-      eaech item is tuple (soname, vers, path)
-      e.g. (libssl.so, 56, /usr/lib/libressl.so.56)
+      each item is full path to versioned library (path)
+      e.g. (/usr/lib/libressl.so.56)
     """
     sonames = []
     if not os.path.exists(elf_file):
@@ -50,13 +50,17 @@ def sonames_in_elf_file(elf_file):
             srow = row.strip().split()
             if len(srow) < 3:
                 continue
+
+            #
+            # check for library version - executable uses soname so we do as well
+            # even if foo.so -> /usr/lib/lib/foo.so.NNN
+            #
             soname = srow[0]
             libname = srow[2]
             vsplit = soname.split('.so.')
             if len(vsplit) < 2:
                 continue
 
-            #item = (soname, vers, libname)
             if libname not in sonames:
                 sonames.append(libname)
     return sonames

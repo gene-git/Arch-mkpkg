@@ -136,11 +136,11 @@ def generate_soname_info(sonames: List[FilePath]) -> Dict[FilePath, SonameInfo]:
 
 def _find_all_elf_executables(dirname:str) -> [str]:
     """
-    Make list of (elf) all executables and list of soname libs they are using
-    creates list of tuples of path of each executable: 
-    libpath ~ /usr/lib/libressl/libssl.so.56
-    e.g. output:
-        [libpath1, libpathr2, version, ... ]
+    Recursively find every executable and return
+    as a list of paths to each one.
+    Output is a list of paths : 
+        [exe1, exe2, exe3, ... ]
+    exeN ~ dirname/x/y/foo
     """
     scan = os_scandir(dirname)
     if not scan:
@@ -161,9 +161,9 @@ def _find_all_elf_executables(dirname:str) -> [str]:
 def _find_all_sonames(dirname:str) -> [str]:
     """
     Generate unique list of sonames from list of all elf executables
-    list of items where each item is full path to library:
-     library path
-      e.g. [/usr/lib/libz.so.1, /usr/lib/libxxx.so.n, ...]
+    Output is list of full paths of each library:
+      e.g. 
+         [/usr/lib/libz.so.1, /usr/lib/libxxx.so.n, ...]
     """
     elf_files = _find_all_elf_executables(dirname)
     if not elf_files:
@@ -183,8 +183,10 @@ def _find_all_sonames(dirname:str) -> [str]:
 
 def get_current_soname_info(pkgdir:str) -> dict:
     """
-    Generate soname_info from all elf executables in
-    found in pkgdir
+    Generate soname info from all elf executables in
+    found in pkgdir. 
+    Output is a dictionary of SonameInfo - key is soname path
+    from executable and value is it's SonameInfo instance
     """
     if not os.path.isdir(pkgdir):
         return None
@@ -195,9 +197,10 @@ def get_current_soname_info(pkgdir:str) -> dict:
 
 def avail_soname_info(last_soname_info:dict) -> dict:
     """
-    Lookup current soname info for each soname when last built
+    Lookup current soname info for each soname in last_soname_info - 
+    Input dict of SonameInfo from last build 
     input: dictionary of soname info as returned by generate_soname_info
-    output: refreshed dict of same sonames
+    output: refreshed dict of same sonames as of now
     """
     if not last_soname_info:
         return {}

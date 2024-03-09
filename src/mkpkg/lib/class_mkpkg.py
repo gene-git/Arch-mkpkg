@@ -49,7 +49,7 @@ class MkPkg:
         #  These compare using greater than: 'major' or 'minor' or 'last' etc
         self.soname_comp = self.conf.soname_comp
         self.soname_info = {}
-        self.avail_soname_info = {}
+        #self.avail_soname_info = {}
 
         self.argv = self.conf.makepkg_args      # passed down to makepkg
 

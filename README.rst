@@ -28,6 +28,10 @@ New / Interesting
 
    If you're interested, the soname info is saved into the file *.mkp_dep_soname*
 
+   **N.B.**
+     that the build must be run at least once with this new version to generate the
+   soname info (mkpkg -f forces a fresh build)
+
  * Old options now deprecated
    
     * (*--mpk-xxx*)
