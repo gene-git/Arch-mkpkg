@@ -1,6 +1,12 @@
 Changelog
 =========
 
+**[6.0.4] ----- 2024-03-09** ::
+
+	    Add missing pydantic from PKGBUILD depends
+	    update Docs/Changelog.rst Docs/mkpkg.pdf for 6.0.3
+
+
 **[6.0.3] ----- 2024-03-09** ::
 
 	    Tidy up code comments. Ensure pylint is clean.
