@@ -8,15 +8,7 @@ import os
 import sys
 import tomli_w
 from .tools import open_file
-
-if sys.version_info >= (3,11):
-    # 3.11 has tomllib
-    try:
-        import tomllib as toml
-    except ImportError:
-        pass
-else:
-    import tomli as toml
+import tomllib as toml
 
 def _dict_none_to_empty(dic):
     """
