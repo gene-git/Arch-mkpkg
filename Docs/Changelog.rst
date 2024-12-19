@@ -1,6 +1,12 @@
 Changelog
 =========
 
+**[6.2.0] ----- 2024-12-19** ::
+
+	    drop tomli for tomllib (python now >= 3.11)
+	    update Docs/Changelog.rst Docs/mkpkg.pdf for 6.1.0
+
+
 **[6.1.0] ----- 2024-03-09** ::
 
 	        soname logic updated.
