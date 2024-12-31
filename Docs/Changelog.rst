@@ -1,6 +1,15 @@
 Changelog
 =========
 
+**[6.2.2] ----- 2024-12-31** ::
+
+	    Git tags are now signed.
+	    Update python dep to 3.13
+	    Small clean ups and linting.
+	    PKGBUILD has info on how to activate verifying git signature once key is in keyring
+	    update Docs/Changelog.rst Docs/mkpkg.pdf for 6.2.0
+
+
 **[6.2.0] ----- 2024-12-19** ::
 
 	    drop tomli for tomllib (python now >= 3.11)
