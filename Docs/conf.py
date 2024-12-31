@@ -9,7 +9,7 @@
 project = "mkpkg"
 copyright = '2023, Gene C'
 author = 'Gene C'
-release = '6.2.0'
+release = '6.2.2'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

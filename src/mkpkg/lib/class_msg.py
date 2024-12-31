@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
  Screen output with indent and color
  Messages are written to stdout
@@ -58,7 +58,7 @@ class AscCol:
 
         return color_num
 
-    def colorize (self, txt, fg_col=None, bg_col=None, bold=False):
+    def colorize (self, txt, fg=None, bg=None, bold=False):
         """
         Colorize a string using 256 color ascii escapes
         Colors are a few names or digit from 0-255
@@ -75,15 +75,15 @@ class AscCol:
         if bold:
             set_bold = ';1'
 
-        if fg_col :
-            color_fg = self._lookup_color_number(fg_col)
+        if fg :
+            color_fg = self._lookup_color_number(fg)
             color_fg = f'{set_fg}{color_fg}'
 
-        if bg_col :
-            color_bg = self._lookup_color_number(bg_col)
+        if bg :
+            color_bg = self._lookup_color_number(bg)
             color_bg = f'{set_bg}{color_bg}'
 
-        if fg_col or bg_col or bold:
+        if fg or bg or bold:
             color_txt = f'{esc}{color_fg}{color_bg}{set_bold}m{txt}{esc}{set_off}m'
         else:
             color_txt = txt
@@ -107,23 +107,23 @@ class GcMsg:
         if self.fpo.isatty():
             self.tty = True
 
-    def _msg(self, lead, txt, fg_col=None, bg_col=None, bold=False):
+    def _msg(self, lead, txt, fg=None, bg=None, bold=False):
         """
         Writes text (string or list of strings)
             lead  - prepended to each line.
             color - if set, then text will be colored according to its value
         """
-        # pylint: disable=R0913
+        # pylint: disable=R0913,R0917
         for line in str_iter(txt):
-            #if self.tty and fg_col and fg_col != '':
+            #if self.tty and fg and fg != '':
             if self.tty :
-                ctxt = self.color.colorize (lead + line, fg_col=fg_col, bg_col=bg_col, bold=bold)
+                ctxt = self.color.colorize (lead + line, fg=fg, bg=bg, bold=bold)
             else:
                 ctxt = lead + line
             self.fpo.write(ctxt)
         self.fpo.flush()
 
-    def msg(self, txt, adash=None, bdash=None, ind=0, fg_col=None, bold=False):
+    def msg(self, txt, adash=None, bdash=None, ind=0, fg=None, bold=False):
         """
         Handles the work for messages with header or footer (dashes)
 
@@ -135,13 +135,14 @@ class GcMsg:
             fg      : ascii color uses first letter or use number 0-254 (Default 'w')
                       blue Bold cyan fail red green head under warn
         """
-        # pylint: disable=R0913
+        # pylint: disable=R0913,R0917
         # always need list and we also split newlines into separate rows
         txt_list = txt
         if not isinstance(txt, list):
             txt_list = [txt]
         txt_list = _txt_list_expand_newlines(txt_list)
 
+        dashes = ''
         if adash or bdash:
             longest = 1 + max( len(line) for line in txt_list)
             dashes = longest *  '-'
@@ -151,11 +152,11 @@ class GcMsg:
 
         # dashes above
         if adash:
-            self._msg(lead, [dashes,  '\n'], fg_col=fg_col, bold=bold)
+            self._msg(lead, [dashes,  '\n'], fg=fg, bold=bold)
 
         # body
-        self._msg(lead, txt_list, fg_col=fg_col, bold=bold)
+        self._msg(lead, txt_list, fg=fg, bold=bold)
 
         # dashes below
         if bdash:
-            self._msg(lead, [dashes, '\n'], fg_col=fg_col, bold=bold)
+            self._msg(lead, [dashes, '\n'], fg=fg, bold=bold)

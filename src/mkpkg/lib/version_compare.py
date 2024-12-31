@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
  Package dependency support tools for MkPkg class
     - version comparison tools
@@ -149,6 +149,6 @@ def check_version_trigger(msg, oper, vers_trigger, pkg_vers, last_vers):
             trigger = new_minus_old <  0
         case _:
             #msg = mkpkg.msg
-            msg(f'Unkown package version operator : {oper} ignoring\n', fg_col='yellow', ind=1)
+            msg(f'Unkown package version operator : {oper} ignoring\n', fg='yellow', ind=1)
 
     return (trigger, pkg_vers_comp, last_vers_comp)

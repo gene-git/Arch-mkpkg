@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
 Package dependency support tools for MkPkg class
     -
@@ -56,7 +56,7 @@ def check_deps(mkpkg):
     # make sure we have pulled PKGBUILD info
     #
     if not mkpkg.pkgname:
-        msg('error: Missing pkgbuild data\n', fg_col='red', ind=1)
+        msg('error: Missing pkgbuild data\n', fg='red', ind=1)
         return (False, False)
 
     #

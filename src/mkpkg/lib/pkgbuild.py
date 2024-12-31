@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
 Support tools relating to PKGBUILD file used by MkPkg class
     - bump_pkgrel
@@ -55,7 +55,7 @@ def write_pkgbuild(mkpkg, pkgbuild):
         fobj.close()
         okay = True
     else:
-        msg(f'Failed to write {path}\n', fg_col='red')
+        msg(f'Failed to write {path}\n', fg='red')
     return okay
 
 def read_pkgbuild(mkpkg):
@@ -75,7 +75,7 @@ def read_pkgbuild(mkpkg):
         fobj.close()
     else:
         okay = False
-        msg(f'Failed to read {pkgbuild}\n', fg_col='red')
+        msg(f'Failed to read {pkgbuild}\n', fg='red')
 
     mkpkg.pkgbuild = pkgbuild
     return okay
@@ -101,7 +101,7 @@ def set_pkgrel(mkpkg, pkgrel):
             okay = write_pkgbuild(mkpkg, new_pkgbuild)
             mkpkg.pkgbuild = new_pkgbuild
         else:
-            msg('Failed to find pkgrel line in PKGBUILD\n', fg_col='red', ind=1)
+            msg('Failed to find pkgrel line in PKGBUILD\n', fg='red', ind=1)
             okay = False
 
     return okay
@@ -127,7 +127,7 @@ def get_pkgbld_data(mkpkg):
     # make sure w have a PKGBUILD
     #
     if not os.path.exists(pkgbld_file):
-        msg(f'Warning: Missing {pkgbld_file} file\n', fg_col='yellow')
+        msg(f'Warning: Missing {pkgbld_file} file\n', fg='yellow')
         return False
 
     #
@@ -183,7 +183,7 @@ def get_pkgbld_data(mkpkg):
     [retc, output, errors] = run_prog (pargs, input_str=cmd_str)
 
     if retc != 0 :
-        msg('Failed to extract PKGBUILD info\n', fg_col='red')
+        msg('Failed to extract PKGBUILD info\n', fg='red')
         if errors:
             msg(f'{errors}')
         return False
@@ -215,19 +215,19 @@ def get_pkgbld_data(mkpkg):
         if line.startswith('_X_ pkgname ='):
             mkpkg.pkgname = data
             if not data:
-                msg('Warning: PKGBUILD missing pkgname\n', fg_col='yellow')
+                msg('Warning: PKGBUILD missing pkgname\n', fg='yellow')
                 okay = False
 
         elif line.startswith('_X_ pkgrel ='):
             mkpkg.pkgrel = data
             if not data:
-                msg('Warning: PKGBUILD missing pkgrel\n', fg_col='yellow')
+                msg('Warning: PKGBUILD missing pkgrel\n', fg='yellow')
                 okay = False
 
         elif line.startswith('_X_ pkgver ='):
             mkpkg.pkgver = data
             if not data:
-                msg('Warning: PKGBUILD missing pkgver\n', fg_col='yellow')
+                msg('Warning: PKGBUILD missing pkgver\n', fg='yellow')
                 okay = False
 
         elif line.startswith('_X_ pkgver_updated ='):

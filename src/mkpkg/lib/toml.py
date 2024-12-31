@@ -1,14 +1,13 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
 toml helper functions
     - NB toml write cannot handle None values
 """
 import os
-import sys
+import tomllib as toml
 import tomli_w
 from .tools import open_file
-import tomllib as toml
 
 def _dict_none_to_empty(dic):
     """

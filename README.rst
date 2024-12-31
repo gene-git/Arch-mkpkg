@@ -12,6 +12,12 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
+ * Going forward all git tags will be signed by <arch@sapience.com>.
+   Public key is available via WKD or download from website:
+   https://www.sapience.com/tech
+   After key is on keyring use the PKGBUILD source line ending with *?signed*
+   or manually verify using *git tag -v <tag-name>
+
  * soname logic updated.
    Default is now 'keep' which only rebuilds of a soname is no longer available.
    This is in line with how sonames are typically used where soname only changes
@@ -479,6 +485,10 @@ Available on
 .. _Archlinux AUR: https://aur.archlinux.org/packages/mkpkg
 
 On Arch you can build using the provided PKGBUILD in the packaging directory or from the AUR.
+All git tags are signed with arch@sapience.com key which is available via WKD
+or download from https://www.sapience.com/tech. Add the key to your package builder gpg keyring.
+In PKGBUILD use source= line with *?signed* at the end. You can also manually verify the signature
+
 To build manually, clone the repo and :
 
  .. code-block:: bash

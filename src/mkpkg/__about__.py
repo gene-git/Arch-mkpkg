@@ -3,4 +3,6 @@
 """
 Project mkpkg
 """
-__version__ = "6.2.0"
+__version__ = "6.2.2"
+__date__ = "2024-12-31"
+

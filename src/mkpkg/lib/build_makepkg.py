@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
 Support tools for MkPkg class
     - build_w_makepkg: Use makepkg to do build
@@ -61,11 +61,11 @@ def build_w_makepkg(mkpkg):
     run_args = {}
 
 
-    msg('Passing the buck to makepkg:\n', adash=True, fg_col='tan', ind=1)
+    msg('Passing the buck to makepkg:\n', adash=True, fg='tan', ind=1)
     [retc, output, errors] = run_prog(pargs, **run_args)
     if mkpkg.verb:
         print(output)
-    msg('------------------------------\n', fg_col='tan', ind=1)
+    msg('------------------------------\n', fg='tan', ind=1)
 
     #
     # what did makepkg tell us:
@@ -79,19 +79,19 @@ def build_w_makepkg(mkpkg):
     pkg_vers = pkg_version(mkpkg)
 
     if res == 'Success' and pkg_vers != vers_mp:
-        msg(f'Warning: Expect version {pkg_vers} makepkg got {vers_mp}\n', ind=1, fg_col='yellow')
+        msg(f'Warning: Expect version {pkg_vers} makepkg got {vers_mp}\n', ind=1, fg='yellow')
 
     if retc != 0:
         build_ok = False
         parg_str = ' '.join(pargs)
-        msg(f'Build failed: {parg_str}\n', ind=1,fg_col='red')
+        msg(f'Build failed: {parg_str}\n', ind=1,fg='red')
         sys.stderr.write(errors)
 
     else:
         build_ok = True
         if res == 'Success':
-            msg(f'Build succeeded : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg_col='green')
+            msg(f'Build succeeded : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg='green')
         elif res == 'Current':
-            msg(f'Package Current : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg_col='green')
+            msg(f'Package Current : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg='green')
 
     return build_ok

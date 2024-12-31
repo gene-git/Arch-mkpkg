@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
 Support tools for MkPkg class
 """
@@ -144,7 +144,7 @@ def print_summary(mkpkg):
     rpt_key = 'mkp:'
     rpt_key_final = 'mkp-status:'
     if mkpkg.verb:
-        msg('Summary of results:\n', adash=True, fg_col='cyan')
+        msg('Summary of results:\n', adash=True, fg='cyan')
 
     pkg_vers = pkg_version(mkpkg)
 
@@ -167,6 +167,8 @@ def print_summary(mkpkg):
         elif 'success' in what:
             has_success = True
 
+    status = ''
+    col = 'white'
     if has_error:
         status = 'error'
         col = 'red'
@@ -180,4 +182,4 @@ def print_summary(mkpkg):
     # move this outside of print_summary
     mkpkg.status = status
 
-    msg(f'{rpt_key_final} {status} {pkg_vers}\n', fg_col=col)
+    msg(f'{rpt_key_final} {status} {pkg_vers}\n', fg=col)

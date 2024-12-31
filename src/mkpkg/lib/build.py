@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2022,2023 Gene C
+# SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
 build()
     - does all the work.
@@ -43,7 +43,7 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
     if pkg_vers_changed or soname_build:
         vers_info = f'{mkpkg.pkgver} -> {mkpkg.pkgver_updated}'
 
-        msg(f'Package vers changed : {mkpkg.pkgname} ({vers_info})\n', fg_col='cyan')
+        msg(f'Package vers changed : {mkpkg.pkgname} ({vers_info})\n', fg='cyan')
         if soname_build:
             msg('Soname requires rebuild\n')
 
@@ -53,20 +53,20 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
         else:
             pkgrel = bump_pkgrel(mkpkg.pkgrel)
         mkpkg.pkgrel_updated = pkgrel
-        msg(f'Resetting pkgrel and rebuilding : {pkgrel}\n', fg_col='cyan')
+        msg(f'Resetting pkgrel and rebuilding : {pkgrel}\n', fg='cyan')
         okay  = set_pkgrel(mkpkg, pkgrel)
         if okay:
             needs_build = True
         else:
-            msg('Failed to reset pkgrel\n', fg_col='red')
+            msg('Failed to reset pkgrel\n', fg='red')
             mkpkg.result.append(['error', 'pkgbuild', f'write new pkgrel {pkgrel}'])
     else:
-        msg(f'Package vers un-changed: {mkpkg.pkgname}\n', fg_col='cyan')
+        msg(f'Package vers un-changed: {mkpkg.pkgname}\n', fg='cyan')
         if pkg_file_found:
             if pkg_file_exact_match:
                 # pkg file vers and release match
                 if mkpkg.verb:
-                    msg('Checking make deps\n', fg_col='cyan')
+                    msg('Checking make deps\n', fg='cyan')
                 (okay,deps_newer) = check_deps(mkpkg)
                 if okay and deps_newer:
                     mkpkg.result.append(['changed', 'deps', 'deps updated'])
@@ -80,7 +80,7 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
                         needs_build = True
                     else:
                         mkpkg.result.append(['error', 'pkgbuild', f'writing new pkgrel {pkgrel}'])
-                        msg('Failed to update pkgrel\n', fg_col='red')
+                        msg('Failed to update pkgrel\n', fg='red')
                 else:
                     if mkpkg.verb:
                         msg('No new trigger dependencies)\n', ind=1)
@@ -88,11 +88,11 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
             else:
                 # pkg file has vers but release doesn't match
                 rel_info = f'{pkg_file_prel} vs {mkpkg.pkgrel}'
-                msg(f'Pkg file version matches.  Release doesnt ({rel_info})\n', fg_col='cyan')
+                msg(f'Pkg file version matches.  Release doesnt ({rel_info})\n', fg='cyan')
                 needs_build = True
                 mkpkg.result.append(['changed', 'no-package', f'rel {rel_info}: '])
         else:
-            msg('Pkg file not found\n', fg_col='cyan')
+            msg('Pkg file not found\n', fg='cyan')
             needs_build = True
             mkpkg.result.append(['changed', 'no-package', 'packge missing'])
 
@@ -106,7 +106,7 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
         msg(f'Updating pkgrel : {mkpkg.pkgrel} -> {pkgrel}\n', ind=1)
         okay = set_pkgrel(mkpkg, pkgrel)
         if not okay:
-            msg('Failed to update pkgrel\n', fg_col='red')
+            msg('Failed to update pkgrel\n', fg='red')
             mkpkg.result.append(['error', 'pkgbuild', f'writing new pkgrel {pkgrel}'])
 
     if needs_build:
@@ -114,7 +114,7 @@ def _build_if_needed(pkg_vers_changed, soname_build, pkg_file_info, mkpkg):
         mkpkg.build_ok = build_w_makepkg(mkpkg)
         ran_build = True
         if not mkpkg.build_ok:
-            msg('Build failed\n', ind=1, fg_col='red')
+            msg('Build failed\n', ind=1, fg='red')
     else:
         msg('Nothing to do\n', ind=1)
 
