@@ -1,6 +1,12 @@
 Changelog
 =========
 
+**[6.2.3] ----- 2024-12-31** ::
+
+	    fix typo in PKGBUILD
+	    update Docs/Changelog.rst Docs/mkpkg.pdf for 6.2.2
+
+
 **[6.2.2] ----- 2024-12-31** ::
 
 	    Git tags are now signed.
