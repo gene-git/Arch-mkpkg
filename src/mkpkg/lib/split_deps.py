@@ -7,20 +7,25 @@
         mkpkg.depends       - package names with no version requirement
         mkpkg.depends_vers  - packages with version requirements
 """
-# pylint: disable=R0912,R0915
+# pylint: disable=
+from ._mkpkg_base import MkPkgBase
 from .dep_vers import read_last_dep_vers
 
-def _split_pkg_vers_constraint(mkpkg, item):
+
+def _split_pkg_vers_constraint(mkpkg: MkPkgBase, item: str
+                               ) -> tuple[str, str, str]:
     """
     Takes a string in form 'pkgname oper vers'
-        where oper is one of the opers list
-        returns (pkgname, oper,  vers)
-        opers can be: '>', '>=' or '<' (the latter being to handle downgrades: pkg<last
+    where oper is one of the opers list
+
+    Returns (pkgname, oper,  vers)
+     opers can be: '>', '>=' or '<'
+     < for downgrades: pkg<last
     """
-    pkg = None
-    oper = None
-    vers_trigger = None
-    wmsg = mkpkg.wmsg
+    pkg = ''
+    oper = ''
+    vers_trigger = ''
+    msg = mkpkg.msg
 
     #
     # add white space
@@ -30,8 +35,10 @@ def _split_pkg_vers_constraint(mkpkg, item):
     xitem = xitem.replace('< =', '<= ')
     xitem = xitem.replace('> =', '>= ')
 
-    splitem = xitem.split()
+    splitem: list[str] = xitem.split()
     num_items = len(splitem)
+    err_txt = f'_mkpkg_depends item should be "X" or "X>Y" etc. Got: {item}'
+
     if num_items == 1:
         pkg = splitem[0]
 
@@ -40,7 +47,7 @@ def _split_pkg_vers_constraint(mkpkg, item):
         # we can return orig or first piece as it makes no sense
         # we return orig
         pkg = item.strip()
-        wmsg(f'Error _mkpkg_depends item should be "X" or "X>Y" etc. Got: {item}')
+        msg(f'Error: {err_txt}', fg='warn')
 
     elif num_items == 3:
         pkg = splitem[0]
@@ -50,11 +57,12 @@ def _split_pkg_vers_constraint(mkpkg, item):
     else:
         # ug - also makes no sense
         pkg = item.strip()
-        wmsg(f'Error _mkpkg_depends item should be "X" or "X>Y" etc. Got: {item}')
+        msg(f'Error: {err_txt}', fg='warn')
 
     return (pkg, oper, vers_trigger)
 
-def split_deps_vers_list(mkpkg):
+
+def split_deps_vers_list(mkpkg: MkPkgBase):
     """
     Splits the mkpkg.depends list into 2 lists:
         mkpkg.depends       - package names with no version requirement
@@ -63,9 +71,9 @@ def split_deps_vers_list(mkpkg):
     if not mkpkg.depends:
         return
 
-    dep_names = []
-    dep_vers = []
-    #opers = mkpkg.dep_vers_opers
+    dep_names: list[str] = []
+    dep_vers: list[tuple[str, str, str]] = []
+
     for item in mkpkg.depends:
         (pkg, oper, vers_trigger) = _split_pkg_vers_constraint(mkpkg, item)
         if oper:

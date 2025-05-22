@@ -4,31 +4,36 @@
 Support tools for MkPkg class
     - build_w_makepkg: Use makepkg to do build
 """
-# pylint: disable=R0912,R0915
 import sys
 from .run_prog import run_prog
 from .tools import pkg_version
 
-def _makepkg_outcome(retc, output, errors):
+
+def _makepkg_outcome(retc: int, output: str, errors: str
+                     ) -> tuple[int, str, str]:
     """
     Determine the outcome of running makepkg.
-    Needs care. For example, it can return non-zero and 'ERROR: A package has already been built.
-    For our needs thats not an error.
-    returns:
+
+    Needs some care. e.g. makepkg can return non-zero
+    and 'ERROR: A package has already been built.
+
+    For our purpose thats not an error.
+
+    Returns:
         retc = 0 means ok (current or success)
         res = Current, Fail, Success
-        pvers - result of build - should match what we got from running pkgver()
+        pvers = result of build - should match output of pkgver()
     """
-    res = None
-    if retc == 0 :
+    res = ''
+    if retc == 0:
         res = 'Success'
 
     key_success = 'Finished making:'
     key_already_built = 'A package has already been built'
     key_group_already_build = 'The package group has already been built.'
 
-    pvers = None
-    if output :
+    pvers = ''
+    if output:
         if key_success in output:
             res = 'Success'
             retc = 0
@@ -46,7 +51,8 @@ def _makepkg_outcome(retc, output, errors):
     if not res:
         res = 'Fail'
 
-    return retc, res, pvers
+    return (retc, res, pvers)
+
 
 def build_w_makepkg(mkpkg):
     """
@@ -58,11 +64,8 @@ def build_w_makepkg(mkpkg):
     if mkpkg.argv:
         pargs += mkpkg.argv
 
-    run_args = {}
-
-
     msg('Passing the buck to makepkg:\n', adash=True, fg='tan', ind=1)
-    [retc, output, errors] = run_prog(pargs, **run_args)
+    (retc, output, errors) = run_prog(pargs)
     if mkpkg.verb:
         print(output)
     msg('------------------------------\n', fg='tan', ind=1)
@@ -70,28 +73,33 @@ def build_w_makepkg(mkpkg):
     #
     # what did makepkg tell us:
     #
-    retc, res, vers_mp = _makepkg_outcome(retc, output, errors)
+    (retc, res, vers_mp) = _makepkg_outcome(retc, output, errors)
 
     #
     # save and check version we got with what makepkg said
     #
-    mkpkg.pkgver_makepkg  = vers_mp
+    mkpkg.pkgver_makepkg = vers_mp
     pkg_vers = pkg_version(mkpkg)
 
     if res == 'Success' and pkg_vers != vers_mp:
-        msg(f'Warning: Expect version {pkg_vers} makepkg got {vers_mp}\n', ind=1, fg='yellow')
+        txt = f'Expect version {pkg_vers} makepkg got {vers_mp}'
+        msg('Warning: {txt}\n', ind=1, fg='yellow')
 
     if retc != 0:
         build_ok = False
         parg_str = ' '.join(pargs)
-        msg(f'Build failed: {parg_str}\n', ind=1,fg='red')
+        msg(f'Build failed: {parg_str}\n', ind=1, fg='red')
         sys.stderr.write(errors)
 
     else:
         build_ok = True
+        status = 'good'
         if res == 'Success':
-            msg(f'Build succeeded : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg='green')
+            status = 'succeeded'
         elif res == 'Current':
-            msg(f'Package Current : {mkpkg.pkgname} {pkg_vers}\n', ind=1, fg='green')
+            status = 'Current'
+
+        txt = f'{mkpkg.pkgname} {pkg_vers}'
+        msg(f'Package {status} : {txt}\n', ind=1, fg='green')
 
     return build_ok

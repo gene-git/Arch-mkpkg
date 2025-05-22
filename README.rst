@@ -9,16 +9,26 @@ Overview
 
 Tool to rebuild Arch packages based on dependency triggers.
 
+* All git tags will be signed by <arch@sapience.com>.
+  Public key is available via WKD or download from website:
+  https://www.sapience.com/tech
+  After key is on keyring use the PKGBUILD source line ending with *?signed*
+  or manually verify using *git tag -v <tag-name>*
+
 New / Interesting
 ==================
 
- * Going forward all git tags will be signed by <arch@sapience.com>.
-   Public key is available via WKD or download from website:
-   https://www.sapience.com/tech
-   After key is on keyring use the PKGBUILD source line ending with *?signed*
-   or manually verify using *git tag -v <tag-name>
+
+ * Immproved code
+
+   PEP-8, PEP-257, PEP-484 and PEP-561
+   Refactor & clean ups.
+
+ * Improved handling of split packages.
+   Now checks every packages for any being missing or out of date.
 
  * soname logic updated.
+
    Default is now 'keep' which only rebuilds of a soname is no longer available.
    This is in line with how sonames are typically used where soname only changes
    when ABI changes.
@@ -616,9 +626,6 @@ Changed the PKGBUILD variables to have underscore prefix to follow Arch Package 
 Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
 The code is backward compatible and supports the previous variable names without the 
 leading "\_" as well as the ones with the "\_".
-
-To fall back to *makedepends* when there are no *_mkpkg_depends* variables now requires
-using the option *--mkp-use_makedepends* to turn it on.
 
 Now also available on aur.
 

@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
-""" module init for mkpkg """
+"""
+mkpkg module
+"""
 from .class_mkpkg import MkPkg
-from .class_msg import GcMsg
+from .class_msg import Msg

@@ -22,9 +22,23 @@ Documentation = "https://github.com/gene-git/Arch-mkpkg/Docs"
 Issues = "https://github.com/gene-git/Arch-mkpkg/issues"
 Source = "https://github.com/gene-git/Arch-mkpkg"
 
+[[tool.hatch.envs.all.matrix]]
+python = ["3.10", "3.11", "3.12"]
+
 [tool.hatch.version]
 path = "src/mkpkg/__about__.py"
 
-[[tool.hatch.envs.all.matrix]]
-python = ["3.10", "3.11", "3.12"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/mkpkg"]
+include = [
+    "src/mkpkg",
+]
+
+[tool.mypy]
+check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["pyalpm.vercmp"]
+follow_untyped_imports = true
+
 

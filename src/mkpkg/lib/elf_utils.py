@@ -6,9 +6,11 @@ soname tools
 import os
 from elftools.elf.elffile import ELFFile
 from elftools.common.exceptions import ELFError
+
 from .run_prog import run_prog
 
-def file_is_elf(filename):
+
+def file_is_elf(filename: str):
     """
     Return True if filename is elf executable
     """
@@ -25,33 +27,37 @@ def file_is_elf(filename):
                 ei_class = e_ident.get('EI_CLASS')
                 if ei_class and ei_class.startswith('ELFCLASS'):
                     is_elf = True
-        except ELFError :
+        except ELFError:
             pass
+
     return is_elf
 
-def sonames_in_elf_file(elf_file:str) -> [str]:
+
+def sonames_in_elf_file(elf_file: str) -> list[str]:
     """
-    Extract list of sonames
-      each item is full path to library
-      e.g. (/usr/lib/libressl.so.56)
+    Extract list of sonames.
+
+    each item is full path to library
+    e.g. (/usr/lib/libressl.so.56)
 
     Discussion:
       We use ldd rather than objdump - this will pick up shared lib
       libxxx.so.1 even if doesn't have NEEDED in private header.
-      e.g. nginx has soname dep on libresolv.so.2 - but objdump -p 
-      shows no NEEDED header (build problem perhaps). So we use ldd
-      For shared libs use objdump -p <shared> | grep SONAME
+      e.g. nginx has soname dep on libresolv.so.2
+      but "objdump -p" shows no NEEDED header (build problem perhaps).
+      So we use ldd For shared libs use instead:
+        "objdump -p <shared> | grep SONAME"
     """
-    sonames = []
+    sonames: list[str] = []
     if not os.path.exists(elf_file):
         return sonames
 
     pargs = ['/usr/bin/ldd', elf_file]
-    [retc, output, _errors] = run_prog(pargs)
+    (retc, output, _errors) = run_prog(pargs)
     if retc == 0 and output:
         rows = output.splitlines()
         for row in rows:
-            if 'linux-vdso.so' in row or  'ld-linux' in row:
+            if 'linux-vdso.so' in row or 'ld-linux' in row:
                 continue
 
             srow = row.strip().split()
@@ -59,7 +65,8 @@ def sonames_in_elf_file(elf_file:str) -> [str]:
                 continue
 
             #
-            # check for library version - executable uses soname so we do as well
+            # check library version.
+            # executable uses soname so we do as well
             # even if foo.so -> /usr/lib/lib/foo.so.NNN
             #
             soname = srow[0]

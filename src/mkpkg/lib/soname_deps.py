@@ -1,40 +1,49 @@
 # SPDX-License-Identifier: MIT
 # SPDX-FileCopyrightText: © 2022-present  Gene C <arch@sapience.com>
 """
-soname dep 
+soname dep
 """
+from typing import (Any)
 import os
+
+from ._mkpkg_base import MkPkgBase
 from .toml import (read_toml_file, write_toml_file)
 from .soname import SonameInfo
 
-#
-# Save / Restore
-#
-def to_dict(infos):
+
+def to_dict(infos: dict[str, SonameInfo]) -> dict[str, dict[str, Any]]:
     """
     Convert dict[SonameInfo] to dict[dict]
     """
-    infos_dict = {}
-    for (key, val) in infos.items():
-        infos_dict[key] = val.dict()
+    infos_dict: dict[str, dict[str, str | int | list[str]]] = {}
+
+    for (key, soname_info) in infos.items():
+        infos_dict[key] = soname_info.asdict()
     return infos_dict
 
-def from_dict(infos_dict):
+
+def from_dict(infos_dict: dict[str, dict[str, Any]]) -> dict[str, SonameInfo]:
     """
-    Convert dict[SonameInfo] to dict[dict]
+    Convert dict[dict] to dict[SonameInfo]
     """
-    infos = {}
+    infos: dict[str, SonameInfo] = {}
+
     for (key, val) in infos_dict.items():
-        info = SonameInfo(**val)
-        infos[key] = info
+        infos[key] = SonameInfo(**val)
+
     return infos
 
-def write_soname_deps(mkpkg):
+
+def write_soname_deps(mkpkg: MkPkgBase):
     """
-    save the soname dep info to current working dir
+    Save the soname dep info to current working dir
+    We could also switch to pickle files and skip
+    converting class to dict and back.
+    Dict has advantage its human readable.
     """
     if not mkpkg.soname_info:
         return
+
     pname = os.path.join(mkpkg.cwd, '.mkpkg_dep_soname')
 
     #
@@ -43,7 +52,8 @@ def write_soname_deps(mkpkg):
     infos_dict = to_dict(mkpkg.soname_info)
     write_toml_file(infos_dict, pname)
 
-def _update_soname_info(infos):
+
+def _update_soname_info(infos: dict[str, SonameInfo]):
     """
     Update to newer version
     """
@@ -54,9 +64,10 @@ def _update_soname_info(infos):
         info.vers = vsplit[1]
         info.avail.append(info.vers)
 
-def read_soname_deps(mkpkg):
+
+def read_soname_deps(mkpkg: MkPkgBase):
     """
-    read soname deps from cwd
+    Read soname deps from cwd
     """
     pname = os.path.join(mkpkg.cwd, '.mkpkg_dep_soname')
 
@@ -64,7 +75,6 @@ def read_soname_deps(mkpkg):
 
     if os.path.exists(pname):
         infos_dict = read_toml_file(pname)
-
 
         #
         # update to new soname_info if needed

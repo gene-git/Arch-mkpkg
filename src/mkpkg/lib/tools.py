@@ -3,12 +3,14 @@
 """
 Support tools for MkPkg class
 """
-# pylint: disable=R0912,R0915
+# pylint: disable=
 import os
-import sys
 import glob
 
-def primary_pkgname(mkpkg):
+from ._mkpkg_base import MkPkgBase
+
+
+def primary_pkgname(mkpkg: MkPkgBase) -> str:
     """
     return the pkgname string
     """
@@ -20,8 +22,11 @@ def primary_pkgname(mkpkg):
 
     return pname
 
-def pkg_version_release(mkpkg):
-    """ Returns version and release number"""
+
+def pkg_version_release(mkpkg: MkPkgBase) -> tuple[str, str, str]:
+    """
+    Returns version and release number
+    """
     pvers = mkpkg.pkgver
     if mkpkg.pkgver_updated:
         pvers = mkpkg.pkgver_updated
@@ -30,80 +35,100 @@ def pkg_version_release(mkpkg):
     if mkpkg.pkgrel_updated:
         prel = mkpkg.pkgrel_updated
 
-    epoch = None
+    epoch = ''
     if mkpkg.epoch:
         epoch = mkpkg.epoch
 
     return (epoch, pvers, prel)
 
-def pkg_version(mkpkg):
-    """ construct the latest package version/release string """
-    (epoch, pvers,prel) = pkg_version_release(mkpkg)
+
+def pkg_version(mkpkg: MkPkgBase) -> str:
+    """
+    construct latest package version/release string
+    """
+    (epoch, pvers, prel) = pkg_version_release(mkpkg)
     if epoch:
         full_vers = f'{epoch}:{pvers}-{prel}'
     else:
         full_vers = f'{pvers}-{prel}'
     return full_vers
 
-def open_file (pathname, mode):
-    """
-     Wrapper to open file and handle errors = returns file object if successfuke or None
-    """
-    # pylint: disable=W1514,R1732
-    try:
-        fobj = open(pathname, mode)
-    except OSError as err:
-        print(f'Error opening file {pathname} : {err}')
-        fobj = None
-    return fobj
 
-def argv_parser(mkpkg):
+def _pkg_fname_vers_rel(fname: str) -> tuple[str, str]:
     """
-    We accept one argument only - it must be first arg.
-    Remaining args are passed down to makepkg
-    Args intended for mkpkg itself are all of the form:
-        --mkp-<option>
-    Options are:
-        verb            - show makepkg (stdout) output
-        force           - always run makepkg even if not needed
-                        - you may want to set makepkg force as well (-f)
+    parse package file and extract version and release
     """
-    opt_keys = ['--mkp-verb', '--mkp-force', '--mkp-refresh']
-    argv = []
-    for opt in sys.argv[1:]:
-        if opt in opt_keys:
-            option = opt.split('--mkp-')[1]
-            setattr(mkpkg, option, True)
-        else:
-            argv += [opt]
-
-    return argv
-
-def _pkg_fname_vers_rel(fname):
-    """ parse package file and extract version and release """
-    pvers = None
-    prel = None
+    pvers = ''
+    prel = ''
     if fname:
         fsplit = fname.split('-')
         pvers = fsplit[1]
         prel = fsplit[2]
     return (pvers, prel)
 
-def check_package_exists(mkpkg):
+
+def check_package_exists(mkpkg: MkPkgBase) -> dict[str, str | bool]:
     """
     Used when PKGBUILD has not pkgver() update function.
     Check that current pkgver/rel has corresponding package
-        - Check for [epoch:]vers-rel
-        - If not find latest vers.
+     - Check for [epoch:]vers-rel
+     - If not find latest vers.
+
+    If the package is a split package, then we check that all
+    packages exist. That way if first package succeeded but
+    other packages failed, we will trigger a rebuild.
+
+    For simplicity we report back a single "packge file info".
+    For split pckage, we take the "worst" of any of the packages.
+    e.g. if one package is missing we report that. This way
+    we wont miss a needed rebuild.
     """
-    pname = primary_pkgname(mkpkg)
+    (epoch, pvers, prel) = pkg_version_release(mkpkg)
 
-    (epoch, pvers,prel) = pkg_version_release(mkpkg)
+    found: bool = True
+    exact_match: bool = True
 
-    found = False
-    exact_match = False
+    for pname in mkpkg.pkgnames:
+        (found_p, exact_p, pvers_p, prel_p) = (
+                _one_package_exists(pname, epoch, pvers, prel)
+                )
+        found &= found_p
+        exact_match &= exact_p
 
-    epoch_str=''
+        if not found_p:
+            # Stop looking - we need to rebuild
+            # Keep the failing package vers and release
+            pvers = pvers_p
+            prel = prel_p
+            break
+
+    pkg_file_info: dict[str, str | bool] = {
+            'found': found,
+            'exact_match': exact_match,
+            'pvers': pvers,
+            'prel': prel,
+            }
+    return pkg_file_info
+
+
+def _one_package_exists(pname: str, epoch: str, pvers: str, prel: str
+                        ) -> tuple[bool, bool, str, str]:
+    """
+    Used when PKGBUILD has not pkgver() update function.
+    Check that current pkgver/rel has corresponding package
+     - Check for [epoch:]vers-rel
+     - If not find latest vers.
+
+    If the package is a split package, then we check that all
+    packages exist. That way if first package succeeded but
+    other packages failed, we will trigger a rebuild.
+
+    Returns (found, exact_match, pvers, prel)
+    """
+    found: bool = False
+    exact_match: bool = False
+
+    epoch_str = ''
     if epoch:
         epoch_str = f'{epoch}:'
     pkg_pattern = f'{pname}-{epoch_str}{pvers}-{prel}-*.pkg.tar.zst'
@@ -122,15 +147,10 @@ def check_package_exists(mkpkg):
             newest = flist[len(flist)-1]
             (pvers, prel) = _pkg_fname_vers_rel(newest)
 
-    pkg_file_info = {
-            'found'         : found,
-            'exact_match'   : exact_match,
-            'pvers'         : pvers,
-            'prel'          : prel,
-            }
-    return pkg_file_info
+    return (found, exact_match, pvers, prel)
 
-def print_summary(mkpkg):
+
+def print_summary(mkpkg: MkPkgBase):
     """
     Print Summary Result
         - mkpkg.build_ok    - gives success/fail of call down to makepkg
@@ -143,6 +163,7 @@ def print_summary(mkpkg):
 
     rpt_key = 'mkp:'
     rpt_key_final = 'mkp-status:'
+
     if mkpkg.verb:
         msg('Summary of results:\n', adash=True, fg='cyan')
 
@@ -152,6 +173,7 @@ def print_summary(mkpkg):
     has_changed = False
     has_success = False
     has_up2date = False
+
     for item in mkpkg.result:
         what = item[0]
         where = item[1]

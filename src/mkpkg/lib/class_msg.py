@@ -5,45 +5,50 @@
  Messages are written to stdout
  Colors are turned off if non-tty
 """
+# pylint: disable=too-few-public-methods
+# pylint: disable=too-many-arguments, too-many-positional-arguments
+from typing import TextIO
 import sys
-from .text import str_iter
 from .color_pick import color_pick
 
-def _txt_list_expand_newlines (txt_list):
+
+def _txt_list_expand_newlines(txt_list: list[str]) -> list[str]:
     """
     List Elements split by newlines expand the list
     """
-    new_list = []
+    new_list: list[str] = []
     for item in txt_list:
         item_expanded = item.splitlines(keepends=True)
-        new_list = new_list + item_expanded
+        new_list += item_expanded
     return new_list
 
-class AscCol:
+
+class _AscCol:
     """
-    Ascii Color
+    Ascii Colors
     """
-    # pylint: disable=R0903
-    def __init__(self):
+    # pylint: disable=
+    def __init__(self, theme: str = 'dark'):
+        self.theme = theme
         self.color_map = {
-                'blue'      : 27,
-                'cyan'      : 51,
-                'green'     : 10,
-                'orange'    : 9,
-                'pink'      : 13,
-                'red'       : 196,
-                'tan'       : 208,
-                'yellow'    : 11,
-                'white'     : 254,
-                'warn'      : 11,
-                'fail'      : 160,
-                'error'     : 196,
-                'info'      : 208,
-                'hdr'       : 227,
+                'blue': '27',
+                'cyan': '51',
+                'green': '10',
+                'orange': '9',
+                'pink': '13',
+                'red': '196',
+                'tan': '208',
+                'yellow': '11',
+                'white': '254',
+                'warn': '11',
+                'fail': '160',
+                'error': '196',
+                'info': '208',
+                'hdr': '227',
                 }
         self.col_list = list(self.color_map.keys())
 
-    def _lookup_color_number(self, color):
+    def _lookup_color_number(self, color: str) -> str:
         """
         Maps first letter of color name to ascii color number (256 color)
         """
@@ -53,106 +58,139 @@ class AscCol:
             color_matched = color_pick(color, self.col_list)
             if color_matched:
                 color_num = self.color_map[color_matched]
-            else:
-                color_num = 254     # unknown - make it white
+                return color_num
+
+        if color.isdigit():
+            return color
+
+        # unknown and not a number
+        color_num = '254'
+        if self.theme and self.theme.lower().startswith('l'):
+            color_num = '0'
 
         return color_num
 
-    def colorize (self, txt, fg=None, bg=None, bold=False):
+    def colorize(self,
+                 txt: str,
+                 fg: str = '',
+                 bg: str = '',
+                 bold: bool = False) -> str:
         """
         Colorize a string using 256 color ascii escapes
         Colors are a few names or digit from 0-255
         """
         esc = '\033['
-        set_fg = '38;5;'
-        set_bg = '48;5;'
-        set_off = '0'
-        #under = '\033[4m'
+        a_fg = '38;5;'
+        a_bg = '48;5;'
+        a_off = '0'
+        # under = '\033[4m'
 
-        set_bold = ''
-        color_fg = ''
-        color_bg = ''
+        a_bold = ''
+        col_fg = ''
+        col_bg = ''
         if bold:
-            set_bold = ';1'
+            a_bold = ';1'
 
-        if fg :
-            color_fg = self._lookup_color_number(fg)
-            color_fg = f'{set_fg}{color_fg}'
+        if fg:
+            col_fg = self._lookup_color_number(fg)
+            col_fg = f'{a_fg}{col_fg}'
 
-        if bg :
-            color_bg = self._lookup_color_number(bg)
-            color_bg = f'{set_bg}{color_bg}'
+        if bg:
+            col_bg = self._lookup_color_number(bg)
+            col_bg = f'{a_bg}{col_bg}'
 
         if fg or bg or bold:
-            color_txt = f'{esc}{color_fg}{color_bg}{set_bold}m{txt}{esc}{set_off}m'
+            ctxt = f'{esc}{col_fg}{col_bg}{a_bold}m{txt}{esc}{a_off}m'
         else:
-            color_txt = txt
+            ctxt = txt
 
-        return color_txt
+        return ctxt
 
 
-class GcMsg:
+class Msg:
     """
-    GcMsg class - handles screen writes
+    Msg class - handles screen writes
     see msg() and companion methods
         indent sets initial indent
         indent_char provides a char to print before every text
     """
-    # pylint: disable=R0903
-    def __init__(self, indent=4*' '):
-        self.color = AscCol()
-        self.fpo = sys.stdout
-        self.indent = indent
-        self.tty = False
+    # pylint: disable=
+    def __init__(self,
+                 indent: str = 4*' ',
+                 theme: str = 'dark'):
+        self.color = _AscCol(theme)
+        self.fpo: TextIO = sys.stdout
+        self.indent: str = indent
+        self.tty: bool = False
+
         if self.fpo.isatty():
             self.tty = True
 
-    def _msg(self, lead, txt, fg=None, bg=None, bold=False):
+    def _msg(self,
+             lead: str,
+             txt: str | list[str],
+             fg: str = '',
+             bg: str = '',
+             bold: bool = False):
         """
         Writes text (string or list of strings)
-            lead  - prepended to each line.
-            color - if set, then text will be colored according to its value
+
+        lead  - prepended to each line.
+        color - if set, then text will be colored according to its value
         """
-        # pylint: disable=R0913,R0917
-        for line in str_iter(txt):
-            #if self.tty and fg and fg != '':
-            if self.tty :
-                ctxt = self.color.colorize (lead + line, fg=fg, bg=bg, bold=bold)
-            else:
-                ctxt = lead + line
+        if isinstance(txt, list):
+            txt_list = txt
+        else:
+            txt_list = [txt]
+
+        for line in txt_list:
+            ctxt = lead + line
+            if self.tty:
+                ctxt = self.color.colorize(ctxt, fg=fg, bg=bg, bold=bold)
             self.fpo.write(ctxt)
         self.fpo.flush()
 
-    def msg(self, txt, adash=None, bdash=None, ind=0, fg=None, bold=False):
+    def msg(self,
+            txt: str | list[str],
+            adash: bool = False,
+            bdash: bool = False,
+            ind: int = 0,
+            fg: str = '',
+            bold: bool = False):
         """
         Handles the work for messages with header or footer (dashes)
 
         txt can be string or list of strings
         Single string can contain newlines.
-            adash   : If True then add dashes on line above the text. (Default False)
-            bdash   : If True then add dashes on line below the text. (Default False)
-            ind     : indent amount (in steps of 4) (Default 0)
-            fg      : ascii color uses first letter or use number 0-254 (Default 'w')
-                      blue Bold cyan fail red green head under warn
+
+         - adash:
+           If True then add dashes on line above the text. (False)
+         - bdash:
+           If True then add dashes on line below the text. (False)
+         - ind: indent amount (in steps of 4) (0)
+         - fg: ascii color uses first letter or use number 0-254 ('w')
+              blue Bold cyan fail red green head under warn
         """
-        # pylint: disable=R0913,R0917
-        # always need list and we also split newlines into separate rows
-        txt_list = txt
-        if not isinstance(txt, list):
+        # pylint: disable=
+        # Make it a list and split newlines into separate rows
+        txt_list: list[str]
+        if isinstance(txt, list):
+            txt_list = txt
+        else:
             txt_list = [txt]
         txt_list = _txt_list_expand_newlines(txt_list)
 
         dashes = ''
         if adash or bdash:
-            longest = 1 + max( len(line) for line in txt_list)
-            dashes = longest *  '-'
+            longest = 1 + max(len(line) for line in txt_list)
+            dashes = longest * '-'
 
         # initial indent
         lead = ind * self.indent
 
         # dashes above
         if adash:
-            self._msg(lead, [dashes,  '\n'], fg=fg, bold=bold)
+            self._msg(lead, [dashes, '\n'], fg=fg, bold=bold)
 
         # body
         self._msg(lead, txt_list, fg=fg, bold=bold)
