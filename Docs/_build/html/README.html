@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>mkpkg &#8212; mkpkg 7.0.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=efe5be6f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="Changelog.html" />
+    <link rel="prev" title="mkpkg documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="mkpkg">
+<h1>mkpkg<a class="headerlink" href="#mkpkg" title="Link to this heading">¶</a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Tool to rebuild Arch packages based on dependency triggers.</p>
+<ul class="simple">
+<li><p>All git tags will be signed by &lt;<a class="reference external" href="mailto:arch&#37;&#52;&#48;sapience&#46;com">arch<span>&#64;</span>sapience<span>&#46;</span>com</a>&gt;.
+Public key is available via WKD or download from website:
+<a class="reference external" href="https://www.sapience.com/tech">https://www.sapience.com/tech</a>
+After key is on keyring use the PKGBUILD source line ending with <em>?signed</em>
+or manually verify using <em>git tag -v &lt;tag-name&gt;</em></p></li>
+</ul>
+</section>
+<section id="new-interesting">
+<h2>New / Interesting<a class="headerlink" href="#new-interesting" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p>Immproved code</p>
+<p>PEP-8, PEP-257, PEP-484 and PEP-561
+Refactor &amp; clean ups.</p>
+</li>
+<li><p>Improved handling of split packages.
+Now checks every packages for any being missing or out of date.</p></li>
+<li><p>soname logic updated.</p>
+<p>Default is now ‘keep’ which only rebuilds of a soname is no longer available.
+This is in line with how sonames are typically used where soname only changes
+when ABI changes.</p>
+</li>
+<li><p>Major update: soname handling has been re-written from scratch and improved substantially.</p>
+<p>It now identifies every soname versioned library in elf executables
+along with their full path.  It also properly handles executables
+built with <em>–rpath</em> loader options.</p>
+<p>Previous versions relied on makepkg soname output
+which, unfortunately, only lists sonames if they are also listed as a PKGBUILD dependency.
+We need every soname versioned library to ensure we do the right thing
+and rebuild when needed. So it was a mistake to rely on this.</p>
+<p>Can also specify how to handle version comparisons similar to the way
+package version comparisons are done (e.g. soname &gt; major)</p>
+<p>If you’re interested, the soname info is saved into the file <em>.mkp_dep_soname</em></p>
+<dl class="simple">
+<dt><strong>N.B.</strong></dt><dd><p>that the build must be run at least once with this new version to generate the</p>
+</dd>
+</dl>
+<p>soname info (mkpkg -f forces a fresh build)</p>
+</li>
+<li><p>Old options now deprecated</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>(<em>–mpk-xxx</em>)</p></li>
+<li><p>(<em>–soname-build</em>) : use <em>–soname-comp</em> instead</p></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</section>
+</section>
+<section id="mkpkg-application">
+<h1>mkpkg application<a class="headerlink" href="#mkpkg-application" title="Link to this heading">¶</a></h1>
+<section id="overview-of-mkpkg">
+<h2>Overview of mkpkg<a class="headerlink" href="#overview-of-mkpkg" title="Link to this heading">¶</a></h2>
+<p>Building an Arch package requires invoking <em>makepkg</em> with a <em>PKGBUILD</em> file.
+PKGBUILD file contains a <em>depends</em> variable which lists those packages that are
+needed to use tool provided by the package.</p>
+<p>It also has a ‘makedepends’ variable which is a list of other packages that are
+needed to build the package. makepkg also assumes that any package listed in the <em>depends</em>
+variable must also be present to build the package.</p>
+<p>However, once a package has been built, then the only thing which causes
+a rebuild is a change to the actual package version itself. This can be either because
+the version of the tool itself changed or because the packager manually
+changed the release version, thereby forcing a rebuild.</p>
+<p>If you have ever needed to rebuild a package by manually bumping the release version, then
+something is not ideal. If something requires a rebuild, other than
+the package itself having an update, it would be far better if this is done automatically
+rather than by hand.</p>
+<p>This is what mkpkg does. It automates rebuilds when they are needed for some reason
+other than the tool / package version itself being newer. As a simple example, if something
+depends on openssl and the last build was against 3.0.0, then it can be set to rebuild
+if openssl has been installed more recently version than when the last package build
+was done. It could also be set to rebuild if openssl has a minor version update like 3.1.x.</p>
+<p>Triggers are discussed in detail below, <a class="reference internal" href="#mkpkg-triggers">mkpkg-triggers</a>, but we’ll provide a short summary
+here.</p>
+</section>
+<section id="triggering-rebuilds-summary">
+<h2>Triggering Rebuilds Summary<a class="headerlink" href="#triggering-rebuilds-summary" title="Link to this heading">¶</a></h2>
+<p>To accomplish this mkpkg allows you to define a set of <em>triggers</em> that will cause a rebuild.
+These are packages, or files,  that trigger a rebuild whenever they change in a
+specified way. Straightforward concept.</p>
+<p>The packager is responsible for providing the list of appropriate triggers.</p>
+<p>The way to provide the these triggers is by adding a PKGBUILD array variable
+to provide the list of conditions that should trigger a rebuild.</p>
+<section id="package-trigger">
+<h3>Package Trigger<a class="headerlink" href="#package-trigger" title="Link to this heading">¶</a></h3>
+<p><em>_mkpkg_depends</em> variable is this list of such triggers</p>
+<p>There are 2 ways a package can trigger a rebuild.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p><strong>A package name</strong></p>
+<p>Rebuilds if the install date is more recent than the last build time
+e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_mkpkg_depends</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span> <span class="s1">&#39;systemd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>A package name plus a version condition</strong></p>
+<p>It can be an explicit version or a key word such as <em>major</em> which would then only trigger
+a rebuild when the major version of that package was greater than that at the last build.
+More details and the different options are detailed below.
+e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_mkpkg_depends</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;openssl&gt;3.0.6&#39;</span> <span class="s1">&#39;systemd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div></blockquote>
+</section>
+<section id="file-trigger">
+<h3>File Trigger<a class="headerlink" href="#file-trigger" title="Link to this heading">¶</a></h3>
+<p>It can also use any file to trigger a build using <em>_mkpkg_depends_file</em>. When a file in this
+list is newer than the lsat build, it triggers a rebuild.</p>
+<p>A typical use case for these file triggers are files provided by the packager,
+rather than the source, and include things such as systemd unit files or pacman hook
+files or other package related items.
+e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_mkpkg_depends_file</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;xxx.service&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is useful to ensure packages build and work when conditions are met by
+other packages being updated.</p>
+<p>It is certainly helpful for packages which statically link in libraries, or when core build tools
+change and it’s important to rebuild with the newer versions. Do we really need to rebuild a package
+when tool chain changes? Sometimes yes; for example, whenever the compiler toolchain is updated,
+I always rebuild my kernel packages and test.</p>
+<p>The majority of compiled packages are built against shared libraries and this can be helpful in
+this case too; there are additional comments on this topic below.</p>
+<p>As another example, I rebuild my python applications when python’s major.minor is larger
+than what was used for previous build.</p>
+<p>An additional little benefit, if packages are up to date then running mkpkg is significantly
+faster than makepkg; can be something like 10x faster or even more.</p>
+</section>
+</section>
+<section id="background-motivation">
+<h2>Background Motivation<a class="headerlink" href="#background-motivation" title="Link to this heading">¶</a></h2>
+<p>mkpkg has one run-time dependency,  python.</p>
+<p>It uses makepkg to perform the actual package builds in the usual way. That said,  makepkg is
+a part of pacman which is always installed and thus not a <em>dependency</em> as far
+as PKGBUILD is concerned.</p>
+<p>When a tool chain used to build a package is updated, it’s good practice, IMHO, to
+rebuild packages which use that tool chain.  For example, when gcc, cargo, binutils et al are updated
+packages using those tools should also be updated. As mentioned above, whenever compiler/binutils
+tool chain changes, I always rebuild and test my kernel packages. This not only ensures that
+things compile and work properly with the new build tools but can also be key to reducing the attack
+surface. One recent (as of time of writing) little example, not to pick on cargo, is <a class="reference external" href="https://nvd.nist.gov/vuln/detail/CVE-2022-36113">CVE-2022-36113</a></p>
+<p>Of course this would require a case where cargo is actually downloading something which
+should never be permitted; still, it’s a conceivable danger.</p>
+<p>While static linked libraries surely don’t demand a rebuild to function, obviously, because
+the older library is part of the binary itself, it’s still a good idea to rebuild it.
+This will pick up bug fixes, including security related ones, as well as improvements.  Of course,
+it’s always sensible to confirm that an application properly builds and works with
+the newer tool or library as well.</p>
+<p>Here’s an example. The <em>refind</em> boot manager statically links against gnu-efi. So when gnu-efi is updated,
+refind should be rebuilt as well even though the previous one will continue to work just fine.</p>
+<p>Recently, arch started switching many packages to be compiled with lto. The gnu-efi package
+was subsequently compiled with * -flto -ffat-lto-object*.  The refind boot manager statically
+links gnu-efi.  At this point, refind itself had not changed and so it’s up to date as far
+standard approach is concerned.</p>
+<p>However, I would like to know as early as possible that refind builds and runs with the the
+new gnu-efi library that was updated. In fact, unfortunately perhaps, this build failed and
+refind not longer builds with the updated gnu-efi library due to lto changes. Good to know.</p>
+<p>You could of course have waited until refind itself gets an update and then discover - oh
+no it no longer builds. But, by doing this early and in this case knowing refind itself has
+not changed, I know with certainty that this problem stems from the gnu-efi rebuild and not from a
+refind change - without even looking at any refind source changes.</p>
+<p>Given the large number of packages I build I doubt I’d remember what trigger packages
+are approprate for every package anyway. Computers are good at automating
+repetitive tasks after all and are much quicker at identifying the trigger packages.</p>
+<p>mkpkg was created to address this need. It automates this for you and rebuilds packages when needed.
+This allows for early detection of problems or confirmation that things are actually fine.</p>
+<p>A small comment on shared libraries. While these are generally not a problem,
+there is an assumption that the library itself still functions the same for whatever part
+of it the tool is using.</p>
+<p>The majority of providers are careful with <em>sonames</em> as well, so most of the time
+that’s likely true, however, the cautious among us may want to run regression
+tests even in this case.</p>
+<p>Certainly for mission critical tools. Bugs happen, and it’s good to
+learn of any issues as soon as possible.</p>
+<p>But there are indeed some shared library packages, some with dynamically loaded
+libraries (plugins) that may also be trigger packages.  One symptom of that need are those
+packages that are manually rebuilt by forcing a release version bump typically with a comment
+such as <em>rebuilt with latest …</em> - we certainly see plenty of that happening.</p>
+</section>
+</section>
+<section id="using-mkpkg">
+<h1>Using  mkpkg<a class="headerlink" href="#using-mkpkg" title="Link to this heading">¶</a></h1>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">¶</a></h2>
+<p>Edit the PKGBUILD and add a <em>_mkpkg_depends</em> variable with a list of triggers that
+should cause a rebuild when the condition is met. Triggers are discussed in
+in detail (<a class="reference internal" href="#mkpkg-triggers">mkpkg-triggers</a>) below, but a simple example is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_mkpkg_depends</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;python&gt;major&#39;</span><span class="p">,</span> <span class="s1">&#39;python-foo&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This would trigger a package rebuild if a version of <em>python-foo</em> is installed more recently
+than the last package build or if <em>python</em> has a major version which is larger than that
+used when package was last built.</p>
+<p>With the trigger conditions in the PKGBUID, then simply call mkpkg instead of makepkg. Couldn’t be simpler.
+Options for mkpkg are those before any double dash <em>–</em>. Any options following <em>–</em>
+are passed through to <em>makepkg</em> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">3</a><span class="fn-bracket">]</span></span>
+<p>The older style options using <em>–mkp-</em> are now deprecated.</p>
+</aside>
+</aside>
+</section>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading">¶</a></h2>
+<p>The options currently supported by mkpkg are:</p>
+<blockquote>
+<div><ul>
+<li><p>(<strong>-v, –verb</strong>)</p>
+<p>Show (stdout) output of makepkg.  Default is not to show it.</p>
+</li>
+<li><p>(<strong>-f, –force</strong>)</p>
+<p>Force a makepkg run even if not needed. Bump the package release and rebuild</p>
+</li>
+<li><p>(<strong>-r, –refresh</strong>)</p>
+<p>Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
+If there is no saved metadata, and build is up to date, will try refresh the build info.
+Files updated are <em>.mkp_dep_vers</em> and  <em>.mkp_dep_soname</em>.</p>
+<p>Note that <em>sonames</em> are found by examining any executables in the <em>pkg</em> directory.
+If the <em>pkg</em> directory is empty, the refresh will not find any sonames.</p>
+</li>
+<li><p>(<strong>so-comp, –soname-comp</strong>)</p>
+<p>How to handle automatic soname changes. Default value is <em>keep</em> - only rebuilds if
+soname is no longer available.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><em>newer</em> : if soname is newer then reubild (time based)</p></li>
+<li><p><em>keep</em> : if soname library is still available, then dont rebuild even if newer version(s) are available</p></li>
+<li><p><em>vcomp</em> : rebuild if soname version is greater than the <em>vcomp</em> version. <em>vcomp</em> is one of <em>major</em>, <em>minor</em>, <em>patch</em>, <em>extra</em> or <em>last</em> - same as for regular depenencies.</p></li>
+<li><p><em>neverever</em> : Developer option - will not rebuild even if the soname library is no longer available.</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>(<em>–</em>)</p>
+<p>All options following this are passed to makepkg</p>
+</li>
+</ul>
+</div></blockquote>
+<p><strong>Config file</strong></p>
+<p>Configs are looked for in first in /etc/mkpkg/config and then in
+~/.config/mkpkg/config. Config files are in TOML format.
+e.g. to change the default soname rebuild compare option from default of <em>last</em>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">soname_comp</span> <span class="o">=</span> <span class="s2">&quot;newer&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="how-mkpkg-works">
+<h2>How mkpkg works<a class="headerlink" href="#how-mkpkg-works" title="Link to this heading">¶</a></h2>
+<p>Outline of what it does</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If PKGBUILD has a pkgver() function, check if the pkgver variable matches its output</p></li>
+<li><p>If the 2 pkgver match or if there is no pkgver() function then check if a matching package exists</p></li>
+<li><p>If package not up to date, then run makepkg build.</p></li>
+<li><p>If package seems otherwise up to date, then check if any of the conditions given by
+<em>mkpkg_depends</em> or <em>mkpkg_depends_files</em> triggers a build.  If a build is called for,
+then bump the pkgrel and rebuild.</p></li>
+<li><p>If the package is out of date, as there is newer version then reset pkgrel back to “1” and build.</p></li>
+</ul>
+</div></blockquote>
+<p>So, if a package builds and gets larger package release number, it was because of some trigger package
+dependency; absent manual modification.  If package release is “1” - then you know its a fresh package version.</p>
+<p>I use separate tool to run all my package builds so I prefer the output to be easily parseable and provide
+simple and clear information to feed the builder too.</p>
+<p>mkpkg thus prints a line of the form:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">mkp</span><span class="o">-</span><span class="n">status</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">status</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">package</span><span class="o">-</span><span class="n">version</span><span class="o">&gt;*</span>
+</pre></div>
+</div>
+<p>Where status is one of :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>current</strong> -&gt; package is up to date</p></li>
+<li><p><strong>success</strong> -&gt; package was built successfully</p></li>
+<li><p><strong>error</strong>   -&gt; problem occurred.</p></li>
+</ul>
+</div></blockquote>
+<p>Obviously, package-version is what is sounds like.</p>
+<p>It is possible for mkpkg itself to fail for some reason, in which case the <em>mkp-status:</em> line could be absent.
+This is also simple to detect programatically.</p>
+</section>
+<section id="triggering-rebuilds-details">
+<span id="mkpkg-triggers"></span><h2>Triggering Rebuilds Details<a class="headerlink" href="#triggering-rebuilds-details" title="Link to this heading">¶</a></h2>
+<section id="mkpkg-depends">
+<h3>_mkpkg_depends<a class="headerlink" href="#mkpkg-depends" title="Link to this heading">¶</a></h3>
+<p>There are 2 kinds of triggers. A trigger based on package and a trigger based on file
+changed. Each is set using the PKGBUILD variable with a an array of triggers. The variables
+used are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>_mkpkg_depends</strong></p></li>
+</ul>
+</div></blockquote>
+<p>This variable provides a list of packages to trigger a rebuild.
+Each item in the list can be in one of 2 forms:</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p><em>name</em></p>
+<p>The item is the name of the package then
+this will trigger a rebuild if the install time of a listed package is newer than the
+time of the last build.</p>
+</li>
+<li><p><em>package_name</em> <em>compare-op</em> <em>vers_trigger</em></p>
+<p>This provides semantic version triggers. Package versions are taken
+to be of the form ‘major.minor.patch’ or more generally ‘elem1.elem2.elem3….’
+White space around the comparison operator is optional.</p>
+</li>
+</ol>
+<ul>
+<li><p><em>compare-op</em></p>
+<p>is one of : <strong>&gt;</strong>, <strong>&gt;=</strong> or <strong>&lt;</strong></p>
+</li>
+<li><p><em>vers_trigger</em></p>
+<p>Based on comparing the first [N] elems of the version or the entire version.</p>
+<ul>
+<li><p>First_[N] : rebuild if first [N] elems of package version greater than when last built</p></li>
+<li><p>major     : alias for First_1 (rebuild if major &gt; last_build)</p></li>
+<li><p>minor     : alias for First_2 (rebuild if major.minor &gt; last_build)</p></li>
+<li><p>patch     : alias for First_3 (if major.minor.patch &gt; last_build)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>micro     : another name for patch</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>extra     : alias for First_4 (major.minor.patch.extra)</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>releaselevel : alias for extra</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>serial    : alias for First_5 (major.minor.patch.extra.serial)</p></li>
+<li><p>last      : rebuild if package version &gt; last_build version.</p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<p><em>last</em> is very similar to a time based trigger but based on version instead of time.</p>
+<p>For example if the expression is</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;pkg_name&gt;First_2&#39;</span>
+</pre></div>
+</div>
+<p>or equivalently:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;pkg_name&gt;minor&#39;</span>
+</pre></div>
+</div>
+<p>and the current package version is 1.2.3,  while the version when last built was 1.2.0 then
+the versions being compared would be</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;1.2&#39;</span> <span class="o">&gt;</span> <span class="s1">&#39;1.2&#39;</span> <span class="n">which</span> <span class="ow">is</span> <span class="n">false</span><span class="o">.</span>
+</pre></div>
+</div>
+<p>Whereas if the expression was:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;pkg_name&gt;First_3&#39;</span>
+</pre></div>
+</div>
+<p>then the comparison would be</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;1.2.3&#39;</span> <span class="o">&gt;</span> <span class="s1">&#39;1.2.0&#39;</span>
+</pre></div>
+</div>
+<p>which is true</p>
+<p>N.B. The package must be built at least once using mkpkg so it can save the dependent package
+versions used. So if a version trigger is added,  then this triggers a rebuild as it treats this
+as if the dependent package version is greater than last used (which is not known at this point).
+On subsequent builds the last built version of each dependent package is then known.</p>
+<p>Unlike the standard <em>makedepends</em> variable, this allows one to not include things
+that are required to build the package but don’t have any affect on the tool function.
+For example ‘git’ - which while required to build will not generally change the tool.</p>
+<p>Another example, if python was version 3.10 when the package was last built and we have::</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_mkpkg_depends</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;python&gt;minor&#39;</span> <span class="s1">&#39;python-dnspython&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Then a rebuild will be done if python is greater than or equal to 3.11.x or if
+python-dnspython was installed more recently than the last build. This will not trigger
+a rebuild if python is updated from 3.10.7 to 3.10.8,  since this is a patch update
+not a minor or major update.</p>
+<p>Why support ‘&lt;’ you may ask.  The only sensible use for less than operator would be to
+provide a mechanism to trigger a rebuild when a package gets downgraded. This would be
+accomplished using</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pkg_name</span> <span class="o">&lt;</span> <span class="n">last</span>
+</pre></div>
+</div>
+</section>
+<section id="mkpkg-depends-files">
+<h3>_mkpkg_depends_files<a class="headerlink" href="#mkpkg-depends-files" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p><em>_mkpkg_depends_files</em></p>
+<blockquote>
+<div><p>This variable can be used to provide a list of files that should trigger a rebuild.
+The files are relative to the directory containing PKGBUILD.</p>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p>This might be useful, for example, if the source for some daemon doesn’t provide a
+systemd service file, and the packager adds the file. Adding the file to this list
+would now trigger rebuilds should there be changes to the service file.
+An alternative would be to put these files into a git repo and just using the git version.
+For a small number of files this may be more convenient/simpler.</p>
+<p>These variables offer considerable control over what can be used to trigger rebuilds.</p>
+</section>
+</section>
+<section id="discussion-and-next-steps">
+<h2>Discussion and Next Steps<a class="headerlink" href="#discussion-and-next-steps" title="Link to this heading">¶</a></h2>
+<section id="possible-future-enhancement">
+<h3>Possible future enhancement<a class="headerlink" href="#possible-future-enhancement" title="Link to this heading">¶</a></h3>
+<p>While mkpkg works for all the packages I build, I am more than happy to take
+enhancement requests - and, of course, to fix bugs!</p>
+<p>As mentioned earlier, it’s pretty useful to run regression tests after run-time dependencies change.
+For example shared libraries or other programs used by the tool.
+To handle this case we might consider adding a separate variable - such as <em>mkpkg_test_depends</em>
+which lists these kind of dependencies.</p>
+<p>We note that <em>checkdepends</em> vartiable is quite different in intent, as it is used to identify
+those packages needed to do testing but NOT for things which could impact the outcome
+of running the tool.</p>
+</section>
+</section>
+</section>
+<section id="appendix">
+<h1>Appendix<a class="headerlink" href="#appendix" title="Link to this heading">¶</a></h1>
+<section id="mkpkg-source">
+<h2>mkpkg Source<a class="headerlink" href="#mkpkg-source" title="Link to this heading">¶</a></h2>
+<p>The source is kept in the github repository <a class="reference external" href="https://github.com/gene-git/Arch-mkpkg">Github-mkpkg</a>.</p>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>Available on</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://github.com/gene-git/Arch-mkpkg">Github-mkpkg</a></p></li>
+<li><p><a class="reference external" href="https://aur.archlinux.org/packages/mkpkg">Archlinux AUR</a></p></li>
+</ul>
+</dd>
+</dl>
+<p>On Arch you can build using the provided PKGBUILD in the packaging directory or from the AUR.
+All git tags are signed with <a class="reference external" href="mailto:arch&#37;&#52;&#48;sapience&#46;com">arch<span>&#64;</span>sapience<span>&#46;</span>com</a> key which is available via WKD
+or download from <a class="reference external" href="https://www.sapience.com/tech">https://www.sapience.com/tech</a>. Add the key to your package builder gpg keyring.
+In PKGBUILD use source= line with <em>?signed</em> at the end. You can also manually verify the signature</p>
+<p>To build manually, clone the repo and :</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rm<span class="w"> </span>-f<span class="w"> </span>dist/*
+/usr/bin/python<span class="w"> </span>-m<span class="w"> </span>build<span class="w"> </span>--wheel<span class="w"> </span>--no-isolation
+<span class="nv">root_dest</span><span class="o">=</span><span class="s2">&quot;/&quot;</span>
+./scripts/do-install<span class="w"> </span><span class="nv">$root_dest</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>When running as non-root then set root_dest a user writable directory</p>
+</section>
+<section id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Run Time:
+- python (3.9 or later)
+- pyalpm</p></li>
+<li><p>Building Package :
+- git
+- build aka python-build
+- intaller aka python-installer
+- wheel aka python-wheel
+- poetry aka python-poetry
+- rsync</p></li>
+</ul>
+<ul class="simple">
+<li><p>Optional for building docs:</p>
+<ul>
+<li><p>sphinx</p></li>
+<li><p>texlive-latexextra  (archlinux packaguing of texlive tools)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="philosophy">
+<h2>Philosophy<a class="headerlink" href="#philosophy" title="Link to this heading">¶</a></h2>
+<p>We follow the <em>live at head commit</em> philosophy. This means we recommend using the
+latest commit on git master branch. We also provide git tags.</p>
+<p>This approach is also taken by Google <a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
+<p>Created by Gene C. and licensed under the terms of the MIT license.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>SPDX-License-Identifier: MIT</p></li>
+<li><p>Copyright (c) 2022-2023 Gene C</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="some-history">
+<h2>Some history<a class="headerlink" href="#some-history" title="Link to this heading">¶</a></h2>
+<section id="version-6-0-0">
+<h3>Version 6.0.0<a class="headerlink" href="#version-6-0-0" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p>soname rewrite</p>
+<p>New argument for how soname changes are treated : <em>-so-comp, –soname-comp</em>.</p>
+<p>Can be <em>&lt;compare&gt;</em>, <em>newer</em>,  <em>never</em> or key how to compare the soname versions.
+The comparison types are the same as for package dependencies described above.
+Default is <em>last</em> which means the entire soname version will be compared to
+whats available and rebuild will be triggered if a later version now available.</p>
+<p><em>&lt;compare&gt;</em> e.g. <em>&gt;major</em> or <em>&gt;minor</em>’ or <em>last</em> etc.
+If the last built soname was 5.1, and now available is 5.2 then
+<em>minor</em> and <em>last</em> will trigger rebuild while <em>major</em> would not. <em>newer</em> triggers if the
+last modify time of the library is newer.</p>
+<p>Previous version used sonmaes produced by makepkg - however this only generates
+sonames if they are listed as dependencies. We want to get every soname - so
+we started over from scratch. By using our own soname generate we catch
+every soname and its absolute path - this enables us to correctly treat soname
+changes. This approach will also correctly deal with any <em>rpath</em> loader flags
+causing executable to use shared library from path(s) specified at compile time.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="version-4-1-0">
+<h3>Version 4.1.0<a class="headerlink" href="#version-4-1-0" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p>Arguments</p>
+<blockquote>
+<div><p>Change in argument handling. Arguments to be passed to <em>makepkg</em> must now follow <em>–</em>.
+Arguments before the double dash are used by mkpkg itself. To keep backward
+compatibility the older <em>–mkp-</em> style arguments are honored, but the newer simpler
+ones are preferred. e.g. <em>-v, –verb</em> for verbose. Help availble via <em>-h</em>.</p>
+</div></blockquote>
+</li>
+<li><p>Config file now available.</p>
+<p>Configs are looked for in /etc/mkpkg/config then ~/.config/mkpkg/config. It should
+be in TOML format. e.g. to change the default soname rebuild option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">soname_comp</span> <span class="o">=</span> <span class="s2">&quot;newer&quot;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="version-4-0-0">
+<h3>Version 4.0.0<a class="headerlink" href="#version-4-0-0" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p>Soname drive rebuilds.</p>
+<p>Adds support for detecting missing soname libraries, and triggering rebuild.
+If soname is found then no rebuild is done. Typically happens when
+older soname is deprecated.</p>
+</li>
+<li><p>Adds new option <em>–mkp-refresh</em>.</p>
+<p>Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="older">
+<h3>Older<a class="headerlink" href="#older" title="Link to this heading">¶</a></h3>
+<p>Adds support for epoch.</p>
+<p>Version 2.x.y brings fine grain control by allowing package dependences to trigger
+builds using semantic version. For example ‘python&gt;minor’ will rebuild only if a new
+python package has it’s major.minor greater than what it was when package was last built.
+See <em>_mkpkg_depends</em> below for more detail.</p>
+<p>The source has been reorganized and packaged using poetry which simplifies installation.
+The installer script, callable from package() function in PKGBUILD has been updated
+accordingly. Ther build() function uses python build module to generate the
+wheel package, as outlined above.</p>
+<p>Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
+Variables are now: <em>_mkpkg_depends</em> and <em>_mkpkg_depends_files</em>.
+The code is backward compatible and supports the previous variable names without the
+leading “_” as well as the ones with the “_”.</p>
+<p>Now also available on aur.</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id5" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://github.com/google/googletest">https://github.com/google/googletest</a></p>
+</aside>
+<aside class="footnote brackets" id="id6" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://abseil.io/about/philosophy#upgrade-support">https://abseil.io/about/philosophy#upgrade-support</a></p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mkpkg</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mkpkg</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#new-interesting">New / Interesting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#mkpkg-application">mkpkg application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview-of-mkpkg">Overview of mkpkg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#triggering-rebuilds-summary">Triggering Rebuilds Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#background-motivation">Background Motivation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#using-mkpkg">Using  mkpkg</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-mkpkg-works">How mkpkg works</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#triggering-rebuilds-details">Triggering Rebuilds Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#discussion-and-next-steps">Discussion and Next Steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#appendix">Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mkpkg-source">mkpkg Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#philosophy">Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#license">License</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#some-history">Some history</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="License.html">MIT License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to help with this project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Code-of-conduct.html">Contributor Covenant Code of Conduct</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">mkpkg documentation</a></li>
+      <li>Next: <a href="Changelog.html" title="next chapter">Changelog</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2023, Gene C.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/README.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
