@@ -7,12 +7,24 @@ Tags
 
 ::
 
-	1.0.0 (2022-09-03) -> 7.0.0 (2025-05-22)
-	166 commits.
+	1.0.0 (2022-09-03) -> 7.1.0 (2025-06-14)
+	168 commits.
 
 Commits
 =======
 
+
+* 2025-06-14  : **7.1.0**
+
+::
+
+                Fixed issue where build subprocesses that generate very large amounts
+                of data on stdout/stderr could occasionally lead to blocked IO when data
+                exceeded python
+                IO.DEFAULT_BUFFER_SIZE.
+                Symptom is that the build hangs waiting for IO to get unblocked.
+                Fixed by enhancing run_prog() to use non-blocking I/O.
+ 2025-05-22     update Docs/Changelogs Docs/mkpkg.pdf for 7.0.0
 
 * 2025-05-22  : **7.0.0**
 

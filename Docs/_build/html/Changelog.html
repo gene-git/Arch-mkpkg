@@ -5,11 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Changelog &#8212; mkpkg 7.0.0 documentation</title>
+    <title>Changelog &#8212; mkpkg 7.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
-    <script src="_static/documentation_options.js?v=efe5be6f"></script>
+    <script src="_static/documentation_options.js?v=9e30f436"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -37,13 +37,25 @@
 <h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h1>
 <section id="tags">
 <h2>Tags<a class="headerlink" href="#tags" title="Link to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0.0</span> <span class="p">(</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">03</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mf">7.0.0</span> <span class="p">(</span><span class="mi">2025</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">22</span><span class="p">)</span>
-<span class="mi">166</span> <span class="n">commits</span><span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mf">1.0.0</span> <span class="p">(</span><span class="mi">2022</span><span class="o">-</span><span class="mi">09</span><span class="o">-</span><span class="mi">03</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="mf">7.1.0</span> <span class="p">(</span><span class="mi">2025</span><span class="o">-</span><span class="mi">06</span><span class="o">-</span><span class="mi">14</span><span class="p">)</span>
+<span class="mi">168</span> <span class="n">commits</span><span class="o">.</span>
 </pre></div>
 </div>
 </section>
 <section id="commits">
 <h2>Commits<a class="headerlink" href="#commits" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>2025-06-14  : <strong>7.1.0</strong></p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>               <span class="n">Fixed</span> <span class="n">issue</span> <span class="n">where</span> <span class="n">build</span> <span class="n">subprocesses</span> <span class="n">that</span> <span class="n">generate</span> <span class="n">very</span> <span class="n">large</span> <span class="n">amounts</span>
+               <span class="n">of</span> <span class="n">data</span> <span class="n">on</span> <span class="n">stdout</span><span class="o">/</span><span class="n">stderr</span> <span class="n">could</span> <span class="n">occasionally</span> <span class="n">lead</span> <span class="n">to</span> <span class="n">blocked</span> <span class="n">IO</span> <span class="n">when</span> <span class="n">data</span>
+               <span class="n">exceeded</span> <span class="n">python</span>
+               <span class="n">IO</span><span class="o">.</span><span class="n">DEFAULT_BUFFER_SIZE</span><span class="o">.</span>
+               <span class="n">Symptom</span> <span class="ow">is</span> <span class="n">that</span> <span class="n">the</span> <span class="n">build</span> <span class="n">hangs</span> <span class="n">waiting</span> <span class="k">for</span> <span class="n">IO</span> <span class="n">to</span> <span class="n">get</span> <span class="n">unblocked</span><span class="o">.</span>
+               <span class="n">Fixed</span> <span class="n">by</span> <span class="n">enhancing</span> <span class="n">run_prog</span><span class="p">()</span> <span class="n">to</span> <span class="n">use</span> <span class="n">non</span><span class="o">-</span><span class="n">blocking</span> <span class="n">I</span><span class="o">/</span><span class="n">O</span><span class="o">.</span>
+<span class="mi">2025</span><span class="o">-</span><span class="mi">05</span><span class="o">-</span><span class="mi">22</span>     <span class="n">update</span> <span class="n">Docs</span><span class="o">/</span><span class="n">Changelogs</span> <span class="n">Docs</span><span class="o">/</span><span class="n">mkpkg</span><span class="o">.</span><span class="n">pdf</span> <span class="k">for</span> <span class="mf">7.0.0</span>
+</pre></div>
+</div>
 <ul class="simple">
 <li><p>2025-05-22  : <strong>7.0.0</strong></p></li>
 </ul>

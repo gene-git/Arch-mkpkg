@@ -18,6 +18,11 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
+ * Fixed issue where build subprocesses that generate very large amounts
+   of data on stdout/stderr could occasionally lead to blocked IO when data exceeded python
+   IO.DEFAULT_BUFFER_SIZE. 
+   Symptom is that the build hangs waiting for IO to get unblocked.
+   Fixed by enhancing run_prog() to use non-blocking I/O.
 
  * Immproved code
 
