@@ -7,12 +7,20 @@ Tags
 
 ::
 
-	1.0.0 (2022-09-03) -> 7.1.0 (2025-06-14)
-	168 commits.
+	1.0.0 (2022-09-03) -> 7.2.0 (2025-06-16)
+	170 commits.
 
 Commits
 =======
 
+
+* 2025-06-16  : **7.2.0**
+
+::
+
+                run_prog: Fix one more possible hang. Add more exception checks that should
+                never happen.
+ 2025-06-14     update Docs/Changelogs Docs/mkpkg.pdf for 7.1.0
 
 * 2025-06-14  : **7.1.0**
 
