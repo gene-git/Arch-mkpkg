@@ -7,12 +7,20 @@ Tags
 
 ::
 
-	1.0.0 (2022-09-03) -> 7.2.0 (2025-06-16)
-	170 commits.
+	1.0.0 (2022-09-03) -> 7.4.0 (2025-06-19)
+	172 commits.
 
 Commits
 =======
 
+
+* 2025-06-19  : **7.4.0**
+
+::
+
+                Keep internal copy of run_prog in sync with pyconcurrent
+                   For subprocess stdin add .flush() on the file object before closing
+ 2025-06-16     update Docs/Changelogs Docs/mkpkg.pdf for 7.2.0
 
 * 2025-06-16  : **7.2.0**
 
