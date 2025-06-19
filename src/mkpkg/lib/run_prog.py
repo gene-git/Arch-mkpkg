@@ -153,13 +153,17 @@ def _wait_for_proc(bstring: bytes | None,
     has_stdin = bool(bstring)
 
     try:
+        if proc.stdin:
+            fcntl.fcntl(proc.stdin, fcntl.F_SETFL, os.O_NONBLOCK)
+
         if proc.stdout:
             fcntl.fcntl(proc.stdout, fcntl.F_SETFL, os.O_NONBLOCK)
 
         if proc.stderr:
             fcntl.fcntl(proc.stderr, fcntl.F_SETFL, os.O_NONBLOCK)
+
     except OSError as err:
-        # Should not happen. Fingers crossed and keep going.
+        # Should not happen. Cross fingers and keep going.
         print(f'Error setting non-blocking: {err}')
 
     data_pending = bool(has_stdout or has_stderr or has_stdin)
@@ -194,8 +198,8 @@ def _wait_for_proc(bstring: bytes | None,
 
             try:
                 if has_stdin and proc.stdin and proc.stdin in write_ready:
-                    # todo handle writing large buffers w/o blocking.
                     proc.stdin.write(bstring)
+                    proc.stdin.flush()
                     proc.stdin.close()
                     has_stdin = False
 
