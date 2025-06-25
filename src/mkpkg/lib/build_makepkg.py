@@ -5,7 +5,7 @@ Support tools for MkPkg class
     - build_w_makepkg: Use makepkg to do build
 """
 import sys
-from .run_prog import run_prog
+from .run_prog_local import run_prog
 from .tools import pkg_version
 
 

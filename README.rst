@@ -18,6 +18,8 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
+ * Use run_prog() from pyconcurrent module if it is available, otherwise
+   use a local copy.
  * Fixed issue where build subprocesses that generate very large amounts
    of data on stdout/stderr could occasionally lead to blocked IO when data exceeded python
    IO.DEFAULT_BUFFER_SIZE. 

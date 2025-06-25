@@ -7,7 +7,7 @@ import os
 from elftools.elf.elffile import ELFFile
 from elftools.common.exceptions import ELFError
 
-from .run_prog import run_prog
+from .run_prog_local import run_prog
 
 
 def file_is_elf(filename: str):

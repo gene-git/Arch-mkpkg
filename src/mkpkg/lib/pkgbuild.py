@@ -14,7 +14,7 @@ import os
 
 from ._mkpkg_base import MkPkgBase
 from .file_tools import open_file
-from .run_prog import run_prog
+from .run_prog_local import run_prog
 from .split_deps import split_deps_vers_list
 
 
@@ -201,7 +201,7 @@ def get_pkgbld_data(mkpkg: MkPkgBase) -> bool:
     # run this shell script and collect output
     #
     pargs = ['/bin/bash', '-s']
-    [retc, output, errors] = run_prog(pargs, input_str=cmd_str)
+    (retc, output, errors) = run_prog(pargs, input_str=cmd_str)
 
     if retc != 0:
         msg('Failed to extract PKGBUILD info\n', fg='red')
