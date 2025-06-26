@@ -7,12 +7,19 @@ Tags
 
 ::
 
-	1.0.0 (2022-09-03) -> 7.6.0 (2025-06-25)
-	176 commits.
+	1.0.0 (2022-09-03) -> 7.7.0 (2025-06-26)
+	178 commits.
 
 Commits
 =======
 
+
+* 2025-06-26  : **7.7.0**
+
+::
+
+                run_prog: sync local copy with latest from pyconcurrent
+ 2025-06-25     update Docs/Changelogs Docs/mkpkg.pdf for 7.6.0
 
 * 2025-06-25  : **7.6.0**
 
