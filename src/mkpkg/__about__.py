@@ -3,5 +3,5 @@
 """
 Project mkpkg
 """
-__version__ = "7.7.1"
+__version__ = "7.7.2"
 __date__ = "2025-10-14"
