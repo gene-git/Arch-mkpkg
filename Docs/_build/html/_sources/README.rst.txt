@@ -58,7 +58,7 @@ New / Interesting
 
    **N.B.**
      that the build must be run at least once with this new version to generate the
-   soname info (mkpkg -f forces a fresh build)
+     soname info (mkpkg -f forces a fresh build)
 
  * Old options now deprecated
    
@@ -540,10 +540,9 @@ Dependencies
 Philosophy
 ==========
 
-We follow the *live at head commit* philosophy. This means we recommend using the
-latest commit on git master branch. We also provide git tags.
-
-This approach is also taken by Google [1]_ [2]_.
+We follow the *live at head commit* philosophy as recommended by
+Google's Abseil team [1]_.  This means we recommend using the
+latest commit on git master branch. 
 
 
 License
@@ -636,6 +635,5 @@ leading "\_" as well as the ones with the "\_".
 
 Now also available on aur.
 
-.. [1] https://github.com/google/googletest  
-.. [2] https://abseil.io/about/philosophy#upgrade-support
+.. [1] https://abseil.io/about/philosophy#upgrade-support
 

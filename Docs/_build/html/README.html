@@ -80,10 +80,10 @@ and rebuild when needed. So it was a mistake to rely on this.</p>
 package version comparisons are done (e.g. soname &gt; major)</p>
 <p>If you’re interested, the soname info is saved into the file <em>.mkp_dep_soname</em></p>
 <dl class="simple">
-<dt><strong>N.B.</strong></dt><dd><p>that the build must be run at least once with this new version to generate the</p>
+<dt><strong>N.B.</strong></dt><dd><p>that the build must be run at least once with this new version to generate the
+soname info (mkpkg -f forces a fresh build)</p>
 </dd>
 </dl>
-<p>soname info (mkpkg -f forces a fresh build)</p>
 </li>
 <li><p>Old options now deprecated</p>
 <blockquote>
@@ -247,10 +247,10 @@ than the last package build or if <em>python</em> has a major version which is l
 used when package was last built.</p>
 <p>With the trigger conditions in the PKGBUID, then simply call mkpkg instead of makepkg. Couldn’t be simpler.
 Options for mkpkg are those before any double dash <em>–</em>. Any options following <em>–</em>
-are passed through to <em>makepkg</em> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+are passed through to <em>makepkg</em> <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id2" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">3</a><span class="fn-bracket">]</span></span>
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">2</a><span class="fn-bracket">]</span></span>
 <p>The older style options using <em>–mkp-</em> are now deprecated.</p>
 </aside>
 </aside>
@@ -525,9 +525,9 @@ In PKGBUILD use source= line with <em>?signed</em> at the end. You can also manu
 </section>
 <section id="philosophy">
 <h2>Philosophy<a class="headerlink" href="#philosophy" title="Link to this heading">¶</a></h2>
-<p>We follow the <em>live at head commit</em> philosophy. This means we recommend using the
-latest commit on git master branch. We also provide git tags.</p>
-<p>This approach is also taken by Google <a class="footnote-reference brackets" href="#id5" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id6" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p>We follow the <em>live at head commit</em> philosophy as recommended by
+Google’s Abseil team <a class="footnote-reference brackets" href="#id4" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.  This means we recommend using the
+latest commit on git master branch.</p>
 </section>
 <section id="license">
 <h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
@@ -619,12 +619,8 @@ The code is backward compatible and supports the previous variable names without
 leading “_” as well as the ones with the “_”.</p>
 <p>Now also available on aur.</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id5" role="doc-footnote">
+<aside class="footnote brackets" id="id4" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">1</a><span class="fn-bracket">]</span></span>
-<p><a class="reference external" href="https://github.com/google/googletest">https://github.com/google/googletest</a></p>
-</aside>
-<aside class="footnote brackets" id="id6" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
 <p><a class="reference external" href="https://abseil.io/about/philosophy#upgrade-support">https://abseil.io/about/philosophy#upgrade-support</a></p>
 </aside>
 </aside>
@@ -689,6 +685,8 @@ leading “_” as well as the ones with the “_”.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html#tags">Tags</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html#commits">Commits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="License.html">MIT License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Contributing.html">How to help with this project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Code-of-conduct.html">Contributor Covenant Code of Conduct</a></li>

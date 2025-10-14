@@ -6,17 +6,18 @@ Tags
 
 .. code-block:: text
 
-	1.0.0 (2022-09-03) -> HEAD (2025-10-14)
-	180 commits.
+	1.0.0 (2022-09-03) -> 7.7.2 (2025-10-14)
+	181 commits.
 
 Commits
 =======
 
 
-* 2025-10-14  : **HEAD**
+* 2025-10-14  : **7.7.2**
 
 .. code-block:: text
 
+              - Switch doc build to xelatex which handles unicode characters
               - Drop unused dependency on pydantic from Arch PKGBUILD
  2025-06-26   ⋯
 
