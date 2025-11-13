@@ -47,9 +47,25 @@ class MkPkgBase:
         self.dep_vers_opers: list[str] = ['>', '>=', '<']
         self.depends_files: list[str] = []
 
-        # deprecated
-        # self.makedepends: List[str] = []
+        #
+        # Current version of a package dependency comes from pacman -Q
+        # However, if that package is not installed then need alternate
+        # way to to get the current version.
+        #
+        # e.g. pigeonhole can be built against the dovecot source repo
+        #
+        # For this case we can provide a list of programs to run that returns
+        # the package version. It takes one argument which is the package name
+        # The default is to run pacman -Qi and extract "Version"
+        #
+        # List of dependency package names and program to run
+        # AN associative array variable in PKGBUILD
+        # declare -A _dep_vers_prog
+        # _dep_vers_prog["pkg-name"] = "prog-returns-version"
+        #
+        self.dep_vers_prog: dict[str, str] = {}
 
+        #
         # options
         #  - force just forces a rebuild
         #  - refresh updates .mkpkg_dep_soname .mkpkg_dep_vers

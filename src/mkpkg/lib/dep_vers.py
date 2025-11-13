@@ -24,6 +24,7 @@ from .pacman import pacman_query
 from .pacman import pac_qi_key
 from .pacman import pac_qi_install_date
 from .version_compare import check_version_trigger
+from .run_prog_local import run_prog
 
 
 def write_current_pkg_dep_vers(mkpkg: MkPkgBase):
@@ -37,7 +38,8 @@ def write_current_pkg_dep_vers(mkpkg: MkPkgBase):
     data = ''
     if mkpkg.dep_vers_now:
         for (pkg, vers) in mkpkg.dep_vers_now.items():
-            data += f'{pkg} {vers}\n'
+            if vers:
+                data += f'{pkg} {vers}\n'
 
         fname = '.mkpkg_dep_vers'
         pname = os.path.join(mkpkg.cwd, fname)
@@ -67,10 +69,12 @@ def read_last_dep_vers(mkpkg: MkPkgBase) -> dict[str, str]:
 
     if data:
         for row in data:
-            [pkg, vers] = row.split()
-            pkg = pkg.strip()
-            vers = vers.strip()
-            dep_vers_last[pkg] = vers
+            pkg_vers = row.split()
+            if len(pkg_vers) > 1:
+                [pkg, vers] = row.split()
+                pkg = pkg.strip()
+                vers = vers.strip()
+                dep_vers_last[pkg] = vers
     return dep_vers_last
 
 
@@ -85,6 +89,7 @@ def get_pkg_dep_vers_now(mkpkg: MkPkgBase):
 
     Save in dictionary mkpkg.dep_vers_now
     """
+    msg = mkpkg.msg
     mkpkg.dep_vers_now = {}
     pkg_list: list[str] = []
     if mkpkg.depends_vers:
@@ -96,9 +101,17 @@ def get_pkg_dep_vers_now(mkpkg: MkPkgBase):
             pkg_list.append(pkg)
 
     for pkg in pkg_list:
-        output = pacman_query(['-Qi', pkg])
-        pkg_vers = pac_qi_key(output, 'Version')
-        mkpkg.dep_vers_now[pkg] = pkg_vers
+        if pkg in mkpkg.dep_vers_prog:
+            prog = mkpkg.dep_vers_prog[pkg]
+            pkg_vers = get_pkg_prog_vers(pkg, prog)
+        else:
+            output = pacman_query(['-Qi', pkg])
+            pkg_vers = pac_qi_key(output, 'Version')
+
+        if pkg_vers:
+            mkpkg.dep_vers_now[pkg] = pkg_vers
+        else:
+            msg(f'Warning: Failed to get current package version {pkg}\n', fg='yellow')
 
 
 def get_depends_times(pkglist: list[str]
@@ -184,3 +197,16 @@ def get_depends_versions(mkpkg: MkPkgBase,
         dep_vers.append(this_one)
 
     return dep_vers
+
+
+def get_pkg_prog_vers(pkg: str, prog: str) -> str:
+    """
+    Run prog to get package version
+    """
+    version: str = ''
+    pargs = [prog, pkg]
+    (retc, output, _error) = run_prog(pargs)
+    if retc == 0:
+        if output:
+            version = output.strip()
+    return version

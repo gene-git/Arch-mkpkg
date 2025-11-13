@@ -173,6 +173,10 @@ def get_pkgbld_data(mkpkg: MkPkgBase) -> bool:
       [[ $(declare -p $1) =~ "declare -a" ]] && echo true|| echo "false"
     }}
 
+    is_associative_array() {{
+      [[ $(declare -p $1 2>/dev/null) =~ "declare -A" ]] && echo true|| echo "false"
+    }}
+
     echo "_X_ pkgname = ${{pkgname[@]}}"
     echo "_X_ pkgver = $pkgver"
     echo "_X_ pkgbase = $pkgbase"
@@ -194,6 +198,14 @@ def get_pkgbld_data(mkpkg: MkPkgBase) -> bool:
 
     echo "_X_ pkgrel = ${{pkgrel}}"
     echo "_X_ epoch = ${{epoch}}"
+
+    if [ $(is_associative_array _dep_vers_prog) == "true" ] ; then
+        echo -n "_D_ dep_vers_prog start="
+        for pkg in "${{!_dep_vers_prog[@]}}"
+        do
+            echo -n "$pkg,${{_dep_vers_prog[$pkg]}} "
+        done
+    fi
 
     """
 
@@ -265,6 +277,17 @@ def get_pkgbld_data(mkpkg: MkPkgBase) -> bool:
 
         elif line.startswith('_X_ _mkpkg_depends_files ='):
             mkpkg.depends_files = data_l          # always a list
+
+        elif line.startswith('_D_ dep_vers_prog start'):
+            # list of pkg-name,versions
+            for item in data_l:
+                pkg_prog = item.split(',')
+                if len(pkg_prog) > 1:
+                    pkg = pkg_prog[0]
+                    prog = pkg_prog[1]
+                    mkpkg.dep_vers_prog[pkg] = prog
+                else:
+                    msg(f'Warning: PKGBUILD _dep_vers_prog invalid {item}\n', fg='yellow')
 
     #
     # split out version deps into mkpkg_depends_vers

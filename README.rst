@@ -18,52 +18,72 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
- * Use run_prog() from pyconcurrent module if it is available, otherwise
-   use a local copy.
- * Fixed issue where build subprocesses that generate very large amounts
-   of data on stdout/stderr could occasionally lead to blocked IO when data exceeded python
-   IO.DEFAULT_BUFFER_SIZE. 
-   Symptom is that the build hangs waiting for IO to get unblocked.
-   Fixed by enhancing run_prog() to use non-blocking I/O.
+**7.8.0**
 
- * Immproved code
+* New feature: Support for uninstalled package dependency getting version from program.
+
+  There are cases when building a package which depends on another uninstalled 
+  package.
+
+  One example is pigeonhole which depends on dovecot. At build time, dovecot 
+  version being used to build against is not yet installed.
+
+  Solved by providing a program (like bash script) which returns the version 
+  of the package name provided as an argument. 
+
+  The new PKGBUILD variable, _dep_vers_prog is a bash associative array which 
+  uses the package name as the key and the script that returns the version
+  as the value.
+
+  Example is provided below. 
+
+
+**Older**
+
+* Use run_prog() from pyconcurrent module if it is available, otherwise
+  use a local copy.
+
+* Fixed issue where build subprocesses that generate very large amounts
+  of data on stdout/stderr could occasionally lead to blocked IO when data exceeded python
+  IO.DEFAULT_BUFFER_SIZE. 
+  Symptom is that the build hangs waiting for IO to get unblocked.
+  Fixed by enhancing run_prog() to use non-blocking I/O.
+
+* Immproved code
 
    PEP-8, PEP-257, PEP-484 and PEP-561
    Refactor & clean ups.
 
- * Improved handling of split packages.
-   Now checks every packages for any being missing or out of date.
+* Improved handling of split packages.
 
- * soname logic updated.
+  Now checks every packages for any being missing or out of date.
 
-   Default is now 'keep' which only rebuilds of a soname is no longer available.
-   This is in line with how sonames are typically used where soname only changes
-   when ABI changes.
+* soname logic updated.
 
- * Major update: soname handling has been re-written from scratch and improved substantially. 
+  Default is now 'keep' which only rebuilds of a soname is no longer available.
+  This is in line with how sonames are typically used where soname only changes
+  when ABI changes.
 
-   It now identifies every soname versioned library in elf executables
-   along with their full path.  It also properly handles executables 
-   built with *--rpath* loader options.
+* Major update: soname handling has been re-written from scratch and improved substantially. 
 
-   Previous versions relied on makepkg soname output
-   which, unfortunately, only lists sonames if they are also listed as a PKGBUILD dependency.
-   We need every soname versioned library to ensure we do the right thing
-   and rebuild when needed. So it was a mistake to rely on this.
+  It now identifies every soname versioned library in elf executables
+  along with their full path.  It also properly handles executables 
+  built with *--rpath* loader options.
 
-   Can also specify how to handle version comparisons similar to the way 
-   package version comparisons are done (e.g. soname > major)
+  Previous versions relied on makepkg soname output
+  which, unfortunately, only lists sonames if they are also listed as a PKGBUILD dependency.
+  We need every soname versioned library to ensure we do the right thing
+  and rebuild when needed. So it was a mistake to rely on this.
 
-   If you're interested, the soname info is saved into the file *.mkp_dep_soname*
+  Can also specify how to handle version comparisons similar to the way 
+  package version comparisons are done (e.g. soname > major)
 
-   **N.B.**
-     that the build must be run at least once with this new version to generate the
-     soname info (mkpkg -f forces a fresh build)
+  If you're interested, the soname info is saved into the file *.mkp_dep_soname*
 
- * Old options now deprecated
-   
-    * (*--mpk-xxx*)
-    * (*--soname-build*) : use *--soname-comp* instead
+  **N.B.**
+    that the build must be run at least once with this new version to generate the
+    soname info (mkpkg -f forces a fresh build)
+
 
 #################
 mkpkg application
@@ -462,6 +482,36 @@ An alternative would be to put these files into a git repo and just using the gi
 For a small number of files this may be more convenient/simpler.
 
 These variables offer considerable control over what can be used to trigger rebuilds.
+
+
+Variable _dep_vers_prog
+-----------------------
+
+In cases where a dependent package being used to build against is not yet installed,
+then it's version cannot be extracted by calling *pacman -Qi*. Instead, a script
+can be provided in PKGBUILD which returns the version of the package name provided
+as an argument.
+
+For example if we have the following dependencies where *foo* and *goo* are used but
+not yet installed on the build machine (at least not the version being built against):
+
+.. code-block:: none
+
+   _mkpkg_depends=('python>minor', 'openssl>3.0', 'foo', 'goo')
+
+   declare -A _dep_vers_prog
+   _dep_vers_prog['foo']='./dep-vers'
+   _dep_vers_prog['goo']='./dep-vers'
+
+where the script *./dep-vers* returns the version of it's one argument - where
+arguments can be *foo* or *goo*.
+
+One example is pigeonhole and dovecot. This are in separate git repos and built
+as separate packages. pigeonhold is built against the just compiled version
+of dovecot. In this case a script which extracts *pkgver* from the .PKGINFG file
+either in the dovecot *pkg* directory, or by extracting it from the just built 
+package does the trick.
+
 
 Discussion and Next Steps
 =========================
