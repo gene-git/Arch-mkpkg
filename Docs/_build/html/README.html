@@ -48,8 +48,23 @@ or manually verify using <em>git tag -v &lt;tag-name&gt;</em></p></li>
 </section>
 <section id="new-interesting">
 <h2>New / Interesting<a class="headerlink" href="#new-interesting" title="Link to this heading">¶</a></h2>
-<blockquote>
-<div><ul>
+<p><strong>7.8.0</strong></p>
+<ul>
+<li><p>New feature: Support for uninstalled package dependency getting version from program.</p>
+<p>There are cases when building a package which depends on another uninstalled
+package.</p>
+<p>One example is pigeonhole which depends on dovecot. At build time, dovecot
+version being used to build against is not yet installed.</p>
+<p>Solved by providing a program (like bash script) which returns the version
+of the package name provided as an argument.</p>
+<p>The new PKGBUILD variable, _dep_vers_prog is a bash associative array which
+uses the package name as the key and the script that returns the version
+as the value.</p>
+<p>Example is provided below.</p>
+</li>
+</ul>
+<p><strong>Older</strong></p>
+<ul>
 <li><p>Use run_prog() from pyconcurrent module if it is available, otherwise
 use a local copy.</p></li>
 <li><p>Fixed issue where build subprocesses that generate very large amounts
@@ -58,11 +73,14 @@ IO.DEFAULT_BUFFER_SIZE.
 Symptom is that the build hangs waiting for IO to get unblocked.
 Fixed by enhancing run_prog() to use non-blocking I/O.</p></li>
 <li><p>Immproved code</p>
-<p>PEP-8, PEP-257, PEP-484 and PEP-561
+<blockquote>
+<div><p>PEP-8, PEP-257, PEP-484 and PEP-561
 Refactor &amp; clean ups.</p>
+</div></blockquote>
 </li>
-<li><p>Improved handling of split packages.
-Now checks every packages for any being missing or out of date.</p></li>
+<li><p>Improved handling of split packages.</p>
+<p>Now checks every packages for any being missing or out of date.</p>
+</li>
 <li><p>soname logic updated.</p>
 <p>Default is now ‘keep’ which only rebuilds of a soname is no longer available.
 This is in line with how sonames are typically used where soname only changes
@@ -85,16 +103,7 @@ soname info (mkpkg -f forces a fresh build)</p>
 </dd>
 </dl>
 </li>
-<li><p>Old options now deprecated</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>(<em>–mpk-xxx</em>)</p></li>
-<li><p>(<em>–soname-build</em>) : use <em>–soname-comp</em> instead</p></li>
 </ul>
-</div></blockquote>
-</li>
-</ul>
-</div></blockquote>
 </section>
 </section>
 <section id="mkpkg-application">
@@ -452,6 +461,29 @@ would now trigger rebuilds should there be changes to the service file.
 An alternative would be to put these files into a git repo and just using the git version.
 For a small number of files this may be more convenient/simpler.</p>
 <p>These variables offer considerable control over what can be used to trigger rebuilds.</p>
+</section>
+<section id="variable-dep-vers-prog">
+<h3>Variable _dep_vers_prog<a class="headerlink" href="#variable-dep-vers-prog" title="Link to this heading">¶</a></h3>
+<p>In cases where a dependent package being used to build against is not yet installed,
+then it’s version cannot be extracted by calling <em>pacman -Qi</em>. Instead, a script
+can be provided in PKGBUILD which returns the version of the package name provided
+as an argument.</p>
+<p>For example if we have the following dependencies where <em>foo</em> and <em>goo</em> are used but
+not yet installed on the build machine (at least not the version being built against):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_mkpkg_depends=(&#39;python&gt;minor&#39;, &#39;openssl&gt;3.0&#39;, &#39;foo&#39;, &#39;goo&#39;)
+
+declare -A _dep_vers_prog
+_dep_vers_prog[&#39;foo&#39;]=&#39;./dep-vers&#39;
+_dep_vers_prog[&#39;goo&#39;]=&#39;./dep-vers&#39;
+</pre></div>
+</div>
+<p>where the script <em>./dep-vers</em> returns the version of it’s one argument - where
+arguments can be <em>foo</em> or <em>goo</em>.</p>
+<p>One example is pigeonhole and dovecot. This are in separate git repos and built
+as separate packages. pigeonhold is built against the just compiled version
+of dovecot. In this case a script which extracts <em>pkgver</em> from the .PKGINFG file
+either in the dovecot <em>pkg</em> directory, or by extracting it from the just built
+package does the trick.</p>
 </section>
 </section>
 <section id="discussion-and-next-steps">

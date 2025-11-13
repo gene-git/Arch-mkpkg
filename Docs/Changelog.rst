@@ -6,12 +6,25 @@ Tags
 
 .. code-block:: text
 
-	1.0.0 (2022-09-03) -> 7.7.2 (2025-10-14)
-	181 commits.
+	1.0.0 (2022-09-03) -> 7.8.0 (2025-11-13)
+	183 commits.
 
 Commits
 =======
 
+
+* 2025-11-13  : **7.8.0**
+
+.. code-block:: text
+
+              - Release 7.8.0
+                New feature: Support for uninstalled package dependency getting version from program.
+                  See new PKGBUILD variable, _dep_vers_prog, in docs
+ 2025-10-14   ⋯
+
+.. code-block:: text
+
+              - update Docs/Changelogs Docs/mkpkg.pdf for 7.7.2
 
 * 2025-10-14  : **7.7.2**
 
