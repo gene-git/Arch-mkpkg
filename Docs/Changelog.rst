@@ -6,14 +6,21 @@ Tags
 
 .. code-block:: text
 
-	1.0.0 (2022-09-03) -> 8.0.0, origin/master (2025-11-13)
-	184 commits.
+	1.0.0 (2022-09-03) -> 8.0.1 (2026-01-03)
+	186 commits.
 
 Commits
 =======
 
 
-* 2025-11-13  : **8.0.0, origin/master**
+* 2026-01-03  : **8.0.1**
+
+.. code-block:: text
+
+              - Arch didnt pick up tag - bump and try again
+              - update Docs/Changelogs Docs/mkpkg.pdf for 8.0.0
+
+* 2025-11-13  : **8.0.0**
 
 .. code-block:: text
 
