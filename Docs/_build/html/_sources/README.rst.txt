@@ -18,6 +18,12 @@ Tool to rebuild Arch packages based on dependency triggers.
 New / Interesting
 ==================
 
+**8.0.0**
+
+* Switch python packaging from hatch to uv
+* License is GPL-2.0-or-later
+* Small source code tree reorg.
+
 **7.8.0**
 
 * New feature: Support for uninstalled package dependency getting version from program.

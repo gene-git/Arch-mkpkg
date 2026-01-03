@@ -6,12 +6,18 @@ Tags
 
 .. code-block:: text
 
-	1.0.0 (2022-09-03) -> 7.8.0 (2025-11-13)
-	183 commits.
+	1.0.0 (2022-09-03) -> 8.0.0, origin/master (2025-11-13)
+	184 commits.
 
 Commits
 =======
 
+
+* 2025-11-13  : **8.0.0, origin/master**
+
+.. code-block:: text
+
+              - update Docs/Changelogs Docs/mkpkg.pdf for 7.8.0
 
 * 2025-11-13  : **7.8.0**
 

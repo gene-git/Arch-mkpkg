@@ -9,7 +9,7 @@
 project = "mkpkg"
 copyright = '2023, Gene C'
 author = 'Gene C'
-release = '7.7.0'
+release = "8.0.0"
 latex_engine = 'xelatex'
 
 # -- General configuration ---------------------------------------------------
@@ -19,7 +19,7 @@ latex_engine = 'xelatex'
 extensions = []
 
 templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', 'Changelog.rst', 'Misc/*.rst']
 
 
 

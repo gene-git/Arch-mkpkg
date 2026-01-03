@@ -1,9 +1,12 @@
 -------------------------------------------------------
  Changelog    : Arch-mkpkg
- Tags         : 7.5.0 ➙ 7.8.0
-              : 2025-06-22 ➙ 2025-11-13
+ Tags         : 7.6.0 ➙ 8.0.0, origin/master
+              : 2025-06-25 ➙ 2025-11-13
               : 6 tags. See Docs for full changelog
 -------------------------------------------------------
+
+ 2025-11-13   : 8.0.0, origin/master
+              - update Docs/Changelogs Docs/mkpkg.pdf for 7.8.0
 
  2025-11-13   : 7.8.0
               - Release 7.8.0
@@ -28,8 +31,3 @@
                 Fix typo
  2025-06-22   ⋯
               - update Docs/Changelogs Docs/mkpkg.pdf for 7.5.0
-
- 2025-06-22   : 7.5.0
-              - Sync local copy of run_prog with latest from pyconcurrent
- 2025-06-19   ⋯
-              - update Docs/Changelogs Docs/mkpkg.pdf for 7.4.0

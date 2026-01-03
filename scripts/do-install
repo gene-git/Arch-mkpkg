@@ -11,13 +11,24 @@ self='mkpkg'
 info="README.rst Docs packaging scripts"
 infodir="/usr/share/${self}"
 
-license="Docs/License.rst"
+license="Docs/License/License.rst"
 licensedir="/usr/share/licenses/${self}"
 
 # list apps without the ".py" or leave empty string
 apps=("mkpkg")
 
 sitedir=$(python -c "import site; print(site.getsitepackages()[0])")
+installdir="${dest}${sitedir}"
+app_location="${sitedir}/mkpkg_mod/apps"
+
+uv_opts=(
+    --python /usr/bin/python
+    --system
+    --no-build-isolation
+    --link-mode=copy
+    --compile-bytecode
+)
+
 
 if [ ! -d "$dest" ] ; then
     echo 'Missing destination directory'
@@ -27,14 +38,17 @@ else
     rsync --mkpath -a ${info} ${dest}${infodir}/
     rsync --mkpath -a ${license} ${dest}/${licensedir}/
 
-    /usr/bin/python -m installer --destdir="$dest" dist/*.whl
+    #/usr/bin/python -m installer --destdir="$dest" dist/*.whl
+    /usr/bin/uv pip install ${uv_opts[@]} --target "$installdir" dist/*.whl
+    /usr/bin/rm -rf "$installdir"/.lock
+
 
     # link(s) in /usr/bin/
     if [ -v apps ] ; then
         /usr/bin/mkdir -p "${dest}/usr/bin"
         for app in ${apps[@]}
         do
-            /usr/bin/ln -sf ${sitedir}/${self}/${app}.py "${dest}/usr/bin/${app}"
+            /usr/bin/ln -sf ${app_location}/${app}.py "${dest}/usr/bin/${app}"
         done
     fi
     exit 0
