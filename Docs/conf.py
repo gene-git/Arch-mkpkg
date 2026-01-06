@@ -9,7 +9,7 @@
 project = "mkpkg"
 copyright = '2023, Gene C'
 author = 'Gene C'
-release = "8.0.1"
+release = "8.0.2"
 latex_engine = 'xelatex'
 
 # -- General configuration ---------------------------------------------------
