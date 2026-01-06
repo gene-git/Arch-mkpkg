@@ -1,4 +1,4 @@
-.. SPDX-License-Identifier: MIT
+.. SPDX-License-Identifier: GPL-2.0-or-later
 
 #####
 mkpkg
@@ -604,9 +604,9 @@ latest commit on git master branch.
 License
 =======
 
-Created by Gene C. and licensed under the terms of the MIT license.
+Created by Gene C. and licensed under the terms of the GPL-2.0-or-later license.
 
- - SPDX-License-Identifier: MIT  
+ - SPDX-License-Identifier: GPL-2.0-or-later  
  - Copyright (c) 2022-2023 Gene C
 
 Some history

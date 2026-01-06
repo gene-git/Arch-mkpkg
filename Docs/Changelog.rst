@@ -6,12 +6,23 @@ Tags
 
 .. code-block:: text
 
-	1.0.0 (2022-09-03) -> 8.0.1 (2026-01-03)
-	186 commits.
+	1.0.0 (2022-09-03) -> 8.0.2 (2026-01-06)
+	188 commits.
 
 Commits
 =======
 
+
+* 2026-01-06  : **8.0.2**
+
+.. code-block:: text
+
+              - PKGBUILD small change
+ 2026-01-03   ⋯
+
+.. code-block:: text
+
+              - update Docs/Changelogs Docs/mkpkg.pdf for 8.0.1
 
 * 2026-01-03  : **8.0.1**
 
