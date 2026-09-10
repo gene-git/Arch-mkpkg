@@ -204,7 +204,7 @@ def build(mkpkg: MkPkgBase):
         3) check all depends_vers for greater version than last build
     """
     #
-    # Extract info from pkgbui;d
+    # Extract info from pkgbuild
     #
     okay = get_pkgbld_data(mkpkg)
     if not okay:

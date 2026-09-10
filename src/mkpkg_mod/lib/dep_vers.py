@@ -17,6 +17,7 @@ Package dependency support tools for MkPkg class check_deps()
 """
 import os
 from datetime import datetime
+from pyconcurrent import run_prog
 
 from ._mkpkg_base import MkPkgBase
 from .file_tools import open_file
@@ -24,7 +25,6 @@ from .pacman import pacman_query
 from .pacman import pac_qi_key
 from .pacman import pac_qi_install_date
 from .version_compare import check_version_trigger
-from .run_prog_local import run_prog
 
 
 def write_current_pkg_dep_vers(mkpkg: MkPkgBase):

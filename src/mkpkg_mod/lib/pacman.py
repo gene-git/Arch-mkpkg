@@ -5,7 +5,7 @@ pacman query tools
 """
 from datetime import datetime
 
-from .run_prog_local import run_prog
+from pyconcurrent import run_prog
 
 
 def pac_qi_key(result: str, key: str) -> str:

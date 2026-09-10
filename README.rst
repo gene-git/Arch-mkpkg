@@ -1,102 +1,33 @@
 .. SPDX-License-Identifier: GPL-2.0-or-later
 
-#####
+=====
 mkpkg
-#####
+=====
 
-Overview
+Synopsis
 ========
 
 Tool to rebuild Arch packages based on dependency triggers.
 
-* All git tags will be signed by <arch@sapience.com>.
-  Public key is available via WKD or download from website:
-  https://www.sapience.com/tech
-  After key is on keyring use the PKGBUILD source line ending with *?signed*
-  or manually verify using *git tag -v <tag-name>*
+Signed Source
+=============
 
-New / Interesting
-==================
+All git tags are signed with arch@sapience.com key which is available via WKD
+or download from https://www.sapience.com/tech. Add the key to your package builder gpg keyring.
+The key is included in the Arch package and the source= line with *?signed* at the end can be used
+to verify the git tag.  You can also manually verify the signature
+using manually verify using *git tag -v <tag-name>*
 
-**8.0.0**
+Recent Changes
+==============
 
-* Switch python packaging from hatch to uv
-* License is GPL-2.0-or-later
-* Small source code tree reorg.
+**8.1.0**
 
-**7.8.0**
+* Use meson / meson-python for build and package management
+* Use python-pyconcurrent - adds new dependency (drop local copy of run_prog).
 
-* New feature: Support for uninstalled package dependency getting version from program.
-
-  There are cases when building a package which depends on another uninstalled 
-  package.
-
-  One example is pigeonhole which depends on dovecot. At build time, dovecot 
-  version being used to build against is not yet installed.
-
-  Solved by providing a program (like bash script) which returns the version 
-  of the package name provided as an argument. 
-
-  The new PKGBUILD variable, _dep_vers_prog is a bash associative array which 
-  uses the package name as the key and the script that returns the version
-  as the value.
-
-  Example is provided below. 
-
-
-**Older**
-
-* Use run_prog() from pyconcurrent module if it is available, otherwise
-  use a local copy.
-
-* Fixed issue where build subprocesses that generate very large amounts
-  of data on stdout/stderr could occasionally lead to blocked IO when data exceeded python
-  IO.DEFAULT_BUFFER_SIZE. 
-  Symptom is that the build hangs waiting for IO to get unblocked.
-  Fixed by enhancing run_prog() to use non-blocking I/O.
-
-* Immproved code
-
-   PEP-8, PEP-257, PEP-484 and PEP-561
-   Refactor & clean ups.
-
-* Improved handling of split packages.
-
-  Now checks every packages for any being missing or out of date.
-
-* soname logic updated.
-
-  Default is now 'keep' which only rebuilds of a soname is no longer available.
-  This is in line with how sonames are typically used where soname only changes
-  when ABI changes.
-
-* Major update: soname handling has been re-written from scratch and improved substantially. 
-
-  It now identifies every soname versioned library in elf executables
-  along with their full path.  It also properly handles executables 
-  built with *--rpath* loader options.
-
-  Previous versions relied on makepkg soname output
-  which, unfortunately, only lists sonames if they are also listed as a PKGBUILD dependency.
-  We need every soname versioned library to ensure we do the right thing
-  and rebuild when needed. So it was a mistake to rely on this.
-
-  Can also specify how to handle version comparisons similar to the way 
-  package version comparisons are done (e.g. soname > major)
-
-  If you're interested, the soname info is saved into the file *.mkp_dep_soname*
-
-  **N.B.**
-    that the build must be run at least once with this new version to generate the
-    soname info (mkpkg -f forces a fresh build)
-
-
-#################
-mkpkg application
-#################
-
-Overview of mkpkg
-=================
+Overview
+========
 
 Building an Arch package requires invoking *makepkg* with a *PKGBUILD* file.
 PKGBUILD file contains a *depends* variable which lists those packages that are
@@ -259,11 +190,6 @@ packages that are manually rebuilt by forcing a release version bump typically w
 such as *rebuilt with latest ...* - we certainly see plenty of that happening.
 
 
-
-############
-Using  mkpkg
-############
-
 Getting Started
 ===============
 
@@ -286,17 +212,21 @@ are passed through to *makepkg* [#]_.
 Options
 =======
 
-The options currently supported by mkpkg are:
+The options currently supported by mkpkg are::
 
- * (**-v, --verb**)   
+    positional arguments:
+      makepkg               All args after -- passed to makepkg.
 
-   Show (stdout) output of makepkg.  Default is not to show it.
+    options:
+      -h, --help            show this help message and exit
+      -f, --force           Bump package release and rebuild
+      -r, --refresh         Update saved metadata files.
+      -so-comp, --soname-comp SONAME_COMP
+                            soname rebuilds: (never, newer, keep, major/minor/last etc (keep).)
+      -v, --verb            More verbose output - shows output of makepkg.
 
- * (**-f, --force**)
 
-   Force a makepkg run even if not needed. Bump the package release and rebuild
-
- * (**-r, --refresh**)
+Note on refresh:
 
    Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
    If there is no saved metadata, and build is up to date, will try refresh the build info.
@@ -305,7 +235,7 @@ The options currently supported by mkpkg are:
    Note that *sonames* are found by examining any executables in the *pkg* directory.
    If the *pkg* directory is empty, the refresh will not find any sonames.
    
- * (**so-comp, --soname-comp**)
+Note on -soname-comp:
 
    How to handle automatic soname changes. Default value is *keep* - only rebuilds if
    soname is no longer available.
@@ -319,9 +249,9 @@ The options currently supported by mkpkg are:
     * *neverever* : Developer option - will not rebuild even if the soname library is no longer available.
 
 
- * (*--*)  
+Note on passing options to makepkg:
 
-   All options following this are passed to makepkg 
+   All options following *--* are passed to makepkg 
 
 **Config file**
 
@@ -371,8 +301,8 @@ This is also simple to detect programatically.
 
 .. _mkpkg-triggers:
 
-Triggering Rebuilds Details
-===========================
+Triggering Rebuilds: Details
+============================
 
 _mkpkg_depends
 --------------
@@ -536,160 +466,4 @@ which lists these kind of dependencies.
 We note that *checkdepends* vartiable is quite different in intent, as it is used to identify 
 those packages needed to do testing but NOT for things which could impact the outcome
 of running the tool. 
-
-########
-Appendix
-########
-
-mkpkg Source
-============
-
-The source is kept in the github repository `Github-mkpkg`_.
-
-
-Installation
-============
-
-Available on
- * `Github-mkpkg`_
- * `Archlinux AUR`_
-
-.. _Github-mkpkg: https://github.com/gene-git/Arch-mkpkg
-.. _Archlinux AUR: https://aur.archlinux.org/packages/mkpkg
-
-On Arch you can build using the provided PKGBUILD in the packaging directory or from the AUR.
-All git tags are signed with arch@sapience.com key which is available via WKD
-or download from https://www.sapience.com/tech. Add the key to your package builder gpg keyring.
-In PKGBUILD use source= line with *?signed* at the end. You can also manually verify the signature
-
-To build manually, clone the repo and :
-
- .. code-block:: bash
-
-        rm -f dist/*
-        /usr/bin/python -m build --wheel --no-isolation
-        root_dest="/"
-        ./scripts/do-install $root_dest
-
-When running as non-root then set root_dest a user writable directory
-
-Dependencies
-============
-
-- Run Time:
-  - python (3.9 or later)
-  - pyalpm
-
-- Building Package :
-  - git 
-  - build aka python-build
-  - intaller aka python-installer
-  - wheel aka python-wheel
-  - poetry aka python-poetry
-  - rsync
-
-* Optional for building docs:
-
-  * sphinx
-  * texlive-latexextra  (archlinux packaguing of texlive tools)
-
-Philosophy
-==========
-
-We follow the *live at head commit* philosophy as recommended by
-Google's Abseil team [1]_.  This means we recommend using the
-latest commit on git master branch. 
-
-
-License
-=======
-
-Created by Gene C. and licensed under the terms of the GPL-2.0-or-later license.
-
- - SPDX-License-Identifier: GPL-2.0-or-later  
- - Copyright (c) 2022-2023 Gene C
-
-Some history
-============
-
-Version 6.0.0
--------------
-
- * soname rewrite
-   
-   New argument for how soname changes are treated : *-so-comp, --soname-comp*. 
-
-   Can be *<compare>*, *newer*,  *never* or key how to compare the soname versions. 
-   The comparison types are the same as for package dependencies described above.
-   Default is *last* which means the entire soname version will be compared to 
-   whats available and rebuild will be triggered if a later version now available.
-
-   *<compare>* e.g. *>major* or *>minor*' or *last* etc. 
-   If the last built soname was 5.1, and now available is 5.2 then
-   *minor* and *last* will trigger rebuild while *major* would not. *newer* triggers if the
-   last modify time of the library is newer.
-
-   Previous version used sonmaes produced by makepkg - however this only generates
-   sonames if they are listed as dependencies. We want to get every soname - so 
-   we started over from scratch. By using our own soname generate we catch
-   every soname and its absolute path - this enables us to correctly treat soname
-   changes. This approach will also correctly deal with any *rpath* loader flags
-   causing executable to use shared library from path(s) specified at compile time.
-
-
-Version 4.1.0
--------------
-
- * Arguments  
-
-    Change in argument handling. Arguments to be passed to *makepkg* must now follow *--*.
-    Arguments before the double dash are used by mkpkg itself. To keep backward
-    compatibility the older *--mkp-* style arguments are honored, but the newer simpler
-    ones are preferred. e.g. *-v, --verb* for verbose. Help availble via *-h*. 
-
-
- * Config file now available.
-
-   Configs are looked for in /etc/mkpkg/config then ~/.config/mkpkg/config. It should
-   be in TOML format. e.g. to change the default soname rebuild option::
-
-        soname_comp = "newer"
-
-Version 4.0.0
--------------
-
- * Soname drive rebuilds.  
-
-   Adds support for detecting missing soname libraries, and triggering rebuild.
-   If soname is found then no rebuild is done. Typically happens when
-   older soname is deprecated.
-
- * Adds new option *--mkp-refresh*.  
-
-   Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
-   
-
-Older
------
-
-Adds support for epoch.
-
-Version 2.x.y brings fine grain control by allowing package dependences to trigger 
-builds using semantic version. For example 'python>minor' will rebuild only if a new
-python package has it's major.minor greater than what it was when package was last built.
-See *_mkpkg_depends* below for more detail. 
-
-The source has been reorganized and packaged using poetry which simplifies installation.
-The installer script, callable from package() function in PKGBUILD has been updated 
-accordingly. Ther build() function uses python build module to generate the
-wheel package, as outlined above.
-
-Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
-Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
-The code is backward compatible and supports the previous variable names without the 
-leading "\_" as well as the ones with the "\_".
-
-Now also available on aur.
-
-.. [1] https://abseil.io/about/philosophy#upgrade-support
 

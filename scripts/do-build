@@ -1,0 +1,15 @@
+#!/usr/bin/bash
+# 
+set -euo pipefail
+
+CFLAGS=
+LDFLAGS=
+
+meson_opts=(
+    --reconfigure build/release
+    --buildtype=release
+)
+/usr/bin/meson setup "${meson_opts[@]}"
+/usr/bin/meson compile -C build/release
+
+exit 0

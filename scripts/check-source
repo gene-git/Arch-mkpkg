@@ -1,12 +1,12 @@
 #!/usr/bin/bash
 #
-# Run mypy checker
-# run from "src" dir
+# Run static code checkers
+#
 
-mod=mkpkg_mod
+export PYTHONPATH=$(/usr/bin/realpath ./src)
+mod="src/mkpkg_mod"
 
-PYTHONPATH=. pylint $mod/*.py $mod/*/*.py
-PYTHONPATH=. pycodestyle --max-line-length=110 $mod/*.py $mod/*/*.py
-
-PYTHONPATH=. mypy --check-untyped-defs --follow-untyped-imports $mod
+/usr/bin/pylint $mod/*.py $mod/*/*.py
+/usr/bin/pycodestyle --max-line-length=110 $mod/*.py $mod/*/*.py
+/usr/bin/mypy --check-untyped-defs --follow-untyped-imports $mod
 

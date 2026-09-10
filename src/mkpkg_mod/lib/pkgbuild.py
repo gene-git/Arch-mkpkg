@@ -11,10 +11,10 @@ Support tools relating to PKGBUILD file used by MkPkg class
 # pylint: disable=too-many-branches, too-many-statements
 # pylint: disable=too-many-locals
 import os
+from pyconcurrent import run_prog
 
 from ._mkpkg_base import MkPkgBase
 from .file_tools import open_file
-from .run_prog_local import run_prog
 from .split_deps import split_deps_vers_list
 
 

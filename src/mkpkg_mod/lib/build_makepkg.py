@@ -5,12 +5,11 @@ Support tools for MkPkg class
     - build_w_makepkg: Use makepkg to do build
 """
 import sys
-from .run_prog_local import run_prog
+from pyconcurrent import run_prog
 from .tools import pkg_version
 
 
-def _makepkg_outcome(retc: int, output: str, errors: str
-                     ) -> tuple[int, str, str]:
+def _makepkg_outcome(retc: int, output: str, errors: str) -> tuple[int, str, str]:
     """
     Determine the outcome of running makepkg.
 

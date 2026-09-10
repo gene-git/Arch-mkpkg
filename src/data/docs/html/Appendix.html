@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. Appendix &#8212; mkpkg 8.1.0
+ documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=87b6a113"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="1. mkpkg" href="README.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="appendix">
+<h1><span class="section-number">2. </span>Appendix<a class="headerlink" href="#appendix" title="Link to this heading">¶</a></h1>
+<section id="installation">
+<h2><span class="section-number">2.1. </span>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>Available on</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/gene-git/Arch-mkpkg">Github-mkpkg</a></p></li>
+<li><p><a class="reference external" href="https://aur.archlinux.org/packages/mkpkg">Archlinux AUR</a></p></li>
+</ul>
+<p>On Arch you can build using the provided PKGBUILD in the packaging directory or from the AUR.
+All git tags are signed with <a class="reference external" href="mailto:arch&#37;&#52;&#48;sapience&#46;com">arch<span>&#64;</span>sapience<span>&#46;</span>com</a> key which is available via WKD
+or download from <a class="reference external" href="https://www.sapience.com/tech">https://www.sapience.com/tech</a>. Add the key to your package builder gpg keyring.
+In PKGBUILD use source= line with <em>?signed</em> at the end. You can also manually verify the signature</p>
+<p>To build manually, clone the repo and:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">do</span><span class="o">-</span><span class="n">build</span>
+<span class="o">./</span><span class="n">scripts</span><span class="o">/</span><span class="n">do</span><span class="o">-</span><span class="n">install</span> <span class="o">&lt;</span><span class="n">destination</span><span class="o">-</span><span class="n">directory</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="dependencies">
+<h2><span class="section-number">2.2. </span>Dependencies<a class="headerlink" href="#dependencies" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Run Time:
+- python (3.14 or later)
+- pyalpm
+- python-tomli-w
+- python-pyelftools
+- python-pyconcurrent</p></li>
+<li><p>Building Package :</p>
+<ul>
+<li><p>git</p></li>
+<li><p>meson</p></li>
+<li><p>meson-python</p></li>
+<li><p>rsync</p></li>
+<li><p>bash</p></li>
+</ul>
+</li>
+</ul>
+<p>Created by Gene C. and licensed under the terms of the GPL-2.0-or-later license.</p>
+<ul class="simple">
+<li><p>SPDX-License-Identifier: GPL-2.0-or-later</p></li>
+<li><p>SPDX-FileCopyrightText: © 2022-present Gene C &lt;<a class="reference external" href="mailto:arch&#37;&#52;&#48;sapience&#46;com">arch<span>&#64;</span>sapience<span>&#46;</span>com</a>&gt;</p></li>
+</ul>
+</section>
+<section id="some-history">
+<h2><span class="section-number">2.3. </span>Some history<a class="headerlink" href="#some-history" title="Link to this heading">¶</a></h2>
+<section id="version-6-0-0">
+<h3><span class="section-number">2.3.1. </span>Version 6.0.0<a class="headerlink" href="#version-6-0-0" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p>soname rewrite</p>
+<p>New argument for how soname changes are treated : <em>-so-comp, –soname-comp</em>.</p>
+<p>Can be <em>&lt;compare&gt;</em>, <em>newer</em>,  <em>never</em> or key how to compare the soname versions.
+The comparison types are the same as for package dependencies described above.
+Default is <em>last</em> which means the entire soname version will be compared to
+whats available and rebuild will be triggered if a later version now available.</p>
+<p><em>&lt;compare&gt;</em> e.g. <em>&gt;major</em> or <em>&gt;minor</em>’ or <em>last</em> etc.
+If the last built soname was 5.1, and now available is 5.2 then
+<em>minor</em> and <em>last</em> will trigger rebuild while <em>major</em> would not. <em>newer</em> triggers if the
+last modify time of the library is newer.</p>
+<p>Previous version used sonmaes produced by makepkg - however this only generates
+sonames if they are listed as dependencies. We want to get every soname - so
+we started over from scratch. By using our own soname generate we catch
+every soname and its absolute path - this enables us to correctly treat soname
+changes. This approach will also correctly deal with any <em>rpath</em> loader flags
+causing executable to use shared library from path(s) specified at compile time.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="version-4-1-0">
+<h3><span class="section-number">2.3.2. </span>Version 4.1.0<a class="headerlink" href="#version-4-1-0" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p>Arguments</p>
+<blockquote>
+<div><p>Change in argument handling. Arguments to be passed to <em>makepkg</em> must now follow <em>–</em>.
+Arguments before the double dash are used by mkpkg itself. To keep backward
+compatibility the older <em>–mkp-</em> style arguments are honored, but the newer simpler
+ones are preferred. e.g. <em>-v, –verb</em> for verbose. Help availble via <em>-h</em>.</p>
+</div></blockquote>
+</li>
+<li><p>Config file now available.</p>
+<p>Configs are looked for in /etc/mkpkg/config then ~/.config/mkpkg/config. It should
+be in TOML format. e.g. to change the default soname rebuild option:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">soname_comp</span> <span class="o">=</span> <span class="s2">"newer"</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="version-4-0-0">
+<h3><span class="section-number">2.3.3. </span>Version 4.0.0<a class="headerlink" href="#version-4-0-0" title="Link to this heading">¶</a></h3>
+<blockquote>
+<div><ul>
+<li><p>Soname drive rebuilds.</p>
+<p>Adds support for detecting missing soname libraries, and triggering rebuild.
+If soname is found then no rebuild is done. Typically happens when
+older soname is deprecated.</p>
+</li>
+<li><p>Adds new option <em>–mkp-refresh</em>.</p>
+<p>Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.</p>
+</li>
+</ul>
+</div></blockquote>
+</section>
+<section id="older">
+<h3><span class="section-number">2.3.4. </span>Older<a class="headerlink" href="#older" title="Link to this heading">¶</a></h3>
+<p>Adds support for epoch.</p>
+<p>Version 2.x.y brings fine grain control by allowing package dependences to trigger
+builds using semantic version. For example ‘python&gt;minor’ will rebuild only if a new
+python package has it’s major.minor greater than what it was when package was last built.
+See <em>_mkpkg_depends</em> below for more detail.</p>
+<p>The source has been reorganized and packaged using poetry which simplifies installation.
+The installer script, callable from package() function in PKGBUILD has been updated
+accordingly. Ther build() function uses python build module to generate the
+wheel package, as outlined above.</p>
+<p>Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
+Variables are now: <em>_mkpkg_depends</em> and <em>_mkpkg_depends_files</em>.
+The code is backward compatible and supports the previous variable names without the
+leading “_” as well as the ones with the “_”.</p>
+<p>Now also available on aur.</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">mkpkg</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">mkpkg Manual:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">1. mkpkg</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Appendix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">2.1. Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">2.2. Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#some-history">2.3. Some history</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="README.html" title="previous chapter"><span class="section-number">1. </span>mkpkg</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/Appendix.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
