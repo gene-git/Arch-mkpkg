@@ -1,0 +1,241 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2. Triggers &mdash; mkpkg 8.1.1
+ documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=29180f0f" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=23ce250a"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="3. Appendix" href="Appendix.html" />
+    <link rel="prev" title="1. mkpkg" href="README.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            mkpkg
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">mkpkg Manual:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">1. mkpkg</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">2. Triggers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mkpkg-depends">2.1. _mkpkg_depends</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mkpkg-depends-files">2.2. _mkpkg_depends_files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variable-dep-vers-prog">2.3. Variable _dep_vers_prog</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Appendix.html">3. Appendix</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">mkpkg</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active"><span class="section-number">2. </span>Triggers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Triggers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="triggers">
+<span id="mkpkg-triggers"></span><h1><span class="section-number">2. </span>Triggers<a class="headerlink" href="#triggers" title="Link to this heading"></a></h1>
+<p>There are 2 kinds of triggers. A trigger based on package and a trigger based on a file.
+Each of these uses a PKGBUILD variable with an array of triggers.</p>
+<section id="mkpkg-depends">
+<h2><span class="section-number">2.1. </span>_mkpkg_depends<a class="headerlink" href="#mkpkg-depends" title="Link to this heading"></a></h2>
+<p>This is used to confugure packages. Changes in one of the packages that meets
+the condition of the trigger, will cause a rebuild.</p>
+<p>The variable in PKGBUILD is: <strong>_mkpkg_depends</strong></p>
+<p>This holds an arry of package based triggers. Each trigger in the list can take one of 2 forms:</p>
+<ul>
+<li><p><strong>package_name</strong></p>
+<p>This item is the name of a package.
+Rebuild is triggered if the install time of this package is newer than the
+the last build time.</p>
+</li>
+<li><p><strong>package_name compare-op vers_trigger</strong></p>
+<p>This is a semantic version trigger. Versions are
+of the form ‘major.minor.patch’ or more generally ‘elem1.elem2.elem3….’
+White space around the comparison operator is optional.
+Rebuild is triggered when the version of <em>package_name</em> satisfies the rule.</p>
+<p>e.g. ‘python &gt; minor’ causes a rebuild when the minor version is larger than
+the minor version used in previous build.</p>
+</li>
+</ul>
+<p>Where:</p>
+<ul>
+<li><p><em>compare-op</em></p>
+<p>is one of : <strong>&gt;</strong>, <strong>&gt;=</strong> or <strong>&lt;</strong></p>
+</li>
+<li><p><em>vers_trigger</em></p>
+<p>Based on comparing the first [N] elems of the version or the entire version.</p>
+<ul class="simple">
+<li><p>First_[N] : rebuild if first [N] elems of package version greater than when last built</p></li>
+<li><p>major     : alias for First_1 (rebuild if major &gt; last_build)</p></li>
+<li><p>minor     : alias for First_2 (rebuild if major.minor &gt; last_build)</p></li>
+<li><p>patch     : alias for First_3 (if major.minor.patch &gt; last_build). Also called <em>micro</em></p></li>
+<li><p>extra     : alias for First_4 (major.minor.patch.extra)  Also called <em>releaselevel</em></p></li>
+<li><p>serial    : alias for First_5 (major.minor.patch.extra.serial)</p></li>
+<li><p>last      : rebuild if package version &gt; last_build version.</p></li>
+</ul>
+</li>
+</ul>
+<p><em>last</em> is very similar to a time based trigger but based on version instead of time.</p>
+<p>For example, the expression</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'pkg_name&gt;First_2'
+</pre></div>
+</div>
+<p>or equivalently:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'pkg_name&gt;minor'
+</pre></div>
+</div>
+<p>Say the current package version is 1.2.3,  and the version when last built was 1.2.0 then
+the versions being compared would be</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'1.2' &gt; '1.2' which is false.
+</pre></div>
+</div>
+<p>Whereas if the expression was:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'pkg_name&gt;First_3'
+</pre></div>
+</div>
+<p>then the comparison would be</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>'1.2.3' &gt; '1.2.0'
+</pre></div>
+</div>
+<p>which is true</p>
+<p>N.B. The package must be built at least once using mkpkg so it can save the various package
+versions used. So if a version trigger is added,  then this triggers a rebuild as it treats this
+as if the dependent package version is greater than last used (which is not known at this point).
+On subsequent builds the last built version of each dependent package is then known.</p>
+<p>Unlike the standard <em>makedepends</em> variable, this allows one to not include things
+that are required to build the package but don’t have any affect on the tool function.
+For example ‘git’ - which while required to build will not generally change the tool.</p>
+<p>Another example, if python was version 3.13 when the package was last built and we have::</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_mkpkg_depends=('python&gt;minor' 'python-dnspython')
+</pre></div>
+</div>
+<p>Then a rebuild will be done if python is greater than or equal to 3.13.x or if
+python-dnspython was installed more recently than the last build. This will not trigger
+a rebuild if python is updated from 3.13.7 to 3.13.8,  since this is a patch update
+not a minor or major update.</p>
+<p>Why support ‘&lt;’ you may ask.  The only sensible use for less than operator would be to
+provide a mechanism to trigger a rebuild when a package gets downgraded. This would be
+accomplished using</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pkg_name &lt; last
+</pre></div>
+</div>
+</section>
+<section id="mkpkg-depends-files">
+<h2><span class="section-number">2.2. </span>_mkpkg_depends_files<a class="headerlink" href="#mkpkg-depends-files" title="Link to this heading"></a></h2>
+<p>The variable <strong>_mkpkg_depends_files</strong>  is used to track changes in files.
+Filenames are relative to the directory containing PKGBUILD.</p>
+<p>This might be useful, for example, if the source for some daemon doesn’t provide a
+systemd service file, and the packager adds one. If that file is in <em>_mkpkg_depends_files</em>,
+then changes to the file trigger rebuilds.</p>
+<p>These variables offer considerable control over what can be used to trigger rebuilds.</p>
+<p>For example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_mkpkg_depends_file=('xxx.service')
+</pre></div>
+</div>
+<p>This directs a rebuild when the file <em>xxx.service</em> changes.</p>
+</section>
+<section id="variable-dep-vers-prog">
+<h2><span class="section-number">2.3. </span>Variable _dep_vers_prog<a class="headerlink" href="#variable-dep-vers-prog" title="Link to this heading"></a></h2>
+<p>In cases where a dependent package being used to build against is not yet installed,
+then it’s version cannot be extracted by calling <em>pacman -Qi</em>. Instead, a script
+can be provided in PKGBUILD which returns the version of the package name provided
+as an argument.</p>
+<p>For example if we have the following dependencies where <em>foo</em> and <em>goo</em> are used but
+not yet installed on the build machine (at least not the version being built against):</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>_mkpkg_depends=('python&gt;minor', 'openssl&gt;3.0', 'foo', 'goo')
+
+declare -A _dep_vers_prog
+_dep_vers_prog['foo']='./dep-vers'
+_dep_vers_prog['goo']='./dep-vers'
+</pre></div>
+</div>
+<p>where the script <em>./dep-vers</em> returns the version of it’s one argument - where
+arguments can be <em>foo</em> or <em>goo</em>.</p>
+<p>One example is pigeonhole and dovecot. This are in separate git repos and built
+as separate packages. pigeonhole is built against the just compiled version
+of dovecot. In this case a script which extracts <em>pkgver</em> from the .PKGINFG file
+either in the dovecot <em>pkg</em> directory, or by extracting it from the just built
+package does the trick.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="README.html" class="btn btn-neutral float-left" title="1. mkpkg" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Appendix.html" class="btn btn-neutral float-right" title="3. Appendix" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -6,14 +6,20 @@ Tags
 
 .. code-block:: text
 
-	1.0.0 (2022-09-03) -> 8.1.0 (2026-09-10)
-	190 commits.
+	1.0.0 (2022-09-03) -> HEAD (2026-10-09)
+	191 commits.
 
 Commits
 =======
 
 
-* 2026-09-10  : **8.1.0**
+* 2026-10-09  : **HEAD**
+
+.. code-block:: text
+
+              - 8.1.1 Documentation available on `readthedocs <https://mkpkg.readthedocs.io>`
+
+* 2026-09-10  : **8.1.0, origin/master**
 
 .. code-block:: text
 

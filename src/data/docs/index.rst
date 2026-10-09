@@ -10,6 +10,7 @@ Cidrtools CFFI Documentation
    :caption: mkpkg Manual:
 
    README
+   Triggers
    Appendix
 
 .. only:: html

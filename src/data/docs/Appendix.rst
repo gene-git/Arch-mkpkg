@@ -4,6 +4,57 @@
 Appendix
 ========
 
+.. _metadata:
+
+Metadata Files
+==============
+
+mkpkg keeps metadata information in files. These files are in the same directory as the PKGBUILD file:
+
+* **.build-info**:         last version built
+* **.build_time**:         time and status of last build
+* **.mkpkg_dep_soname**:   list of all shared libraries and sonames
+* **.mkpkg_dep_vers**:     list of triggger pacakges and versions last built against
+
+How mkpkg works
+===============
+
+Outline of what it does
+
+* If PKGBUILD has a pkgver() function, check if the pkgver variable matches its output
+
+* If the 2 pkgver match or if there is no pkgver() function then check if a matching package exists
+
+* If package not up to date, then run makepkg build.
+
+* If package seems otherwise up to date, then check if any of the conditions given by
+  *mkpkg_depends* or *mkpkg_depends_files* triggers a build.  If a build is called for,
+  then bump the pkgrel and rebuild.
+
+* If the package is out of date, as there is newer version then reset pkgrel back to "1" and build.
+
+So, if a package builds and gets larger package release number, it was because of some trigger package
+dependency; absent manual modification.  If package release is "1" - then you know its a fresh package version.
+
+I use separate tool to run all my package builds so I prefer the output to be easily parseable and provide
+simple and clear information to feed the builder too.
+
+mkpkg thus prints a line of the form::
+
+    *mkp-status: <status> <package-version>*
+
+Where status is one of :
+
+ * **current** -> package is up to date
+ * **success** -> package was built successfully
+ * **error**   -> problem occurred.
+
+Obviously, package-version is what is sounds like.
+
+It is possible for mkpkg itself to fail for some reason, in which case the *mkp-status:* line could be absent.
+This is also simple to detect programatically.
+
+
 Installation
 ============
 
@@ -105,26 +156,4 @@ Version 4.0.0
 
    Attempts to update saved metadata files. Faster, if imperfect, alternative to rebuild.
    
-
-Older
------
-
-Adds support for epoch.
-
-Version 2.x.y brings fine grain control by allowing package dependences to trigger 
-builds using semantic version. For example 'python>minor' will rebuild only if a new
-python package has it's major.minor greater than what it was when package was last built.
-See *_mkpkg_depends* below for more detail. 
-
-The source has been reorganized and packaged using poetry which simplifies installation.
-The installer script, callable from package() function in PKGBUILD has been updated 
-accordingly. Ther build() function uses python build module to generate the
-wheel package, as outlined above.
-
-Changed the PKGBUILD variables to have underscore prefix to follow Arch Package Guidelines.
-Variables are now: *_mkpkg_depends* and *_mkpkg_depends_files*. 
-The code is backward compatible and supports the previous variable names without the 
-leading "\_" as well as the ones with the "\_".
-
-Now also available on aur.
 

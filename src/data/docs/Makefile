@@ -9,7 +9,7 @@ SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = _build
 
-SOURCES = conf.py ../../version.txt index.rst README.rst Appendix.rst Makefile
+SOURCES = conf.py ../../version.txt index.rst README.rst Triggers.rst Appendix.rst Makefile
 
 .PHONY: help clean html latexpdf
 
@@ -23,8 +23,8 @@ help:
 
 $(BUILDDIR)/html/index.html: $(SOURCES)
 	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" $(SPHINXOPTS) $(O)
-	@$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html" $(SPHINXOPTS) $(O)
 	@rsync -a $(HTML_EXCL) _build/html .
+	@touch  _build/html/index.html
 	@echo "HTML doc build complete. Path: $@"
 
 $(PKG).pdf: $(SOURCES)
@@ -33,6 +33,7 @@ $(PKG).pdf: $(SOURCES)
 	$(MAKE) -C "$(BUILDDIR)/latex" all-pdf LATEXOPTS="-interaction=nonstopmode" PDFLATEX=xelatex
 	$(MAKE) -C "$(BUILDDIR)/latex" all-pdf LATEXOPTS="-interaction=nonstopmode" PDFLATEX=xelatex
 	@rsync -av _build/latex/$(PKG).pdf .
+	@touch $(PKG).pdf
 	@echo "PDF doc build complete. Path: $@"
 
 clean:

@@ -1,11 +1,14 @@
 -------------------------------------------------------
  Changelog    : Arch-mkpkg
- Tags         : 7.8.0 ➙ 8.1.0
-              : 2025-11-13 ➙ 2026-09-10
+ Tags         : 7.8.0 ➙ HEAD
+              : 2025-11-13 ➙ 2026-10-09
               : 6 tags. See Docs for full changelog
 -------------------------------------------------------
 
- 2026-09-10   : 8.1.0
+ 2026-10-09   : HEAD
+              - 8.1.1 Documentation available on `readthedocs <https://mkpkg.readthedocs.io>`
+
+ 2026-09-10   : 8.1.0, origin/master
               - **8.1.0**
             
                 * Use meson / meson-python for build and package management
