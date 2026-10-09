@@ -64,7 +64,7 @@ Documentation
 -------------
 
 The manual, in both HTML and PDF formats, is installed under */usr/share/mkpkg/docs*.
-and also available at: `readthedocs <https://mkpkg.readthedocs.io>`_.
+and also available at: `readthedocs <https://arch-mkpkg.readthedocs.io>`_.
 
 Signed Source
 -------------

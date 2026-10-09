@@ -1,6 +1,6 @@
 Recent Changes
 ==============
 
-**8.1.1**
+**8.1.2**
     
-* Documentation available on `readthedocs <https://mkpkg.readthedocs.io>`_.
+* Documentation available on `readthedocs <https://arch-mkpkg.readthedocs.io>`_.

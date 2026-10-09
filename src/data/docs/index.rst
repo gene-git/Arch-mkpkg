@@ -1,8 +1,7 @@
-.. cidrtools docs
 
-============================
-Cidrtools CFFI Documentation
-============================
+===================
+mkpkg Documentation
+===================
 
 .. toctree::
    :maxdepth: 2
